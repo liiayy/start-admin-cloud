@@ -84,12 +84,41 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
         <!-- 公共模块 -->
-<!--        <dependency>-->
-<!--            <groupId>com.company</groupId>-->
-<!--            <artifactId>common-core</artifactId>-->
-<!--            <version>1.0.0</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-core</artifactId>
+        </dependency>
     </dependencies>
+
+
+    <build>
+        <plugins>
+            <!--maven-jar-plugin 先执行：生成普通的 my-app.jar（只包含你的代码）-->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--创建新的可执行 my-app.jar（包含所有依赖）-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

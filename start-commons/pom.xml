@@ -9,8 +9,13 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>start-common</artifactId>
+    <artifactId>start-commons</artifactId>
+    <packaging>pom</packaging>
     <description>common 通用模块</description>
+
+    <modules>
+        <module>start-common-core</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

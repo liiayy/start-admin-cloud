@@ -1,9 +1,10 @@
-package cn.muziseo.gateway.banner;
+package cn.muziseo.gateway.utils;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +20,7 @@ import java.time.format.DateTimeFormatter;
  */
 @Component
 @Profile("dev")  // 只在开发环境显示
-@Order(Integer.MAX_VALUE)  // 最后执行
+@Order(Ordered.LOWEST_PRECEDENCE)  // 最后执行
 public class StartupBanner implements ApplicationListener<ApplicationReadyEvent> {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

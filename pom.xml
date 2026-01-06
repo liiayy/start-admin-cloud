@@ -11,8 +11,10 @@
     <description>StartAdmin 管理系统</description>
 
     <modules>
-        <module>start-common</module>
+        <module>start-dependencies</module>
+        <module>start-commons</module>
         <module>start-infrastructure</module>
+        <module>start-services</module>
     </modules>
 
     <properties>
@@ -23,8 +25,6 @@
         <spring-boot.version>3.4.13</spring-boot.version>
         <lombok.version>1.18.40</lombok.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
-        <spring-cloud.version>2024.0.3</spring-cloud.version>
-        <spring-cloud-alibaba.version>2025.0.0.0</spring-cloud-alibaba.version>
 
 
         <!-- 插件版本 -->
@@ -38,38 +38,14 @@
 
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
 
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba.cloud</groupId>
-                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>${spring-cloud-alibaba.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-        </dependencies>
-
-    </dependencyManagement>
 
     <repositories>
+        <repository>
+            <id>ai-cloud-repository</id>
+            <name>ai-cloud</name>
+            <url>http://192.168.100.20:8081/repository/maven-public/</url>
+        </repository>
         <repository>
             <id>huaweicloud</id>
             <name>huawei</name>
@@ -98,6 +74,18 @@
             </releases>
         </repository>
     </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>cn.muziseo</groupId>
+                <artifactId>start-dependencies</artifactId>
+                <version>${revision}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 
 

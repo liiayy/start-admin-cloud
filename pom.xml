@@ -1,0 +1,269 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cn.muziseo</groupId>
+    <artifactId>start-admin-cloud</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+
+    <name>start-admin-cloud</name>
+    <description>StartAdmin 管理系统</description>
+
+    <modules>
+        <module>start-common</module>
+        <module>start-infrastructure</module>
+    </modules>
+
+    <properties>
+        <revision>1.0.0</revision>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>21</java.version>
+        <spring-boot.version>3.4.13</spring-boot.version>
+        <lombok.version>1.18.40</lombok.version>
+        <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
+        <spring-cloud.version>2024.0.3</spring-cloud.version>
+        <spring-cloud-alibaba.version>2025.0.0.0</spring-cloud-alibaba.version>
+
+
+        <!-- 插件版本 -->
+        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+        <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
+        <flatten-maven-plugin.version>1.3.0</flatten-maven-plugin.version>
+        <!-- 打包默认跳过测试 -->
+        <skipTests>true</skipTests>
+
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>huaweicloud</id>
+            <name>huawei</name>
+            <url>https://mirrors.huaweicloud.com/repository/maven/</url>
+        </repository>
+        <repository>
+            <id>aliyunmaven</id>
+            <name>aliyun</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
+
+
+
+    <!--Maven 的 构建环境（Profiles），这是 Maven 用来管理不同环境（如开发、测试、生产）配置的核心机制。它允许你根据当前激活的环境，动态地改变构建行为或注入不同的属性值。-->
+    <profiles>
+        <!--开发环境-->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profiles.active>dev</profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <!--测试环境-->
+        <profile>
+            <id>test</id>
+            <properties>
+                <profiles.active>test</profiles.active>
+            </properties>
+        </profile>
+        <!--预发布环境-->
+        <profile>
+            <id>pre</id>
+            <properties>
+                <profiles.active>pre</profiles.active>
+            </properties>
+        </profile>
+        <!--生产环境-->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <!--这是最重要的插件，负责将你的 .java源代码编译成 .class字节码文件。-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version> <!-- 版本号在properties中定义 -->
+                <configuration>
+                    <!-- 指定源代码使用的Java版本 -->
+                    <source>${java.version}</source>
+                    <!-- 指定生成的字节码目标运行的JVM版本 -->
+                    <target>${java.version}</target>
+                    <!-- 指定源代码文件的字符编码，通常是UTF-8 -->
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <!-- 【重点】注解处理器路径：配置Lombok、MapStruct等代码生成工具 -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId> <!-- 自动生成Getter/Setter/Constructor等 -->
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor
+                            </artifactId> <!-- 处理@ConfigurationProperties注解，为IDE提供提示 -->
+                            <version>${spring-boot.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId> <!-- 让Lombok和MapStruct协同工作 -->
+                            <version>${mapstruct-plus.lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <!-- 编译器参数：保留方法参数名信息，这对Spring MVC等框架非常重要 -->
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <!--这个插件用于清理和标准化 pom.xml，特别是在持续集成/交付（CI/CD）场景中非常有用。-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven-plugin.version}</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <!-- 清理模式：只解析CI相关的动态变量（如${revision}），生成一个干净的pom -->
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <!-- 在"process-resources"阶段执行，生成扁平化的pom -->
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <!-- 在"clean"阶段执行，清理掉生成的扁平化pom -->
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--这个插件用于在 mvn test阶段执行单元测试-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <!-- 设置JVM参数，确保测试运行时文件编码为UTF-8 -->
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+
+                    <!-- 【重要】根据激活的Maven环境（如dev, test, prod）来运行对应的测试 -->
+                    <groups>${profiles.active}</groups>
+                    <!-- 排除掉被标记为@Tag("exclude")的测试类或方法 -->
+                    <excludedGroups>exclude</excludedGroups>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <finalName>${project.name}-${profiles.active}-${project.version}</finalName>
+        <!--这部分定义了如何处理 src/main/resources目录下的非代码文件（如配置文件、图片等）。-->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- 引入所有 匹配文件进行过滤 -->
+                <includes>
+                    <include>banner*</include>
+                </includes>
+                <!-- 启用过滤 即该资源中的变量将会被过滤器中的值替换 -->
+                <filtering>true</filtering>
+            </resource>
+            <!-- 复制 src/main/resources根目录下的所有文件，但排除各个环境特定的配置目录-->
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>dev/*</exclude>
+                    <exclude>test/*</exclude>
+                    <exclude>pre/*</exclude>
+                    <exclude>prod/*</exclude>
+                </excludes>
+            </resource>
+            <!-- 从当前激活环境对应的目录（如 src/main/resources/dev）中，只复制 YAML 文件到最终包的根目录，并开启变量替换 -->
+            <resource>
+                <directory>src/main/resources/${profiles.active}</directory>
+                <filtering>true</filtering> <!-- 开启变量替换 YAML 文件中的 Maven 属性占位符（如 @project.version@）会被替换为实际值。-->
+                <includes>
+                    <include>*.yaml</include>
+                </includes>
+            </resource>
+            <!--复制当前环境目录下的所有非YAML文件到最终包的根目录-->
+            <resource>
+                <directory>src/main/resources/${profiles.active}</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>*.*</include>
+                </includes>
+            </resource>
+        </resources>
+
+    </build>
+
+
+</project>

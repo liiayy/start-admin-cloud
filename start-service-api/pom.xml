@@ -9,13 +9,10 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>start-commons</artifactId>
+    <artifactId>start-service-api</artifactId>
     <packaging>pom</packaging>
-    <description>common 通用模块</description>
-
     <modules>
-        <module>start-common-core</module>
-        <module>start-common-web</module>
+        <module>start-service-system-api</module>
     </modules>
 
     <properties>

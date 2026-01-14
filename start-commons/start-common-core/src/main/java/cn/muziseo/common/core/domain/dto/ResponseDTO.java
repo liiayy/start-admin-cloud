@@ -131,4 +131,21 @@ public class ResponseDTO<T> implements Serializable {
     public <R> ResponseDTO<R> convert(R newData) {
         return of(this.code, this.msg, newData);
     }
+
+
+    // 链式调用方法
+    public ResponseDTO<T> setCode(Integer code) {
+        this.code = code;
+        return this;
+    }
+
+    public ResponseDTO<T> setMsg(String msg) {
+        this.msg = msg;
+        return this;
+    }
+
+    public ResponseDTO<T> setData(T data) {
+        this.data = data;
+        return this;
+    }
 }

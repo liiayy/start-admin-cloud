@@ -5,46 +5,28 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.muziseo</groupId>
-        <artifactId>start-commons</artifactId>
+        <artifactId>start-service-api</artifactId>
         <version>${revision}</version>
     </parent>
 
-    <artifactId>start-common-core</artifactId>
-    <packaging>jar</packaging>
-
-
-    <name>${project.artifactId}</name>
-    <description>核心工具类：Jackson、Date、常量、统一异常</description>
+    <artifactId>start-service-system-api</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-core</artifactId>
         </dependency>
-
+        <!-- RPC 远程调用相关 -->
         <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <optional>true</optional>
         </dependency>
-
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-
-
-
-
     </dependencies>
-
 
 </project>

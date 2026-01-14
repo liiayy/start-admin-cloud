@@ -12,7 +12,7 @@
     <artifactId>start-infrastructure</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>start-gateway</module>
+
     </modules>
 
     <properties>

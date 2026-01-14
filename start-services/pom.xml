@@ -12,7 +12,7 @@
     <artifactId>start-services</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>start-system</module>
+        <module>start-system-service</module>
     </modules>
 
     <properties>

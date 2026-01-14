@@ -18,12 +18,12 @@
 
     <properties>
         <revision>1.0.0</revision>
-        <spring-boot.version>3.4.13</spring-boot.version>
+        <spring-boot.version>3.5.9</spring-boot.version>
         <lombok.version>1.18.40</lombok.version>
-        <spring-cloud.version>2024.0.3</spring-cloud.version>
+        <spring-cloud.version>2025.0.1</spring-cloud.version>
         <spring-cloud-alibaba.version>2025.0.0.0</spring-cloud-alibaba.version>
         <hutool.version>5.8.43</hutool.version>
-        <springdoc.version>3.0.1</springdoc.version>
+        <springdoc.version>2.8.15</springdoc.version>
 
 
     </properties>
@@ -68,10 +68,24 @@
             </dependency>
 
             <dependency>
+                <groupId>cn.muziseo</groupId>
+                <artifactId>start-common-web</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+
 
         </dependencies>
 

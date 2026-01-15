@@ -21,6 +21,13 @@ spring:
                 - Path=/api/system/**
               filters:
                 - StripPrefix=2  # 去掉前两级路径 /api/system/ 文档:https://spring-doc.muziseo.cn/spring-cloud/gateway/filters/strip-prefix.html
+            - id: demo-admin-api
+              uri: lb://demo-service
+              predicates:
+                - Path=/api/demo/**
+              filters:
+                - StripPrefix=2
+
 
 logging:
   level:

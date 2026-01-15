@@ -12,11 +12,11 @@ package cn.muziseo.common.core.constant;
  *   <li>5xx - 服务器错误 (500-599)</li>
  * </ul>
  *
- * @Author 木子SEO
+ * @Author 木子软件
  * @Date 2025/11/7周五 09:15:30
  * @Wechat liiayy
  * @Email 773582348@qq.com
- * @Copyright <a href="https://1024lab.net">木子SEO</a>
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 public final class HttpStatus {
 

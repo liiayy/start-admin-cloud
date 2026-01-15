@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 /**
  * Gateway 的全局异常处理器，将 Exception 翻译成 ResponseDTO + 对应的异常编号
  *
- * @author 木子SEO
+ * @author 木子软件
  * @Date 2026-01-14
  */
 @Component

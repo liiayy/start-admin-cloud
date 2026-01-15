@@ -12,7 +12,8 @@
     <artifactId>start-services</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>start-system-service</module>
+        <module>start-service-system</module>
+        <module>start-service-demo</module>
     </modules>
 
     <properties>

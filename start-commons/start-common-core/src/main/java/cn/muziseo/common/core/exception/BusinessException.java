@@ -11,11 +11,11 @@ import java.io.Serial;
  * <p>
  * 用于业务处理过程中抛出的预期异常
  *
- * @Author 木子SEO
+ * @Author 木子软件
  * @Date 2025/11/6周四 18:16:34
  * @Wechat liiayy
  * @Email 773582348@qq.com
- * @Copyright <a href="https://1024lab.net">木子SEO</a>
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

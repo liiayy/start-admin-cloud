@@ -16,6 +16,7 @@
     <modules>
         <module>start-common-core</module>
         <module>start-common-web</module>
+        <module>start-common-db</module>
     </modules>
 
     <properties>

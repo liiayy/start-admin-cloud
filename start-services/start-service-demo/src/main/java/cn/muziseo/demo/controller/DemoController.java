@@ -17,9 +17,10 @@ public class DemoController {
     DemoApi demoApi;
 
     @GetMapping("/test")
+
     public String test(HttpServletRequest request, HttpServletResponse response) {
         String demo = demoApi.demo();
         System.out.println(demo);
-        return "Hello word";
+        return Thread.currentThread().toString();
     }
 }

@@ -50,6 +50,26 @@
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-seata</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-mq</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-db</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-sentinel</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

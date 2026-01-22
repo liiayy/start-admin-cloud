@@ -1,4 +1,4 @@
-package cn.muziseo.gateway.config.filter;
+package cn.muziseo.gateway.config.cors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

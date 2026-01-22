@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: demo2-service
+  profiles:
+    active: @profiles.active@  # 使用Maven过滤 激活对应环境的配置
+  config:
+    import:
+      - optional:application-${spring.profiles.active}.yaml
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml # 加载【Nacos】的配置
+  threads:
+    virtual:
+      enabled: true
+  main:
+    allow-circular-references: true # 允许循环依赖
+
+server:
+  port: 58092
+
+

@@ -1,6 +1,6 @@
 package cn.muziseo.system.module.demo.repository.entity;
 
-import cn.muziseo.common.db.base.BaseDO;
+import cn.muziseo.common.db.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DemoEntity extends BaseDO {
+public class DemoEntity extends BaseEntity {
 
     @TableId
     private Long id;

@@ -28,6 +28,9 @@
         <p6spy.version>3.9.1</p6spy.version>
         <mysql-connector-j.version>9.3.0</mysql-connector-j.version>
         <druid.version>1.2.25</druid.version>
+        <snail-job.version>1.9.0</snail-job.version>
+        <redisson.version>3.23.1</redisson.version>
+        <seata.version>2.5.0</seata.version>
 
 
     </properties>
@@ -92,6 +95,30 @@
             </dependency>
 
             <dependency>
+                <groupId>cn.muziseo</groupId>
+                <artifactId>start-common-job</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.muziseo</groupId>
+                <artifactId>start-common-seata</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.muziseo</groupId>
+                <artifactId>start-common-mq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.muziseo</groupId>
+                <artifactId>start-common-sentinel</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
                 <version>${springdoc.version}</version>
@@ -120,6 +147,39 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-3-starter</artifactId>
                 <version>${druid.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.aizuda</groupId>
+                <artifactId>snail-job-client-starter</artifactId>
+                <version>${snail-job.version}</version>
+            </dependency>
+
+            <!-- snail-job 重试相关依赖 -->
+            <dependency>
+                <groupId>com.aizuda</groupId>
+                <artifactId>snail-job-client-retry-core</artifactId>
+                <version>${snail-job.version}</version>
+            </dependency>
+
+            <!-- snail-job 客户端核心依赖 -->
+            <dependency>
+                <groupId>com.aizuda</groupId>
+                <artifactId>snail-job-client-job-core</artifactId>
+                <version>${snail-job.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.seata</groupId>
+                <artifactId>seata-spring-boot-starter</artifactId>
+                <version>${seata.version}</version>
             </dependency>
 
 

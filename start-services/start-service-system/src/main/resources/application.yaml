@@ -7,6 +7,9 @@ spring:
     import:
       - optional:application-${spring.profiles.active}.yaml
       - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml # 加载【Nacos】的配置
+  threads:
+    virtual:
+      enabled: true
   main:
     allow-circular-references: true # 允许循环依赖
 
@@ -14,6 +17,18 @@ server:
   port: 58081
 
 
+
+feign:
+  client:
+    config:
+      default: # default全局的配置
+        loggerLevel: BASIC # 日志级别，BASIC就是基本的请求和响应信息
+  httpclient:
+    enabled: true # 开启feign对HttpClient的支持
+    max-connections: 200 # 最大的连接数
+    max-connections-per-route: 50 # 每个路径的最大连接数
+
+
 start:
   info:
-    base-package: cn.muziseo
+    entity-package: cn.muziseo

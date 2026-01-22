@@ -17,6 +17,11 @@
         <module>start-common-core</module>
         <module>start-common-web</module>
         <module>start-common-db</module>
+        <module>start-common-job</module>
+        <module>start-common-seata</module>
+        <module>start-common-mq</module>
+        <module>start-common-redis</module>
+        <module>start-common-sentinel</module>
     </modules>
 
     <properties>

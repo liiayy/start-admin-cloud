@@ -1,4 +1,4 @@
-package cn.muziseo.common.db.base;
+package cn.muziseo.common.db.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  * @Date 2026-01-15
  */
 @Data
-public class BaseDO implements Serializable {
+public class BaseEntity implements Serializable {
     
     @Serial
     private static final long serialVersionUID = 1L;

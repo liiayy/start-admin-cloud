@@ -7,8 +7,16 @@ spring:
     import:
       - optional:application-${spring.profiles.active}.yaml
       - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml # 加载【Nacos】的配置
+  threads:
+    virtual:
+      enabled: true
   main:
     allow-circular-references: true # 允许循环依赖
 
 server:
   port: 58082
+
+start:
+  info:
+    entity-package: cn.muziseo
+

@@ -1,4 +1,5 @@
-package cn.muziseo.system.utils;
+package cn.muziseo.common.web.banner;
+
 
 import io.micrometer.common.lang.NonNull;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -56,21 +57,6 @@ public class StartupBanner implements ApplicationListener<ApplicationReadyEvent>
 
         // 启动信息
         System.out.printf("⏱️  启动耗时: %.2f 秒\n", startupTime / 1000.0);
-
-        // 文档链接
-        System.out.println("\n📚 相关文档：");
-        System.out.println("   接口文档 → https://cloud.iocoder.cn/api-doc/");
-
-
-        // 内存信息
-        Runtime runtime = Runtime.getRuntime();
-        long usedMB = (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024;
-        long maxMB = runtime.maxMemory() / 1024 / 1024;
-
-        System.out.println("\n💾 系统资源：");
-        System.out.printf("   内存: %dMB / %dMB\n", usedMB, maxMB);
-        System.out.printf("   处理器: %d 核心\n", runtime.availableProcessors());
-        System.out.printf("   JDK版本: %s\n", System.getProperty("java.version"));
 
         System.out.println(border);
         System.out.println("🚀 服务已就绪，祝您使用愉快！");

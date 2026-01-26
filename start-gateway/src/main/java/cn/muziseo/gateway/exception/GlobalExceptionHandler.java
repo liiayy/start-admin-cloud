@@ -1,15 +1,19 @@
 package cn.muziseo.gateway.exception;
 
+import cn.hutool.core.util.StrUtil;
 import cn.muziseo.common.core.constant.HttpStatus;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.alibaba.csp.sentinel.slots.block.degrade.DegradeException;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowException;
+import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -19,102 +23,79 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-/**
- * Gateway 的全局异常处理器，将 Exception 翻译成 ResponseDTO + 对应的异常编号
- *
- * @author 木子软件
- * @Date 2026-01-14
- */
 @Component
-@Order(-1) // 保证优先级高于默认的 Spring Cloud Gateway 的 ErrorWebExceptionHandler 实现
+@Order(-1)
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, @NonNull Throwable ex) {
-        //获取响应对象
         ServerHttpResponse response = exchange.getResponse();
-        //response是否结束  用于多个异常处理时候
         if (response.isCommitted()) {
             return Mono.error(ex);
         }
 
-        // 转换成 ResponseDTO
         ResponseDTO<?> result;
-        if (ex instanceof ResponseStatusException) {
-            result = responseStatusExceptionHandler(exchange, (ResponseStatusException) ex);
-        } else {
-            result = defaultExceptionHandler(exchange, ex);
+
+        // 1. 处理 Sentinel 限流/降级异常
+        if (BlockException.isBlockException(ex)) {
+            result = handleBlockException(ex);
+        }
+        // 2. 处理 Spring 标准响应异常 (如 404, 405)
+        else if (ex instanceof ResponseStatusException rse) {
+            result = ResponseDTO.fail(rse.getStatusCode().value(),
+                    StrUtil.blankToDefault(rse.getReason(), "网关请求失败"));
+        }
+        // 3. 兜底处理系统异常
+        else {
+            result = handleInternalException(exchange, ex);
         }
 
-        // 返回给前端
         return writeJSON(exchange, result);
     }
 
     /**
-     * 处理 Spring Cloud Gateway 默认抛出的 ResponseStatusException 异常
-     *
-     * @param exchange ServerWebExchange
-     * @param ex       ResponseStatusException
-     * @return ResponseDTO
+     * 处理 Sentinel 异常，翻译为业务文案
      */
-    private ResponseDTO<?> responseStatusExceptionHandler(ServerWebExchange exchange,
-                                                         ResponseStatusException ex) {
-        ServerHttpRequest request = exchange.getRequest();
-        log.error("[responseStatusExceptionHandler][uri({}/{}) 发生异常]", request.getURI(), request.getMethod(), ex);
-        // 转换为用户友好的错误信息
-        String message = ex.getReason();
-        if (message == null || message.isEmpty()) {
-            message = "请求处理失败";
+    private ResponseDTO<?> handleBlockException(Throwable ex) {
+        if (ex instanceof FlowException) {
+            return ResponseDTO.fail(HttpStatus.TOO_MANY_REQUESTS, "请求过于频繁，请稍后再试");
+        } else if (ex instanceof DegradeException) {
+            return ResponseDTO.fail(HttpStatus.TOO_MANY_REQUESTS, "服务已降级，请稍候重试");
+        } else if (ex instanceof ParamFlowException) {
+            return ResponseDTO.fail(HttpStatus.TOO_MANY_REQUESTS, "热点参数限流");
         }
-        return ResponseDTO.fail(ex.getStatusCode().value(), message);
+        return ResponseDTO.fail(HttpStatus.TOO_MANY_REQUESTS, "系统忙，请稍后再试");
     }
 
-    /**
-     * 处理系统异常，兜底处理所有的一切
-     *
-     * @param exchange ServerWebExchange
-     * @param ex       Throwable
-     * @return ResponseDTO
-     */
-    private ResponseDTO<?> defaultExceptionHandler(ServerWebExchange exchange,
-                                                  Throwable ex) {
+    private ResponseDTO<?> handleInternalException(ServerWebExchange exchange, Throwable ex) {
         ServerHttpRequest request = exchange.getRequest();
-        log.error("[defaultExceptionHandler][uri({}/{}) 发生异常]", request.getURI(), request.getMethod(), ex);
-        // 返回 ERROR ResponseDTO
-        return ResponseDTO.fail(HttpStatus.INTERNAL_SERVER_ERROR, "系统内部错误");
-    }
+        log.error("[网关系统异常] 路径: {}, 信息: ", request.getURI().getPath(), ex);
 
-
-    /**
-     * 将对象写入到响应中
-     *
-     * @param exchange 交换对象
-     * @param response 响应对象
-     * @return Mono<Void>
-     */
-    public static Mono<Void> writeJSON(ServerWebExchange exchange, ResponseDTO<?> response) {
-        // 设置响应头
-        exchange.getResponse().getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        exchange.getResponse().getHeaders().set(HttpHeaders.CACHE_CONTROL, "no-store, no-cache, must-revalidate, max-age=0");
-
-        // 序列化响应对象
-        byte[] bytes;
-        try {
-            bytes = OBJECT_MAPPER.writeValueAsBytes(response);
-        } catch (JsonProcessingException e) {
-            log.error("[writeJSON] 序列化响应对象失败", e);
-            // 序列化失败时，返回系统错误
-            return writeJSON(exchange, ResponseDTO.fail("系统内部错误"));
+        // 识别服务不可用的常见情况
+        String msg = ex.getMessage();
+        if (msg != null && msg.contains("Unable to find instance for")) {
+            return ResponseDTO.fail(HttpStatus.NOT_FOUND, "服务暂时不可用，请稍后再试");
         }
 
-        // 写入响应
-        DataBufferFactory bufferFactory = exchange.getResponse().bufferFactory();
-        DataBuffer buffer = bufferFactory.wrap(bytes);
-        return exchange.getResponse().writeWith(Mono.just(buffer));
+        return ResponseDTO.fail(HttpStatus.INTERNAL_SERVER_ERROR, "网关内部错误");
     }
 
+    private Mono<Void> writeJSON(ServerWebExchange exchange, ResponseDTO<?> responseDTO) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        response.setStatusCode(org.springframework.http.HttpStatus.OK);
 
+        return response.writeWith(Mono.fromSupplier(() -> {
+            DataBufferFactory bufferFactory = response.bufferFactory();
+            try {
+                return bufferFactory.wrap(objectMapper.writeValueAsBytes(responseDTO));
+            } catch (JsonProcessingException e) {
+                return bufferFactory.wrap("{\"code\":500,\"msg\":\"Internal Server Error\"}".getBytes());
+            }
+        }));
+    }
 }

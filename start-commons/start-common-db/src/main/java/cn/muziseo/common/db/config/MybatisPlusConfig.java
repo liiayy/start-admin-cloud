@@ -14,16 +14,16 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * MyBatis Plus 配置
- * 
+ *
  * @Author 木子软件
  * @Date 2026-01-15
  */
 @EnableTransactionManagement
 @AutoConfiguration(before = MybatisPlusAutoConfiguration.class)
 @MapperScan(value = "${start.info.entity-package}", annotationClass = Mapper.class)
-@PropertySource(value = "classpath:common-mybatis.yml", factory = YmlPropertySourceFactory.class)
+@PropertySource(value = "classpath:common-db.yml", factory = YmlPropertySourceFactory.class)
 public class MybatisPlusConfig {
-    
+
     /**
      * 分页插件
      *

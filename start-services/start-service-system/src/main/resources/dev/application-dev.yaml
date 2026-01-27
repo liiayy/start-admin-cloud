@@ -27,54 +27,12 @@ spring:
     username: root  # 请确认你的 PG 用户名 (之前配置的是 wego_admin)
     password: root
     # --- 修改结束 ---
-
-    # Druid 配置
-    druid:
-      # 连接池配置
-      initial-size: 5
-      min-idle: 10
-      max-active: 20
-      max-wait: 60000
-
-      # 连接测试
-      # PG 推荐使用 SELECT 1 或 SELECT NOW()
-      validation-query: SELECT 1
-      test-while-idle: true
-      test-on-borrow: false
-      test-on-return: false
-
-      # 连接保持
-      time-between-eviction-runs-millis: 60000
-      min-evictable-idle-time-millis: 600000
-      max-evictable-idle-time-millis: 1800000
-
-      # PreparedStatement 缓存
-      pool-prepared-statements: true
-      max-pool-prepared-statement-per-connection-size: 20
-
-      web-stat-filter:
-        enabled: true
-
-      stat-view-servlet:
-        enabled: true
-        allow: # 设置白名单
-        url-pattern: /druid/*
-        login-username: # 控制台管理用户名
-        login-password: # 控制台管理密码
-
-      # 过滤器
-      filters: stat,wall,slf4j
-
-      filter:
-        stat:
-          enabled: true
-          log-slow-sql: true
-          slow-sql-millis: 1000
-        wall:
-          enabled: true
-          config:
-          # --- 删除了 delete-where-none-check (这是 MySQL 特有的，PG 不适用) ---
-          # PG 的 Wall 模块默认配置已足够安全
+  data:
+    redis:
+      host: 192.168.100.20
+      port: 6379
+      password: WeEvBhLapEHJMG4JFfFG
+      database: 0
 
 # 日志文件配置 (通常不需要变动)
 logging:

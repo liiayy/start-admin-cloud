@@ -111,6 +111,11 @@
                 <artifactId>start-common-mq</artifactId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <groupId>cn.muziseo</groupId>
+                <artifactId>start-common-cache</artifactId>
+                <version>${revision}</version>
+            </dependency>
 
             <dependency>
                 <groupId>cn.muziseo</groupId>

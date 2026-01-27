@@ -70,6 +70,13 @@
             <artifactId>start-common-sentinel</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-cache</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+
     </dependencies>
 
 </project>

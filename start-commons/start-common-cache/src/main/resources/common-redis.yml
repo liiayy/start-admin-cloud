@@ -1,0 +1,3 @@
+start:
+  cache:
+    scan-batch-size: 30

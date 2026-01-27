@@ -20,7 +20,7 @@
         <module>start-common-job</module>
         <module>start-common-seata</module>
         <module>start-common-mq</module>
-        <module>start-common-redis</module>
+        <module>start-common-cache</module>
         <module>start-common-sentinel</module>
     </modules>
 

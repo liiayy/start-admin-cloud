@@ -81,7 +81,7 @@ public class XssStringJsonDeserializer extends StringDeserializer {
             // otherwise, try conversion using toString()...
             return ob.toString();
         }
-        // 29-Jun-2020, tatu: New! "Scalar from Object" (mostly for XML)
+        // 29-Jun-2020, tatu: New! "Scalar request Object" (mostly for XML)
         if (t == JsonToken.START_OBJECT) {
             return ctxt.extractScalarFromObject(p, this, _valueClass);
         }

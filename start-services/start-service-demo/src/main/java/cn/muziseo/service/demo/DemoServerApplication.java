@@ -15,7 +15,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @Email 773582348@qq.com
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
-@SpringBootApplication(scanBasePackages = {"cn.muziseo.demo"})
+@SpringBootApplication(scanBasePackages = {"cn.muziseo.service.demo"})
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = "cn.muziseo")
 public class DemoServerApplication {

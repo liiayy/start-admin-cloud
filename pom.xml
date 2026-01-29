@@ -23,7 +23,7 @@
         <revision>1.0.0</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <spring-boot.version>3.4.13</spring-boot.version>
         <lombok.version>1.18.40</lombok.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
@@ -39,7 +39,6 @@
         <skipTests>true</skipTests>
 
     </properties>
-
 
 
     <repositories>
@@ -88,8 +87,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-
 
 
     <!--Maven 的 构建环境（Profiles），这是 Maven 用来管理不同环境（如开发、测试、生产）配置的核心机制。它允许你根据当前激活的环境，动态地改变构建行为或注入不同的属性值。-->

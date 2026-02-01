@@ -66,3 +66,14 @@ gateway:
         window: 60
         limit: 200
         enabled: true
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: system
+        url: /api/system/v3/api-docs
+      - name: demo
+        url: /api/demo/v3/api-docs

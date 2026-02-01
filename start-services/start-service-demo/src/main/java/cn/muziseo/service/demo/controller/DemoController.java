@@ -1,6 +1,8 @@
 package cn.muziseo.service.demo.controller;
 
 import cn.muziseo.service.system.module.demo.api.DemoApi;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/demo")
+@Tag(name = "Demo")
 public class DemoController {
 
 
@@ -17,7 +20,7 @@ public class DemoController {
     DemoApi demoApi;
 
     @GetMapping("/test")
-
+    @Operation(summary = "test")
     public String test(HttpServletRequest request, HttpServletResponse response) {
         String demo = demoApi.demo();
         System.out.println(demo);

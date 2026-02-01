@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * 字符串工具类
  *
- * @author Lion Li
+ * @author 木子软件
  */
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
 

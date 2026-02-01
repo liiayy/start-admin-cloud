@@ -2,7 +2,7 @@ package cn.muziseo.common.core.utils.servlet;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
-import cn.muziseo.common.core.utils.JsonUtils;
+import cn.muziseo.common.core.utils.json.JsonUtils;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,4 +1,4 @@
-package cn.muziseo.common.core.utils;
+package cn.muziseo.common.core.utils.json;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;

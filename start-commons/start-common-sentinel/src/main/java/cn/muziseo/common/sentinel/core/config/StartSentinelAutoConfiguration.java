@@ -3,7 +3,7 @@ package cn.muziseo.common.sentinel.core.config;
 
 import cn.muziseo.common.core.constant.HttpStatus;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
-import cn.muziseo.common.core.utils.JsonUtils;
+import cn.muziseo.common.core.utils.json.JsonUtils;
 import com.alibaba.csp.sentinel.adapter.spring.webmvc_v6x.callback.BlockExceptionHandler;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeException;

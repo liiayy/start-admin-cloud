@@ -1,6 +1,6 @@
 package cn.muziseo.common.core.factory;
 
-import cn.muziseo.common.core.utils.StringUtils;
+import cn.muziseo.common.core.utils.string.StringUtils;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertySource;

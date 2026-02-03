@@ -1,4 +1,4 @@
-package cn.muziseo.common.core.utils;
+package cn.muziseo.common.core.utils.string;
 
 
 import cn.hutool.core.collection.CollUtil;

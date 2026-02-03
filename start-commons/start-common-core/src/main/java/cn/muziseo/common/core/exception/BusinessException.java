@@ -1,4 +1,5 @@
 package cn.muziseo.common.core.exception;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,12 +29,12 @@ public class BusinessException extends RuntimeException {
     /**
      * 错误码
      */
-    private Integer code = ErrorCode.COMMON_ERROR_CODE.getCode();
+    private Integer code = 600;
 
     /**
      * 错误提示
      */
-    private String message = ErrorCode.COMMON_ERROR_CODE.getMessage();
+    private String message = "服务异常,请稍后再试";
 
     /**
      * 构造方法 - 仅包含错误信息
@@ -57,16 +58,6 @@ public class BusinessException extends RuntimeException {
         this.code = code;
     }
 
-    /**
-     * 构造方法 - 基于错误码枚举
-     *
-     * @param errorCode 错误码枚举
-     */
-    public BusinessException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.code = errorCode.getCode();
-        this.message = errorCode.getMessage();
-    }
 
     @Override
     public String getMessage() {

@@ -1,16 +1,16 @@
-# StartAdmin 代码规范文档
+# Start-Admin-Cloud 代码规范文档
 
 ## 1. 概述
 
-本文档定义了 StartAdmin 项目的代码规范，旨在确保团队开发的代码具有一致性、可读性和可维护性。所有团队成员在开发过程中必须严格遵守本规范。
+本文档定义了 Start-Admin-Cloud 项目的代码规范，旨在确保团队开发的代码具有一致性、可读性和可维护性。所有团队成员在开发过程中必须严格遵守本规范。
 
 ## 2. 命名规范
 
 ### 2.1 包命名
 
 - 包名使用域名倒置的方式，遵循小写字母规范
-- 格式：`cn.muziseo.模块名.子模块名...`
-- 示例：`cn.muziseo.admin.module.system.employee.controller`
+- 格式：`cn.muziseo.service.服务名.module.模块名...`
+- 示例：`cn.muziseo.service.system.module.auth.controller`
 
 ### 2.2 类命名
 
@@ -20,11 +20,11 @@
 - 实现类命名通常为接口名+`Impl`
 - 枚举类命名使用大驼峰，枚举值使用全大写加下划线
 - 示例：
-  - `EmployeeController`
-  - `EmployeeService`
-  - `EmployeeEntity`
-  - `GenderEnum`
-  - `BaseService`
+    - `AuthController`
+    - `AuthService`
+    - `UserEntity`
+    - `GenderEnum`
+    - `BaseService`
 
 ### 2.3 方法命名
 
@@ -35,10 +35,10 @@
 - 删除方法使用 `delete`、`remove` 前缀
 - 添加方法使用 `add`、`create`、`insert` 前缀
 - 示例：
-  - `queryEmployee`
-  - `addEmployee`
-  - `updateDisableFlag`
-  - `batchUpdateDepartment`
+    - `queryUser`
+    - `addUser`
+    - `updateStatus`
+    - `batchUpdateRole`
 
 ### 2.4 变量命名
 
@@ -47,10 +47,10 @@
 - 布尔类型变量可以使用 `is`、`has`、`can` 等前缀
 - 临时变量、循环变量等可以使用简单名称如 `i`、`j`、`temp` 等
 - 示例：
-  - `employeeId`
-  - `loginName`
-  - `disabledFlag`
-  - `departmentIdList`
+    - `userId`
+    - `username`
+    - `disabledFlag`
+    - `roleIdList`
 
 ### 2.5 常量命名
 
@@ -58,9 +58,9 @@
 - 静态常量使用 `static final` 修饰
 - 常量应放置在专用的常量类中或类的顶部
 - 示例：
-  - `SYSTEM_EMPLOYEE`
-  - `SWAGGER_WHITELIST`
-  - `MAX_PAGE_SIZE`
+    - `SYSTEM_USER`
+    - `SWAGGER_WHITELIST`
+    - `MAX_PAGE_SIZE`
 
 ### 2.6 文件名命名
 
@@ -68,22 +68,21 @@
 - 配置文件名使用小驼峰或短横线分隔
 - 资源文件名使用小写字母和下划线组合
 - 示例：
-  - `EmployeeController.java`
-  - `application-dev.yaml`
-  - `log4j2-spring.xml`
+    - `AuthController.java`
+    - `application-dev.yaml`
+    - `logback-spring.xml`
 
 ### 2.7 目录命名
 
 - 目录名使用小写字母
 - 遵循项目结构约定的目录名
 - 示例：
-  - `controller`
-  - `service`
-  - `mapper`
-  - `domain`
-  - `entity`
-  - `form`
-  - `vo`
+    - `controller`
+    - `service`
+    - `repository`
+    - `entity`
+    - `dto`
+    - `vo`
 
 ## 3. 代码格式
 
@@ -100,15 +99,17 @@
 - 示例：
 
 ```java
-if (condition) {
-    // 代码块
-} else {
-    // 代码块
-}
+if(condition){
+        // 代码块
+        }else{
+        // 代码块
+        }
 
-for (int i = 0; i < count; i++) {
-    // 代码块
-}
+        for(
+int i = 0;
+i<count;i++){
+        // 代码块
+        }
 ```
 
 ### 3.3 空格规范
@@ -134,14 +135,14 @@ List<String> list = Arrays.asList("a", "b", "c");
 
 ```java
 // 长方法调用链换行
-ResponseDTO<PageResult<EmployeeVO>> response = employeeService
-        .queryEmployee(employeeQueryForm)
-        .setPageSize(10)
-        .setOrderBy("createTime");
+ResponseDTO<PageResult<UserVO>> response = userService
+                .queryUser(userQueryForm)
+                .setPageSize(10)
+                .setOrderBy("createTime");
 
 // 长参数列表换行
-public ResponseDTO<String> addEmployee(
-        @Valid @RequestBody EmployeeAddForm employeeAddForm,
+public ResponseDTO<String> addUser(
+        @Valid @RequestBody UserAddForm userAddForm,
         HttpServletRequest request,
         HttpServletResponse response) {
     // 代码块
@@ -160,13 +161,13 @@ public ResponseDTO<String> addEmployee(
 
 ```java
 /**
- * 员工 实体表
+ * 用户 实体表
  */
 @Data
-@TableName("t_employee")
-public class EmployeeEntity {
+@TableName("sys_user")
+public class UserEntity {
     @TableId(type = IdType.AUTO)
-    private Long employeeId;
+    private Long id;
     // 其他字段
 }
 ```
@@ -181,11 +182,12 @@ public class EmployeeEntity {
 - 示例：
 
 ```java
-@Operation(summary = "添加员工(返回添加员工的密码) @author 李彦军")
-@PostMapping("/employee/add")
-@SaCheckPermission("system:employee:add")
-public ResponseDTO<String> addEmployee(@Valid @RequestBody EmployeeAddForm employeeAddForm) {
-    return employeeService.addEmployee(employeeAddForm);
+
+@Operation(summary = "添加用户(返回初始密码) @author 李彦军")
+@PostMapping("/user/add")
+@SaCheckPermission("system:user:add")
+public ResponseDTO<String> addUser(@Valid @RequestBody UserAddForm userAddForm) {
+    return userService.addUser(userAddForm);
 }
 ```
 
@@ -198,15 +200,25 @@ public ResponseDTO<String> addEmployee(@Valid @RequestBody EmployeeAddForm emplo
 - 示例：
 
 ```java
-try {
-    // 业务逻辑
-    return ResponseDTO.ok(result);
-} catch (BusinessException e) {
-    log.error("业务异常: {}", e.getMessage());
-    return ResponseDTO.error(e.getMessage());
-} catch (Exception e) {
-    log.error("系统异常: {}", e.getMessage(), e);
-    return ResponseDTO.error(UserErrorCode.SYSTEM_ERROR);
+try{
+        // 业务逻辑
+        return ResponseDTO.success(result);
+}catch(
+BusinessException e){
+        log.
+
+error("业务异常: {}",e.getMessage());
+        return ResponseDTO.
+
+fail(e.getMessage());
+        }catch(
+Exception e){
+        log.
+
+error("系统异常: {}",e.getMessage(),e);
+        return ResponseDTO.
+
+fail(UserErrorCode.SYSTEM_ERROR);
 }
 ```
 
@@ -220,11 +232,11 @@ try {
 ```java
 // 正确的集合定义
 List<String> nameList = new ArrayList<>();
-Map<String, EmployeeVO> employeeMap = new HashMap<>();
+Map<String, UserVO> userMap = new HashMap<>();
 
 // 使用Stream API
-List<Long> employeeIdList = employeeList.stream()
-        .map(EmployeeVO::getEmployeeId)
+List<Long> userIdList = userList.stream()
+        .map(UserVO::getId)
         .collect(Collectors.toList());
 ```
 
@@ -237,16 +249,17 @@ List<Long> employeeIdList = employeeList.stream()
 - 示例：
 
 ```java
+
 @Resource
-private EmployeeService employeeService;
+private UserService userService;
 
 @TableId(type = IdType.AUTO)
-private Long employeeId;
+private Long id;
 
 @Schema(description = "姓名")
 @NotNull(message = "姓名不能为空")
 @Length(max = 30, message = "姓名最多30字符")
-private String actualName;
+private String nickname;
 ```
 
 ## 5. 注释规范
@@ -259,7 +272,7 @@ private String actualName;
 
 ```java
 /**
- * 员工 service
+ * 用户 service
  *
  * @author 木子软件: 李彦军
  * @Date 2026-01-07 21:52:46
@@ -268,7 +281,7 @@ private String actualName;
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
-public class EmployeeService {
+public class UserService {
     // 类实现
 }
 ```
@@ -281,11 +294,11 @@ public class EmployeeService {
 
 ```java
 /**
- * 查询员工列表
- * @param employeeQueryForm 查询条件
- * @return 员工分页列表
+ * 查询用户列表
+ * @param userQueryForm 查询条件
+ * @return 用户分页列表
  */
-public ResponseDTO<PageResult<EmployeeVO>> queryEmployee(EmployeeQueryForm employeeQueryForm) {
+public ResponseDTO<PageResult<UserVO>> queryUser(UserQueryForm userQueryForm) {
     // 方法实现
 }
 ```
@@ -298,13 +311,13 @@ public ResponseDTO<PageResult<EmployeeVO>> queryEmployee(EmployeeQueryForm emplo
 
 ```java
 /**
- * 员工名称
+ * 用户昵称
  */
-private String actualName;
+private String nickname;
 
-@Schema(description = "姓名")
-@NotNull(message = "姓名不能为空")
-private String actualName;
+@Schema(description = "昵称")
+@NotNull(message = "昵称不能为空")
+private String nickname;
 ```
 
 ### 5.4 行内注释
@@ -315,34 +328,37 @@ private String actualName;
 - 示例：
 
 ```java
-// 查询员工角色
-List<Long> employeeIdList = employeeList.stream().map(EmployeeVO::getEmployeeId).collect(Collectors.toList());
+// 获取用户角色ID列表
+List<Long> roleIdList = userRoleList.stream().map(UserRole::getRoleId).collect(Collectors.toList());
 ```
 
 ## 6. 文件组织
 
 ### 6.1 目录结构
 
-- 按照功能模块划分目录
-- 每个模块内部按照层次结构组织文件
+- 按照 Maven 多模块 + 功能模块划分目录
+- 每个微服务模块内部按照分层架构组织文件
 - 遵循 MVC 架构的目录划分
 - 示例：
 
 ```
-module/
-  ├── system/
-  │   ├── employee/
-  │   │   ├── controller/    # 控制器
-  │   │   ├── service/       # 服务层
-  │   │   ├── dao/           # 数据访问层
-  │   │   ├── domain/        # 领域模型
-  │   │   │   ├── entity/    # 实体类
-  │   │   │   ├── form/      # 表单类
-  │   │   │   └── vo/        # 视图对象
-  │   │   └── manager/       # 业务管理器
-  │   ├── department/
-  │   └── role/
-  └── business/
+start-services/
+  ├── start-service-system/
+  │   ├── src/main/java/cn/muziseo/service/system/
+  │   │   ├── module/
+  │   │   │   ├── auth/
+  │   │   │   │   ├── controller/    # 控制器
+  │   │   │   │   ├── service/       # 服务层
+  │   │   │   │   ├── repository/    # 仓储层（DAO）
+  │   │   │   │   │   ├── entity/    # 实体类
+  │   │   │   │   │   └── mapper/    # Mapper接口
+  │   │   │   │   ├── domain/        # 领域模型
+  │   │   │   │   │   ├── dto/       # 数据传输对象
+  │   │   │   │   │   ├── vo/        # 视图对象
+  │   │   │   │   │   └── request/   # 请求对象
+  │   │   ├── config/                # 配置类
+  │   │   └── SystemApplication.java # 启动类
+  └── start-service-demo/
 ```
 
 ### 6.2 导入导出规则
@@ -363,15 +379,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 
-import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
-import net.lab1024.sa.admin.module.system.employee.domain.form.EmployeeAddForm;
+import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.service.system.module.auth.controller.request.LoginRequest;
 ```
 
 ### 6.3 模块划分原则
 
 - 按业务功能垂直划分模块
-- 模块之间通过接口进行交互，避免直接依赖
-- 通用功能抽取为独立模块
+- 模块之间通过 Feign Client 或消息队列进行交互
+- 通用功能抽取为独立模块（start-commons）
 - 遵循单一职责原则
 
 ## 7. 错误处理
@@ -399,9 +415,11 @@ import net.lab1024.sa.admin.module.system.employee.domain.form.EmployeeAddForm;
 - 示例：
 
 ```java
-if (CollectionUtils.isEmpty(employeeList)) {
-    PageResult<EmployeeVO> pageResult = SmartPageUtil.convert2PageResult(pageParam, employeeList);
-    return ResponseDTO.ok(pageResult);
+if(CollectionUtils.isEmpty(userList)){
+PageResult<UserVO> pageResult = SmartPageUtil.convert2PageResult(pageParam, userList);
+    return ResponseDTO.
+
+success(pageResult);
 }
 ```
 
@@ -417,19 +435,19 @@ if (CollectionUtils.isEmpty(employeeList)) {
 
 ```java
 // 分页查询
-Page pageParam = SmartPageUtil.convert2PageQuery(employeeQueryForm);
-List<EmployeeVO> employeeList = employeeDao.queryEmployee(pageParam, employeeQueryForm, departmentIdList);
+Page pageParam = SmartPageUtil.convert2PageQuery(userQueryForm);
+List<UserVO> userList = userDao.queryUser(pageParam, userQueryForm, deptIdList);
 
 // 批量查询替代循环查询
-List<Long> employeeIdList = employeeList.stream().map(EmployeeVO::getEmployeeId).collect(Collectors.toList());
-List<RoleEmployeeVO> roleEmployeeEntityList = employeeIdList.isEmpty() ? 
-    Collections.emptyList() : roleEmployeeDao.selectRoleByEmployeeIdList(employeeIdList);
+List<Long> userIdList = userList.stream().map(UserVO::getId).collect(Collectors.toList());
+List<UserRoleEntity> userRoleList = userIdList.isEmpty() ?
+        Collections.emptyList() : userRoleDao.selectByUserIdList(userIdList);
 ```
 
 ### 8.2 内存使用优化
 
 - 避免创建不必要的对象
-- 合理使用缓存
+- 合理使用缓存（如 Redis）
 - 及时释放不再使用的资源
 - 使用合适的数据结构
 
@@ -449,6 +467,7 @@ List<RoleEmployeeVO> roleEmployeeEntityList = employeeIdList.isEmpty() ?
 - 示例：
 
 ```java
+
 @Schema(description = "手机号")
 @NotNull(message = "手机号不能为空")
 @Pattern(regexp = SmartVerificationUtil.PHONE_REGEXP, message = "手机号格式不正确")
@@ -476,8 +495,9 @@ private SecurityPasswordService securityPasswordService;
 - 示例：
 
 ```java
-@SaCheckPermission("system:employee:add")
-public ResponseDTO<String> addEmployee(@Valid @RequestBody EmployeeAddForm employeeAddForm) {
+
+@SaCheckPermission("system:user:add")
+public ResponseDTO<String> addUser(@Valid @RequestBody UserAddForm userAddForm) {
     // 方法实现
 }
 ```
@@ -496,8 +516,9 @@ public ResponseDTO<String> addEmployee(@Valid @RequestBody EmployeeAddForm emplo
 - 示例：
 
 ```java
+
 @ApiDecrypt
-public ResponseDTO<String> updatePassword(@Valid @RequestBody EmployeeUpdatePasswordForm updatePasswordForm) {
+public ResponseDTO<String> updatePassword(@Valid @RequestBody UpdatePasswordForm form) {
     // 方法实现
 }
 ```
@@ -539,4 +560,4 @@ public ResponseDTO<String> updatePassword(@Valid @RequestBody EmployeeUpdatePass
 
 ## 12. 总结
 
-本代码规范旨在提高 StartAdmin 项目的代码质量和可维护性。团队成员应严格遵守本规范，共同打造高质量的软件产品。
+本代码规范旨在提高 Start-Admin-Cloud 项目的代码质量和可维护性。团队成员应严格遵守本规范，共同打造高质量的软件产品。

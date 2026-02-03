@@ -20,4 +20,12 @@ public interface UserService {
      * @param request 添加请求
      */
     void addUser(cn.muziseo.service.system.module.auth.controller.request.UserAddRequest request);
+
+    /**
+     * 根据ID获取用户
+     *
+     * @param id 用户ID
+     * @return 用户实体
+     */
+    UserEntity getUserById(Long id);
 }

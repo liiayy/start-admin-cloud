@@ -3,6 +3,7 @@ package cn.muziseo.common.web.core.handler;
 import cn.hutool.core.util.StrUtil;
 import cn.muziseo.common.core.constant.HttpStatus;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.core.exception.BusinessException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -34,6 +35,21 @@ import java.util.Optional;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+
+    /**
+     * 处理 BusinessException 异常
+     *
+     * @param ex BusinessException 异常对象
+     * @return ResponseDTO 统一响应结果
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseDTO<?> handleBusinessException(BusinessException ex) {
+        // 记录警告日志，避免暴露敏感信息
+        log.warn("[业务异常] 错误码: {}, 错误信息: {}", ex.getCode(), ex.getMessage());
+        // 返回统一的错误响应
+        return ResponseDTO.fail(ex.getCode(), ex.getMessage());
+    }
 
     /**
      * 处理 SpringMVC 请求参数缺失

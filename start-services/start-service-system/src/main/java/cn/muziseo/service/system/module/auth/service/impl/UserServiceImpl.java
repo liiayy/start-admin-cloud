@@ -29,4 +29,9 @@ public class UserServiceImpl implements UserService {
         // 这里后续可以补充密码加密逻辑
         userManager.save(userEntity);
     }
+
+    @Override
+    public UserEntity getUserById(Long id) {
+        return userManager.getById(id);
+    }
 }

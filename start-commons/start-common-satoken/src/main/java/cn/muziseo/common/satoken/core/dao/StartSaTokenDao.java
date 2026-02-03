@@ -21,7 +21,6 @@ public class StartSaTokenDao implements SaTokenDaoBySessionFollowObject {
             .initialCapacity(100) // 初始的缓存空间大小
             .maximumSize(1000) // 缓存的最大条数
             .recordStats()  // 开启统计，监控命中率
-            .refreshAfterWrite(3, TimeUnit.SECONDS)  // 异步刷新
             .build();
 
     /**

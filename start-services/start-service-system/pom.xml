@@ -73,6 +73,10 @@
             <groupId>cn.muziseo</groupId>
             <artifactId>start-common-cache</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-satoken</artifactId>
+        </dependency>
 
     </dependencies>
 

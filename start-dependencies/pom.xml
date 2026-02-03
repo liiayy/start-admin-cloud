@@ -126,6 +126,12 @@
             </dependency>
 
             <dependency>
+                <groupId>cn.muziseo</groupId>
+                <artifactId>start-common-satoken</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
                 <version>${springdoc.version}</version>

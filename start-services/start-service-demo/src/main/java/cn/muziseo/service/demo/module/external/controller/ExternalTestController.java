@@ -1,4 +1,4 @@
-package cn.muziseo.service.demo.controller;
+package cn.muziseo.service.demo.module.external.controller;
 
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.service.demo.module.external.model.WeatherResponseDTO;

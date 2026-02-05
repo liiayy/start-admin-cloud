@@ -19,7 +19,7 @@ import java.util.Map;
 @Service
 public class ExternalDemoService {
 
-    @Value("${external.weather.key}")
+    @Value("${external.weather.key:xxxx}")
     private String apiKey;
 
     @Value("${external.weather.url:https://api.seniverse.com/v3}")

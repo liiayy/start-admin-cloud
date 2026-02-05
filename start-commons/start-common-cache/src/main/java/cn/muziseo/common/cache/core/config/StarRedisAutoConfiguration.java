@@ -1,11 +1,13 @@
 package cn.muziseo.common.cache.core.config;
 
+import cn.muziseo.common.core.factory.YmlPropertySourceFactory;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -19,6 +21,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @AutoConfiguration(before = RedissonAutoConfiguration.class)
+@PropertySource(value = "classpath:common-redis.yml", factory = YmlPropertySourceFactory.class)
 public class StarRedisAutoConfiguration {
 
     /**

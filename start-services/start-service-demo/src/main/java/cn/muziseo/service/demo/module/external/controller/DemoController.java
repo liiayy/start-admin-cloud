@@ -1,4 +1,4 @@
-package cn.muziseo.service.demo.controller;
+package cn.muziseo.service.demo.module.external.controller;
 
 import cn.muziseo.service.system.module.demo.api.DemoApi;
 import io.swagger.v3.oas.annotations.Operation;

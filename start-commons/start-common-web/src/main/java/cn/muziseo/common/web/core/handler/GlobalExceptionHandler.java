@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.muziseo.common.core.constant.HttpStatus;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.core.exception.ServiceException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -47,6 +48,20 @@ public class GlobalExceptionHandler {
     public ResponseDTO<?> handleBusinessException(BusinessException ex) {
         // 记录警告日志，避免暴露敏感信息
         log.warn("[业务异常] 错误码: {}, 错误信息: {}", ex.getCode(), ex.getMessage());
+        // 返回统一的错误响应
+        return ResponseDTO.fail(ex.getCode(), ex.getMessage());
+    }
+
+    /**
+     * 处理 ServiceException 异常
+     *
+     * @param ex ServiceException 异常对象
+     * @return ResponseDTO 统一响应结果
+     */
+    @ExceptionHandler(ServiceException.class)
+    public ResponseDTO<?> handleServiceException(ServiceException ex) {
+        // 记录错误日志，包含完整堆栈信息
+        log.error("[系统异常] 错误码: {}, 错误信息: {}", ex.getCode(), ex.getMessage(), ex);
         // 返回统一的错误响应
         return ResponseDTO.fail(ex.getCode(), ex.getMessage());
     }

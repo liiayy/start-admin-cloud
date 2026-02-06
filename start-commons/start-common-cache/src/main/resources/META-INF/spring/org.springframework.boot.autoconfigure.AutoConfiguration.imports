@@ -1,2 +1,3 @@
 cn.muziseo.common.cache.core.config.StarRedisAutoConfiguration
 cn.muziseo.common.cache.core.config.StartCacheAutoConfiguration
+cn.muziseo.common.cache.core.config.RedissonConfig

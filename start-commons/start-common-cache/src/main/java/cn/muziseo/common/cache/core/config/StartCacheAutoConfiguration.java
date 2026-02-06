@@ -40,13 +40,10 @@ public class StartCacheAutoConfiguration {
     @Bean
     @Primary
     public RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties) {
-        // 1. 获取默认配置
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
 
-        // 2. 优化 Key 前缀处理逻辑：统一使用单冒号，增强健壮性
         config = config.computePrefixWith(cacheName -> {
             String keyPrefix = cacheProperties.getRedis().getKeyPrefix();
-            // 使用 Hutool 或 Spring 的工具类简化拼接逻辑
             String prefix = StringUtils.hasText(keyPrefix) ? keyPrefix : "";
             if (StringUtils.hasText(prefix) && !prefix.endsWith(StrUtil.COLON)) {
                 prefix += StrUtil.COLON;
@@ -54,11 +51,9 @@ public class StartCacheAutoConfiguration {
             return prefix + cacheName + StrUtil.COLON;
         });
 
-        // 3. 统一序列化方案：确保与 RedisTemplate 风格一致
         config = config.serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(buildRedisSerializer()));
 
-        // 4. 集成映射官方 CacheProperties 属性
         CacheProperties.Redis redisProperties = cacheProperties.getRedis();
         if (redisProperties.getTimeToLive() != null) {
             config = config.entryTtl(redisProperties.getTimeToLive());
@@ -85,14 +80,11 @@ public class StartCacheAutoConfiguration {
     public RedisCacheManager redisCacheManager(RedisConnectionFactory connectionFactory,
                                                RedisCacheConfiguration redisCacheConfiguration,
                                                StartCacheProperties startCacheProperties) {
-        // 1. 明确创建 RedisCacheWriter，并指定批处理策略
-        // 使用非锁定写入提升并发性能
         RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(
                 connectionFactory,
                 BatchStrategies.scan(startCacheProperties.getRedisScanBatchSize())
         );
 
-        // 2. 返回自定义的 TimeoutRedisCacheManager 以支持多级过期时间
         return new TimeoutRedisCacheManager(cacheWriter, redisCacheConfiguration);
     }
 }

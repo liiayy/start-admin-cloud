@@ -27,6 +27,14 @@ import java.util.stream.Collectors;
 
 /**
  * 认证管理 Controller
+ * <p>
+ * 提供用户登录、登出、获取当前用户信息等认证相关功能
+ *
+ * @author 木子软件
+ * @Date 2026-01-07
+ * @Wechat liiayy
+ * @Email 773582348@qq.com
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Tag(name = "认证管理")
 @RestController
@@ -47,12 +55,30 @@ public class AuthController {
     @Resource
     private MenuService menuService;
 
+    /**
+     * 用户登录
+     * <p>
+     * 验证用户账号密码，成功后返回 Token 信息
+     *
+     * @param request 登录请求参数（包含账号、密码、验证码等）
+     * @return Token 信息（包含 token、tokenName 等）
+     */
     @Operation(summary = "用户登录")
     @PostMapping("/login")
     public ResponseDTO<SaTokenInfo> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseDTO.success(authService.login(request));
+        log.info("用户登录: username={}", request.getUsername());
+        SaTokenInfo tokenInfo = authService.login(request);
+        log.info("用户登录成功: username={}, tokenName={}", request.getUsername(), tokenInfo.getTokenName());
+        return ResponseDTO.success(tokenInfo);
     }
 
+    /**
+     * 用户退出
+     * <p>
+     * 退出当前登录用户，清除 Token 信息
+     *
+     * @return 空
+     */
     @Operation(summary = "用户退出")
     @PostMapping("/logout")
     public ResponseDTO<Void> logout() {
@@ -60,6 +86,13 @@ public class AuthController {
         return ResponseDTO.success();
     }
 
+    /**
+     * 获取当前用户信息
+     * <p>
+     * 获取当前登录用户的基本信息、角色列表和权限列表
+     *
+     * @return 当前用户信息（包含用户基本信息、角色、权限等）
+     */
     @Operation(summary = "获取当前用户信息")
     @GetMapping("/get-info")
     public ResponseDTO<LoginUserVO> getInfo() {
@@ -67,6 +100,7 @@ public class AuthController {
         Long userId = StpUtil.getLoginIdAsLong();
         UserEntity user = userService.getUserById(userId);
         if (user == null) {
+            log.warn("用户不存在: userId={}", userId);
             throw new BusinessException("用户不存在");
         }
 
@@ -94,7 +128,6 @@ public class AuthController {
                 .roles(roleCodes)
                 .permissions(permissions)
                 .build();
-
         return ResponseDTO.success(vo);
     }
 }

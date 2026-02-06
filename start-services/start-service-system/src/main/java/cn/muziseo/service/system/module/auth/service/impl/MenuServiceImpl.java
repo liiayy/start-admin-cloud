@@ -8,6 +8,7 @@ import cn.muziseo.service.system.module.auth.repository.entity.RoleMenuEntity;
 import cn.muziseo.service.system.module.auth.service.MenuService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,8 +16,17 @@ import java.util.stream.Collectors;
 
 /**
  * 菜单业务实现
+ * <p>
+ * 实现菜单的增删改查、角色菜单查询等功能
+ *
+ * @author 木子软件
+ * @Date 2026-01-29
+ * @Wechat liiayy
+ * @Email 773582348@qq.com
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
+@Slf4j
 public class MenuServiceImpl implements MenuService {
 
     @Resource

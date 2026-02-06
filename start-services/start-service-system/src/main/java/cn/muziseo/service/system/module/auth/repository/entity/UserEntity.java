@@ -8,10 +8,15 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * 系统用户表
+ * 系统用户实体
+ * <p>
+ * 对应数据库表 sys_user，用于存储系统的用户账号、登录信息、个人资料等
  *
- * @Author Antigravity
+ * @author 木子软件
  * @Date 2026-01-29
+ * @Wechat liiayy
+ * @Email 773582348@qq.com
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @TableName("sys_user")
 @Data

@@ -6,10 +6,15 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 菜单/权限表
+ * 菜单/权限实体
+ * <p>
+ * 对应数据库表 sys_menu，用于存储系统的菜单结构、权限标识等信息
  *
- * @Author Antigravity
+ * @author 木子软件
  * @Date 2026-01-29
+ * @Wechat liiayy
+ * @Email 773582348@qq.com
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @TableName("sys_menu")
 @Data

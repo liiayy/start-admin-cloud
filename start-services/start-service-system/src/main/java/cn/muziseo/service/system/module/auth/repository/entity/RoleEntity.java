@@ -6,10 +6,15 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 角色表
+ * 角色实体
+ * <p>
+ * 对应数据库表 sys_role，用于存储系统的角色信息，支持角色权限管理
  *
- * @Author Antigravity
+ * @author 木子软件
  * @Date 2026-01-29
+ * @Wechat liiayy
+ * @Email 773582348@qq.com
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @TableName("sys_role")
 @Data

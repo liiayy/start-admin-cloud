@@ -10,12 +10,22 @@ import cn.muziseo.service.system.module.auth.service.MenuService;
 import cn.muziseo.service.system.module.auth.service.RoleService;
 import cn.muziseo.service.system.module.auth.service.UserService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
  * 认证业务实现
+ * <p>
+ * 实现用户登录、退出登录等认证功能，基于 Sa-Token 框架
+ *
+ * @author 木子软件
+ * @Date 2026-01-29
+ * @Wechat liiayy
+ * @Email 773582348@qq.com
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     @Resource

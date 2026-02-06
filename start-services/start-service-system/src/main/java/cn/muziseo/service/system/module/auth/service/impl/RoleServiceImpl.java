@@ -11,6 +11,7 @@ import cn.muziseo.service.system.module.auth.repository.entity.UserRoleEntity;
 import cn.muziseo.service.system.module.auth.service.RoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +20,17 @@ import java.util.stream.Collectors;
 
 /**
  * 角色业务实现
+ * <p>
+ * 实现角色的增删改查、用户角色查询、分配菜单等功能
+ *
+ * @author 木子软件
+ * @Date 2026-01-29
+ * @Wechat liiayy
+ * @Email 773582348@qq.com
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
+@Slf4j
 public class RoleServiceImpl implements RoleService {
 
     @Resource

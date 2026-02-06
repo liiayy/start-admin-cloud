@@ -11,10 +11,15 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 用户和角色关联表
+ * 用户角色关联实体
+ * <p>
+ * 对应数据库表 sys_user_role，用于存储用户与角色的多对多关联关系
  *
- * @Author Antigravity
+ * @author 木子软件
  * @Date 2026-01-29
+ * @Wechat liiayy
+ * @Email 773582348@qq.com
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @TableName("sys_user_role")
 @Data

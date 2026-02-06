@@ -11,10 +11,15 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 角色和菜单关联表
+ * 角色菜单关联实体
+ * <p>
+ * 对应数据库表 sys_role_menu，用于存储角色与菜单的多对多关联关系
  *
- * @Author Antigravity
+ * @author 木子软件
  * @Date 2026-01-29
+ * @Wechat liiayy
+ * @Email 773582348@qq.com
+ * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @TableName("sys_role_menu")
 @Data

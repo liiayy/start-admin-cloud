@@ -26,7 +26,7 @@ import java.util.List;
 @Tag(name = "角色管理")
 @RestController
 @Slf4j
-@RequestMapping("/system/auth/role")
+@RequestMapping("/auth/role")
 public class RoleController {
 
     @Resource

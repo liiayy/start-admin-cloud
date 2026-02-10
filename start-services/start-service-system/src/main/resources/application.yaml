@@ -4,6 +4,9 @@
 # 说明：系统微服务的主配置入口，通过Maven Profile切换不同环境配置
 # 作者：木子软件
 # ===================================================================
+server:
+  # 系统服务端口
+  port: 58081
 
 spring:
   application:
@@ -17,6 +20,4 @@ spring:
       - optional:application-${spring.profiles.active}.yaml
       - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
 
-server:
-  # 系统服务端口
-  port: 58081
+

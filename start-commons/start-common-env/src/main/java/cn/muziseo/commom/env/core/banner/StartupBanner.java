@@ -1,4 +1,4 @@
-package cn.muziseo.common.web.banner;
+package cn.muziseo.commom.env.core.banner;
 
 
 import io.micrometer.common.lang.NonNull;

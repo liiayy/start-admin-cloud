@@ -2,4 +2,3 @@ cn.muziseo.common.web.core.config.StartWebConfig
 cn.muziseo.common.web.core.handler.GlobalExceptionHandler
 cn.muziseo.common.web.jackson.config.StartJacksonAutoConfiguration
 cn.muziseo.common.web.xss.config.StartXssAutoConfiguration
-cn.muziseo.common.web.banner.StartupBanner

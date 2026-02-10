@@ -65,5 +65,5 @@ seata: # 应用名称，默认使用 spring.application.name，也可以不配
 logging:
   level:
     root: INFO
-    org.springframework.web: DEBUG
-    org.mybatis: DEBUG
+#    org.springframework.web: DEBUG
+#    org.mybatis: DEBUG

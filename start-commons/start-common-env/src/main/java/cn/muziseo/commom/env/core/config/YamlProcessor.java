@@ -1,4 +1,4 @@
-package cn.muziseo.commom.enb.core.config;
+package cn.muziseo.commom.env.core.config;
 
 import cn.muziseo.common.core.utils.string.StringUtils;
 import lombok.extern.slf4j.Slf4j;

@@ -1,1 +1,1 @@
-org.springframework.boot.env.EnvironmentPostProcessor=cn.muziseo.commom.enb.core.config.YamlProcessor
+org.springframework.boot.env.EnvironmentPostProcessor=cn.muziseo.commom.env.core.config.YamlProcessor

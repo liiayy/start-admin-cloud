@@ -41,10 +41,10 @@
         </dependency>
 
 
-        <!--        <dependency>-->
-        <!--            <groupId>cn.muziseo</groupId>-->
-        <!--            <artifactId>start-common-seata</artifactId>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-seata</artifactId>
+        </dependency>
         <dependency>
             <groupId>cn.muziseo</groupId>
             <artifactId>start-common-sentinel</artifactId>

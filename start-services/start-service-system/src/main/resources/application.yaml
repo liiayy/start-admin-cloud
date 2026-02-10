@@ -15,7 +15,6 @@ spring:
     import:
       # 加载环境特定的配置文件
       - optional:application-${spring.profiles.active}.yaml
-      # 加载Nacos配置中心的配置
       - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
 
 server:

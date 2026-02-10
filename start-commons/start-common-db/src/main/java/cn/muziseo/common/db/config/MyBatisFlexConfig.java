@@ -14,9 +14,7 @@ import com.mybatisflex.core.query.QueryColumnBehavior;
 import com.mybatisflex.spring.boot.ConfigurationCustomizer;
 import com.mybatisflex.spring.boot.MyBatisFlexCustomizer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.logging.stdout.StdOutImpl;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +40,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement(proxyTargetClass = true)
 @AutoConfiguration
 @Slf4j
-@MapperScan(value = "${start.info.entity-package}", annotationClass = Mapper.class)
+// @MapperScan(value = "${start.info.entity-package}", annotationClass =
+// Mapper.class)
 @PropertySource(value = "classpath:common-db.yml", factory = YmlPropertySourceFactory.class)
 public class MyBatisFlexConfig implements ConfigurationCustomizer, MyBatisFlexCustomizer {
 

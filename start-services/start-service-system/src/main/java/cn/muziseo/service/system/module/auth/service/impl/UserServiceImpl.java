@@ -4,7 +4,6 @@ import cn.muziseo.service.system.module.auth.controller.request.UserAddRequest;
 import cn.muziseo.service.system.module.auth.manager.UserManager;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.auth.service.UserService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,8 +28,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity getByUsername(String username) {
-        return userManager.getOne(new LambdaQueryWrapper<UserEntity>()
-                .eq(UserEntity::getUsername, username));
+        return userManager.queryChain()
+                .where(UserEntity::getUsername).eq(username)
+                .one();
     }
 
     @Override

@@ -1,8 +1,8 @@
 package cn.muziseo.service.system.module.auth.repository.entity;
 
 import cn.muziseo.common.db.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  * @Email 773582348@qq.com
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
-@TableName("sys_user")
+@Table("sys_user")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -30,7 +30,7 @@ public class UserEntity extends BaseEntity {
     /**
      * 用户ID
      */
-    @TableId
+    @Id
     private Long id;
 
     /**

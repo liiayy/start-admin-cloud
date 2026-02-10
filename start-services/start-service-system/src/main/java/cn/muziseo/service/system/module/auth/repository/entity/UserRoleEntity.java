@@ -1,7 +1,7 @@
 package cn.muziseo.service.system.module.auth.repository.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +21,7 @@ import java.io.Serializable;
  * @Email 773582348@qq.com
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
-@TableName("sys_user_role")
+@Table("sys_user_role")
 @Data
 @Builder
 @NoArgsConstructor
@@ -34,7 +34,7 @@ public class UserRoleEntity implements Serializable {
     /**
      * 自增主键
      */
-    @TableId
+    @Id
     private Long id;
 
     /**

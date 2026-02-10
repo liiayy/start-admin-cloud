@@ -1,8 +1,8 @@
 package cn.muziseo.service.system.module.auth.repository.entity;
 
 import cn.muziseo.common.db.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import lombok.*;
 
 /**
@@ -16,7 +16,7 @@ import lombok.*;
  * @Email 773582348@qq.com
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
-@TableName("sys_role")
+@Table("sys_role")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -28,7 +28,7 @@ public class RoleEntity extends BaseEntity {
     /**
      * 角色ID
      */
-    @TableId
+    @Id
     private Long id;
 
     /**

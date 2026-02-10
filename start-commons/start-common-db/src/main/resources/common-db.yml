@@ -1,10 +1,11 @@
-mybatis-plus:
+mybatis-flex:
+  audit_enable: true
+  sql_print: true
   global-config:
-    db-config:
-      # 指定逻辑未删除的值 (对应数据库的 false)
-      logic-not-delete-value: false
-      # 指定逻辑已删除的值 (对应数据库的 true)
-      logic-delete-value: true
+    logic-delete-column: deleted
+    # 如果数据库是 boolean 类型，改为 true / false
+    normal-value-of-logic-delete: false
+    deleted-value-of-logic-delete: true
 spring:
   datasource:
     # Druid 配置

@@ -1,7 +1,7 @@
 package cn.muziseo.service.system.module.demo.repository.mapper;
 
 import cn.muziseo.service.system.module.demo.repository.entity.DemoEntity;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mybatisflex.core.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 

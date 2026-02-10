@@ -22,7 +22,7 @@ spring:
     # 2. 修改 URL (注意: 端口从 3306 改为 5432，IP 请确认是否正确)
     #    去掉了 rewriteBatchedStatements (PG 不支持，但 PG 的 batch 性能原本就很好)
     #    去掉了 allowMultiQueries (PG 原生支持分号;执行多语句，无需参数)
-    url: jdbc:postgresql://192.168.100.20:5432/start-admin-system?autoReconnect=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:postgresql://192.168.100.20:5432/start-admin-system?characterEncoding=UTF-8
 
     username: root  # 请确认你的 PG 用户名 (之前配置的是 wego_admin)
     password: root
@@ -33,6 +33,7 @@ spring:
       port: 6379
       password: WeEvBhLapEHJMG4JFfFG
       database: 0
+
 
 # 日志文件配置 (通常不需要变动)
 logging:

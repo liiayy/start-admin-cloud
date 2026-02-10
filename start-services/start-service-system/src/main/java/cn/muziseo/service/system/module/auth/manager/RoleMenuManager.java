@@ -1,8 +1,8 @@
 package cn.muziseo.service.system.module.auth.manager;
 
+import cn.muziseo.common.db.service.impl.BaseServiceImpl;
 import cn.muziseo.service.system.module.auth.repository.entity.RoleMenuEntity;
 import cn.muziseo.service.system.module.auth.repository.mapper.RoleMenuMapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,5 +17,5 @@ import org.springframework.stereotype.Service;
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
-public class RoleMenuManager extends ServiceImpl<RoleMenuMapper, RoleMenuEntity> {
+public class RoleMenuManager extends BaseServiceImpl<RoleMenuMapper, RoleMenuEntity> {
 }

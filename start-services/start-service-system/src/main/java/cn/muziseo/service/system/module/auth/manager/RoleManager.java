@@ -1,8 +1,8 @@
 package cn.muziseo.service.system.module.auth.manager;
 
+import cn.muziseo.common.db.service.impl.BaseServiceImpl;
 import cn.muziseo.service.system.module.auth.repository.entity.RoleEntity;
 import cn.muziseo.service.system.module.auth.repository.mapper.RoleMapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,5 +17,5 @@ import org.springframework.stereotype.Service;
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
-public class RoleManager extends ServiceImpl<RoleMapper, RoleEntity> {
+public class RoleManager extends BaseServiceImpl<RoleMapper, RoleEntity> {
 }

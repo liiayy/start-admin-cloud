@@ -1,2 +1,2 @@
 cn.muziseo.common.db.config.DruidConfig
-cn.muziseo.common.db.config.MybatisPlusConfig
+cn.muziseo.common.db.config.MyBatisFlexConfig

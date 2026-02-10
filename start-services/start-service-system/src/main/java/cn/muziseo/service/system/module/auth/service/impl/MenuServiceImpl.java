@@ -6,7 +6,6 @@ import cn.muziseo.service.system.module.auth.manager.RoleMenuManager;
 import cn.muziseo.service.system.module.auth.repository.entity.MenuEntity;
 import cn.muziseo.service.system.module.auth.repository.entity.RoleMenuEntity;
 import cn.muziseo.service.system.module.auth.service.MenuService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,8 +40,9 @@ public class MenuServiceImpl implements MenuService {
             return List.of();
         }
 
-        List<Long> menuIds = roleMenuManager.list(new LambdaQueryWrapper<RoleMenuEntity>()
-                        .in(RoleMenuEntity::getRoleId, roleIds))
+        List<Long> menuIds = roleMenuManager.queryChain()
+                .where(RoleMenuEntity::getRoleId).in(roleIds)
+                .list()
                 .stream().map(RoleMenuEntity::getMenuId).distinct().collect(Collectors.toList());
 
         if (menuIds.isEmpty()) {

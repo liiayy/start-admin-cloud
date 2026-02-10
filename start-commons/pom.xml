@@ -24,6 +24,7 @@
         <module>start-common-sentinel</module>
         <module>start-common-satoken</module>
         <module>start-commom-test</module>
+        <module>start-common-env</module>
     </modules>
 
     <properties>

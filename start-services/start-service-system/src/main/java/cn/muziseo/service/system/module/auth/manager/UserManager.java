@@ -1,8 +1,8 @@
 package cn.muziseo.service.system.module.auth.manager;
 
+import cn.muziseo.common.db.service.impl.BaseServiceImpl;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.auth.repository.mapper.UserMapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,5 +17,5 @@ import org.springframework.stereotype.Service;
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
-public class UserManager extends ServiceImpl<UserMapper, UserEntity> {
+public class UserManager extends BaseServiceImpl<UserMapper, UserEntity> {
 }

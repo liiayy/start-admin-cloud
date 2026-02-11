@@ -1,19 +1,14 @@
 package cn.muziseo.service.system.module.auth.repository.entity;
 
+import cn.muziseo.common.db.entity.BaseEntity;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serial;
-import java.io.Serializable;
+import lombok.*;
 
 /**
  * 角色菜单关联实体
  * <p>
- * 对应数据库表 sys_role_menu，用于存储角色与菜单的多对多关联关系
+ * 对应数据库表 system_role_menu，用于存储角色与菜单的多对多关联关系
  *
  * @author 木子软件
  * @Date 2026-01-29
@@ -21,15 +16,14 @@ import java.io.Serializable;
  * @Email 773582348@qq.com
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
-@Table("sys_role_menu")
+@Table("system_role_menu")
 @Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleMenuEntity implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class RoleMenuEntity extends BaseEntity {
 
     /**
      * 自增主键

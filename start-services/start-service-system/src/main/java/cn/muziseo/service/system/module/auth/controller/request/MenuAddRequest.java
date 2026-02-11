@@ -19,9 +19,9 @@ public class MenuAddRequest {
     @Schema(description = "权限标识")
     private String permission;
 
-    @Schema(description = "菜单类型（M目录 C菜单 F按钮）", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "菜单类型不能为空")
-    private String type;
+    @Schema(description = "菜单类型（1：目录 2：菜单 3：按钮）", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "菜单类型不能为空")
+    private Integer type;
 
     @Schema(description = "父菜单ID")
     private Long parentId;
@@ -36,6 +36,9 @@ public class MenuAddRequest {
     @Schema(description = "组件路径")
     private String component;
 
+    @Schema(description = "组件名")
+    private String componentName;
+
     @Schema(description = "菜单图标")
     private String icon;
 
@@ -47,5 +50,8 @@ public class MenuAddRequest {
 
     @Schema(description = "是否缓存")
     private Boolean keepAlive;
+
+    @Schema(description = "是否总是显示")
+    private Boolean alwaysShow;
 
 }

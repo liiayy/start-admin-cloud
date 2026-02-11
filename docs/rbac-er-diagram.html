@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>RBAC 数据库模型 ER 图</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .diagram {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .legend {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .legend h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        .legend ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .legend li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .legend li:last-child {
+            border-bottom: none;
+        }
+
+        .legend code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>RBAC（基于角色的访问控制）数据库模型 ER 图</h1>
+
+    <div class="diagram">
+        <div class="mermaid">
+            erDiagram
+            system_user ||--o{ system_user_role : "拥有"
+            system_role ||--o{ system_user_role : "分配给"
+            system_role ||--o{ system_role_menu : "包含"
+            system_menu ||--o{ system_role_menu : "属于"
+            system_user }o--|| system_dept : "所属"
+            system_user }o--o{ system_post : "担任"
+
+            system_user {
+            bigint id PK "用户ID"
+            varchar username UK "用户账号"
+            varchar password "密码"
+            varchar nickname "用户昵称"
+            varchar remark "备注"
+            bigint dept_id FK "部门ID"
+            bigint[] post_ids "岗位ID数组"
+            varchar email "用户邮箱"
+            varchar mobile "手机号码"
+            smallint sex "用户性别"
+            varchar avatar "用户头像"
+            smallint status "帐号状态"
+            varchar login_ip "最后登录IP"
+            timestamp login_date "最后登录时间"
+            }
+
+            system_role {
+            bigint id PK "角色ID"
+            varchar name "角色名称"
+            varchar code "角色权限字符串"
+            integer sort "显示顺序"
+            smallint data_scope "数据范围"
+            varchar data_scope_dept_ids "数据范围部门IDs"
+            smallint status "角色状态"
+            smallint type "角色类型"
+            varchar remark "备注"
+            }
+
+            system_menu {
+            bigint id PK "菜单ID"
+            varchar name "菜单名称"
+            varchar permission "权限标识"
+            smallint type "菜单类型"
+            integer sort "显示顺序"
+            bigint parent_id "父菜单ID"
+            varchar path "路由地址"
+            varchar icon "菜单图标"
+            varchar component "组件路径"
+            varchar component_name "组件名"
+            smallint status "菜单状态"
+            boolean visible "是否可见"
+            boolean keep_alive "是否缓存"
+            boolean always_show "是否总是显示"
+            }
+
+            system_dept {
+            bigint id PK "部门ID"
+            varchar name "部门名称"
+            bigint parent_id "父部门ID"
+            integer sort "显示顺序"
+            bigint leader_user_id "负责人"
+            varchar phone "联系电话"
+            varchar email "邮箱"
+            smallint status "部门状态"
+            }
+
+            system_post {
+            bigint id PK "岗位ID"
+            varchar code "岗位编码"
+            varchar name "岗位名称"
+            integer sort "显示顺序"
+            smallint status "状态"
+            varchar remark "备注"
+            }
+
+            system_user_role {
+            bigint id PK "自增编号"
+            bigint user_id FK "用户ID"
+            bigint role_id FK "角色ID"
+            }
+
+            system_role_menu {
+            bigint id PK "自增编号"
+            bigint role_id FK "角色ID"
+            bigint menu_id FK "菜单ID"
+            }
+        </div>
+    </div>
+
+    <div class="legend">
+        <h3>📋 图例说明</h3>
+        <ul>
+            <li><code>PK</code> - Primary Key（主键）</li>
+            <li><code>FK</code> - Foreign Key（外键）</li>
+            <li><code>UK</code> - Unique Key（唯一键）</li>
+            <li><code>bigint[]</code> - PostgreSQL 数组类型</li>
+            <li><code>||--o{</code> - 一对多关系</li>
+            <li><code>}o--o{</code> - 多对多关系</li>
+            <li><code>}o--||</code> - 多对一关系</li>
+        </ul>
+    </div>
+
+    <div class="legend">
+        <h3>🔗 表关系说明</h3>
+        <ul>
+            <li><strong>用户 - 角色</strong>: 多对多关系，通过 system_user_role 关联表实现</li>
+            <li><strong>角色 - 菜单</strong>: 多对多关系，通过 system_role_menu 关联表实现</li>
+            <li><strong>用户 - 部门</strong>: 多对一关系，一个用户属于一个部门</li>
+            <li><strong>用户 - 岗位</strong>: 多对多关系，用户可担任多个岗位（通过 post_ids 数组字段）</li>
+            <li><strong>菜单 - 菜单</strong>: 自引用关系，通过 parent_id 实现树形结构</li>
+            <li><strong>部门 - 部门</strong>: 自引用关系，通过 parent_id 实现树形结构</li>
+        </ul>
+    </div>
+
+    <div class="legend">
+        <h3>🎯 核心设计说明</h3>
+        <ul>
+            <li><strong>数据权限</strong>: 角色支持数据范围控制（data_scope），可限制用户访问的数据范围</li>
+            <li><strong>菜单类型</strong>: 菜单支持目录、菜单、按钮等多种类型</li>
+            <li><strong>岗位管理</strong>: 用户可同时担任多个岗位，使用 PostgreSQL 数组类型存储</li>
+            <li><strong>审计字段</strong>: 所有表包含 creator, create_time, updater, update_time, deleted 字段</li>
+            <li><strong>软删除</strong>: 使用 deleted 字段实现逻辑删除</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        erDiagram: {
+            useMaxWidth: true
+        }
+    });
+</script>
+</body>
+</html>

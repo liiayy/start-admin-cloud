@@ -1,16 +1,18 @@
 package cn.muziseo.service.system.module.auth.repository.entity;
 
 import cn.muziseo.common.db.entity.BaseEntity;
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 系统用户实体
  * <p>
- * 对应数据库表 sys_user，用于存储系统的用户账号、登录信息、个人资料等
+ * 对应数据库表 system_user，用于存储系统的用户账号、登录信息、个人资料等
  *
  * @author 木子软件
  * @Date 2026-01-29
@@ -18,7 +20,7 @@ import java.time.LocalDateTime;
  * @Email 773582348@qq.com
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
-@Table("sys_user")
+@Table("system_user")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -59,9 +61,12 @@ public class UserEntity extends BaseEntity {
     private Long deptId;
 
     /**
-     * 岗位编号数组
+     * 岗位ID数组
+     * <p>
+     * PostgreSQL bigint[] 类型，一个用户可以担任多个岗位
      */
-    // private Set<Long> postIds; // 暂时注释，待模型完善
+    @Column(isArray = true)
+    private List<Long> postIds;
 
     /**
      * 用户邮箱

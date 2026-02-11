@@ -32,6 +32,9 @@ public class UserAddRequest {
     @Schema(description = "部门ID")
     private Long deptId;
 
+    @Schema(description = "岗位ID列表")
+    private java.util.List<Long> postIds;
+
     @Schema(description = "状态（0正常 1停用）")
     private Integer status;
 

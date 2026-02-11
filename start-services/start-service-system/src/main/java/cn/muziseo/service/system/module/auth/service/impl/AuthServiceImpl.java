@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.service.system.module.auth.controller.request.LoginRequest;
+import cn.muziseo.service.system.module.auth.controller.vo.LoginVO;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.auth.service.AuthService;
 import cn.muziseo.service.system.module.auth.service.MenuService;
@@ -38,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private MenuService menuService;
 
     @Override
-    public SaTokenInfo login(LoginRequest request) {
+    public LoginVO login(LoginRequest request) {
         // 1. 校验账号密码
         UserEntity user = userService.getByUsername(request.getUsername());
         if (user == null || !user.getPassword().equals(request.getPassword())) {
@@ -54,8 +55,17 @@ public class AuthServiceImpl implements AuthService {
         // 3. 登录
         StpUtil.login(user.getId());
 
+        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+
         // 4. 返回 Token
-        return StpUtil.getTokenInfo();
+        return LoginVO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .nickname(user.getNickname())
+                .avatar(user.getAvatar())
+                .tokenName(tokenInfo.getTokenName())
+                .tokenValue(tokenInfo.getTokenValue())
+                .build();
     }
 
     @Override

@@ -6,9 +6,9 @@ import com.mybatisflex.annotation.Table;
 import lombok.*;
 
 /**
- * 角色实体
+ * 部门实体
  * <p>
- * 对应数据库表 system_role，用于存储系统的角色信息，支持角色权限管理和数据权限控制
+ * 对应数据库表 system_dept，用于存储组织架构的部门信息，支持树形结构
  *
  * @author 木子软件
  * @Date 2026-01-29
@@ -16,30 +16,30 @@ import lombok.*;
  * @Email 773582348@qq.com
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
-@Table("system_role")
+@Table("system_dept")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleEntity extends BaseEntity {
+public class DeptEntity extends BaseEntity {
 
     /**
-     * 角色ID
+     * 部门ID
      */
     @Id
     private Long id;
 
     /**
-     * 角色名称
+     * 部门名称
      */
     private String name;
 
     /**
-     * 角色权限字符串
+     * 父部门ID
      */
-    private String code;
+    private Long parentId;
 
     /**
      * 显示顺序
@@ -47,28 +47,23 @@ public class RoleEntity extends BaseEntity {
     private Integer sort;
 
     /**
-     * 数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）
+     * 负责人用户ID
      */
-    private Integer dataScope;
+    private Long leaderUserId;
 
     /**
-     * 数据范围(指定部门数组)，JSON字符串存储部门ID列表
+     * 联系电话
      */
-    private String dataScopeDeptIds;
+    private String phone;
 
     /**
-     * 角色状态（0正常 1停用）
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 部门状态（0正常 1停用）
      */
     private Integer status;
-
-    /**
-     * 角色类型
-     */
-    private Integer type;
-
-    /**
-     * 备注
-     */
-    private String remark;
 
 }

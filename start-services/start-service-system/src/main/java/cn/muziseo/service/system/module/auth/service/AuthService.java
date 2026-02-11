@@ -1,7 +1,7 @@
 package cn.muziseo.service.system.module.auth.service;
 
-import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.muziseo.service.system.module.auth.controller.request.LoginRequest;
+import cn.muziseo.service.system.module.auth.controller.vo.LoginVO;
 
 /**
  * 认证业务接口
@@ -22,7 +22,7 @@ public interface AuthService {
      * @param request 登录请求
      * @return Token信息
      */
-    SaTokenInfo login(LoginRequest request);
+    LoginVO login(LoginRequest request);
 
     /**
      * 退出登录

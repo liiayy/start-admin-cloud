@@ -8,7 +8,7 @@ import lombok.*;
 /**
  * 菜单/权限实体
  * <p>
- * 对应数据库表 sys_menu，用于存储系统的菜单结构、权限标识等信息
+ * 对应数据库表 system_menu，用于存储系统的菜单结构、权限标识等信息
  *
  * @author 木子软件
  * @Date 2026-01-29
@@ -16,7 +16,7 @@ import lombok.*;
  * @Email 773582348@qq.com
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
-@Table("sys_menu")
+@Table("system_menu")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -42,9 +42,9 @@ public class MenuEntity extends BaseEntity {
     private String permission;
 
     /**
-     * 菜单类型（M目录 C菜单 F按钮）
+     * 菜单类型（1：目录 2：菜单 3：按钮）
      */
-    private String type;
+    private Integer type;
 
     /**
      * 父菜单ID
@@ -67,6 +67,11 @@ public class MenuEntity extends BaseEntity {
     private String component;
 
     /**
+     * 组件名
+     */
+    private String componentName;
+
+    /**
      * 菜单图标
      */
     private String icon;
@@ -85,5 +90,10 @@ public class MenuEntity extends BaseEntity {
      * 是否缓存（0缓存 1不缓存）
      */
     private Boolean keepAlive;
+
+    /**
+     * 是否总是显示
+     */
+    private Boolean alwaysShow;
 
 }

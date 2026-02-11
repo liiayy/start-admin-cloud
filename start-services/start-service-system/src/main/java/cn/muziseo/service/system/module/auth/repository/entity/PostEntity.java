@@ -6,9 +6,9 @@ import com.mybatisflex.annotation.Table;
 import lombok.*;
 
 /**
- * 用户角色关联实体
+ * 岗位实体
  * <p>
- * 对应数据库表 system_user_role，用于存储用户与角色的多对多关联关系
+ * 对应数据库表 system_post，用于存储岗位信息
  *
  * @author 木子软件
  * @Date 2026-01-29
@@ -16,29 +16,44 @@ import lombok.*;
  * @Email 773582348@qq.com
  * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
-@Table("system_user_role")
+@Table("system_post")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRoleEntity extends BaseEntity {
+public class PostEntity extends BaseEntity {
 
     /**
-     * 自增主键
+     * 岗位ID
      */
     @Id
     private Long id;
 
     /**
-     * 用户ID
+     * 岗位编码
      */
-    private Long userId;
+    private String code;
 
     /**
-     * 角色ID
+     * 岗位名称
      */
-    private Long roleId;
+    private String name;
+
+    /**
+     * 显示顺序
+     */
+    private Integer sort;
+
+    /**
+     * 状态（0正常 1停用）
+     */
+    private Integer status;
+
+    /**
+     * 备注
+     */
+    private String remark;
 
 }

@@ -1,11 +1,11 @@
 package cn.muziseo.service.system.module.auth.controller;
 
-import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.service.system.module.auth.controller.request.LoginRequest;
 import cn.muziseo.service.system.module.auth.controller.vo.LoginUserVO;
+import cn.muziseo.service.system.module.auth.controller.vo.LoginVO;
 import cn.muziseo.service.system.module.auth.repository.entity.MenuEntity;
 import cn.muziseo.service.system.module.auth.repository.entity.RoleEntity;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
@@ -65,9 +65,9 @@ public class AuthController {
      */
     @Operation(summary = "用户登录")
     @PostMapping("/login")
-    public ResponseDTO<SaTokenInfo> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseDTO<LoginVO> login(@Valid @RequestBody LoginRequest request) {
         log.info("用户登录: username={}", request.getUsername());
-        SaTokenInfo tokenInfo = authService.login(request);
+        LoginVO tokenInfo = authService.login(request);
         log.info("用户登录成功: username={}, tokenName={}", request.getUsername(), tokenInfo.getTokenName());
         return ResponseDTO.success(tokenInfo);
     }

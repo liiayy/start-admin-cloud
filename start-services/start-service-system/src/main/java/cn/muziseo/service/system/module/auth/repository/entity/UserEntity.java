@@ -1,7 +1,6 @@
 package cn.muziseo.service.system.module.auth.repository.entity;
 
 import cn.muziseo.common.db.entity.BaseEntity;
-import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
@@ -65,7 +64,6 @@ public class UserEntity extends BaseEntity {
      * <p>
      * PostgreSQL bigint[] 类型，一个用户可以担任多个岗位
      */
-    @Column(isArray = true)
     private List<Long> postIds;
 
     /**

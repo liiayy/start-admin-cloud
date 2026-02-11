@@ -5,7 +5,6 @@ import cn.muziseo.service.system.module.auth.controller.request.PostAddRequest;
 import cn.muziseo.service.system.module.auth.manager.PostManager;
 import cn.muziseo.service.system.module.auth.repository.entity.PostEntity;
 import cn.muziseo.service.system.module.auth.service.PostService;
-import com.mybatisflex.core.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,9 +31,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostEntity> list() {
-        return postManager.list(QueryWrapper.create()
-                .orderBy(PostEntity::getSort, true)
-                .orderBy(PostEntity::getId, true));
+        // 调用Manager层查询
+        return postManager.listAll();
     }
 
     @Override

@@ -5,13 +5,11 @@ import cn.muziseo.service.system.module.auth.controller.request.DeptAddRequest;
 import cn.muziseo.service.system.module.auth.manager.DeptManager;
 import cn.muziseo.service.system.module.auth.repository.entity.DeptEntity;
 import cn.muziseo.service.system.module.auth.service.DeptService;
-import com.mybatisflex.core.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 部门业务实现
@@ -33,29 +31,14 @@ public class DeptServiceImpl implements DeptService {
 
     @Override
     public List<DeptEntity> list() {
-        return deptManager.list(QueryWrapper.create()
-                .orderBy(DeptEntity::getSort, true)
-                .orderBy(DeptEntity::getId, true));
+        // 调用Manager层查询
+        return deptManager.listAll();
     }
 
     @Override
     public List<DeptEntity> tree() {
-        List<DeptEntity> allDepts = list();
-        return buildTree(allDepts, 0L);
-    }
-
-    /**
-     * 构建部门树
-     *
-     * @param depts    所有部门列表
-     * @param parentId 父部门ID
-     * @return 树形结构
-     */
-    private List<DeptEntity> buildTree(List<DeptEntity> depts, Long parentId) {
-        return depts.stream()
-                .filter(dept -> parentId.equals(dept.getParentId()))
-                .peek(dept -> dept.setChildren(buildTree(depts, dept.getId())))
-                .collect(Collectors.toList());
+        // 调用Manager层查询树形结构
+        return deptManager.tree();
     }
 
     @Override
@@ -90,9 +73,8 @@ public class DeptServiceImpl implements DeptService {
     public void deleteDept(Long id) {
         log.info("删除部门: id={}", id);
 
-        // 检查是否有子部门
-        long count = deptManager.count(QueryWrapper.create()
-                .where(DeptEntity::getParentId).eq(id));
+        // 调用Manager层检查是否有子部门
+        long count = deptManager.countByParentId(id);
         if (count > 0) {
             throw new RuntimeException("存在子部门，无法删除");
         }

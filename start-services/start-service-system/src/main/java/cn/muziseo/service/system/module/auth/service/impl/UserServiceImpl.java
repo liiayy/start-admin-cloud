@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 /**
  * 用户业务实现
  * <p>
- * 实现用户的增删改查、用户名查询等功能
+ * 实现用户的增删改查等功能
  *
  * @author 木子软件
  * @Date 2026-01-29
@@ -28,9 +28,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity getByUsername(String username) {
-        return userManager.queryChain()
-                .where(UserEntity::getUsername).eq(username)
-                .one();
+        // 调用Manager层查询
+        return userManager.getByUsername(username);
     }
 
     @Override

@@ -4,14 +4,12 @@ import cn.muziseo.service.system.module.auth.controller.request.MenuAddRequest;
 import cn.muziseo.service.system.module.auth.manager.MenuManager;
 import cn.muziseo.service.system.module.auth.manager.RoleMenuManager;
 import cn.muziseo.service.system.module.auth.repository.entity.MenuEntity;
-import cn.muziseo.service.system.module.auth.repository.entity.RoleMenuEntity;
 import cn.muziseo.service.system.module.auth.service.MenuService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 菜单业务实现
@@ -40,10 +38,8 @@ public class MenuServiceImpl implements MenuService {
             return List.of();
         }
 
-        List<Long> menuIds = roleMenuManager.queryChain()
-                .where(RoleMenuEntity::getRoleId).in(roleIds)
-                .list()
-                .stream().map(RoleMenuEntity::getMenuId).distinct().collect(Collectors.toList());
+        // 调用Manager层获取菜单ID
+        List<Long> menuIds = roleMenuManager.getMenuIdsByRoleIds(roleIds);
 
         if (menuIds.isEmpty()) {
             return List.of();

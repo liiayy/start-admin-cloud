@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(java:*)",
-      "Bash(javac:*)"
+      "Bash(javac:*)",
+      "Bash(dir:*)",
+      "Bash(mvn:*)"
     ]
   }
 }

@@ -16,8 +16,8 @@
     </description>
 
     <properties>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -59,5 +59,74 @@
             <artifactId>start-common-satoken</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <!-- 1. 复制依赖到指定目录(lib) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <!-- 拷贝依赖到 target/lib 目录下 -->
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <excludeTransitive>false</excludeTransitive>
+                            <stripVersion>false</stripVersion>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 2. 打包业务代码 Jar (Thin Jar) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <!-- 指定 MANIFEST.MF 中的 Class-Path 路径前缀 -->
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <!-- 启动类全路径 -->
+                            <mainClass>cn.muziseo.service.system.SystemServerApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- 3. Spring Boot Repackage 瘦身配置 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <!-- 通过 layout 设置为 ZIP，配合 loader.path 可实现外部依赖加载 (或者仅利用其生成可执行结构) -->
+                    <!-- 这里通过 excludes 排除所有依赖，使其变瘦 -->
+                    <includes>
+                        <include>
+                            <groupId>nothing</groupId>
+                            <artifactId>nothing</artifactId>
+                        </include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

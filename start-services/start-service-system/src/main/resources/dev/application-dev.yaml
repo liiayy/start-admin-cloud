@@ -1,3 +1,11 @@
+# ===================================================================
+# 系统服务 - 开发环境本地配置
+# ===================================================================
+# 敏感配置（数据库、Redis、Seata）已迁移到 Nacos 配置中心
+# Nacos DataId: system-service-dev.yaml
+# 本地仅保留 Nacos 连接地址，用于引导加载远程配置
+# ===================================================================
+
 spring:
   cloud:
     nacos:
@@ -13,57 +21,3 @@ spring:
     sentinel:
       transport:
         dashboard: 192.168.100.20:8858
-  datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    # --- 修改开始 ---
-    # 1. 修改驱动类
-    driver-class-name: org.postgresql.Driver
-
-    # 2. 修改 URL (注意: 端口从 3306 改为 5432，IP 请确认是否正确)
-    #    去掉了 rewriteBatchedStatements (PG 不支持，但 PG 的 batch 性能原本就很好)
-    #    去掉了 allowMultiQueries (PG 原生支持分号;执行多语句，无需参数)
-    url: jdbc:postgresql://192.168.100.20:5432/start-admin-system?characterEncoding=UTF-8
-
-    username: root  # 请确认你的 PG 用户名 (之前配置的是 wego_admin)
-    password: root
-    # --- 修改结束 ---
-  data:
-    redis:
-      host: 192.168.100.20
-      port: 6379
-      password: WeEvBhLapEHJMG4JFfFG
-      database: 0
-
-seata: # 应用名称，默认使用 spring.application.name，也可以不配
-  application-name: ${spring.application.name}
-
-  # Seata 事务组名称 (关键配置)
-  # 格式：自定义名，例如 my_test_tx_group
-  tx-service-group: my_test_tx_group
-
-  data-source-proxy-mode: XA
-
-  # 注册中心配置 (与 Server 端保持一致)
-  registry:
-    type: nacos
-    nacos:
-      server-addr: 192.168.100.20:8848 # 你的 Nacos 地址
-      namespace:       # 你的 Nacos 命名空间 ID
-      group: DEFAULT_GROUP           # 你的 Nacos 分组
-      application: seata-server   # 客户端通常不需要配置这个，除非做特殊服务发现
-
-  # 配置中心配置 (与 Server 端保持一致)
-  config:
-    type: nacos
-    nacos:
-      server-addr: 192.168.100.20:8848 # 你的 Nacos 地址
-      namespace: seata-server      # 你的 Nacos 命名空间 ID
-      group: DEFAULT_GROUP
-      data-id: seataServer.properties # 从 Nacos 读取的配置文件 ID
-
-# 日志文件配置 (通常不需要变动)
-logging:
-  level:
-    root: INFO
-#    org.springframework.web: DEBUG
-#    org.mybatis: DEBUG

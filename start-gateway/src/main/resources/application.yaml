@@ -45,28 +45,6 @@ cors:
   allow-credentials: true
   max-age: "3600"
 
-# 限流配置
-gateway:
-  ratelimit:
-    enabled: true
-    redis:
-      host: 192.168.100.20
-      port: 6379
-      password: WeEvBhLapEHJMG4JFfFG
-      database: 0
-      timeout: 10000
-    rules:
-      default:
-        pattern: /**
-        window: 60
-        limit: 100
-        enabled: true
-      api:
-        pattern: /api/**
-        window: 60
-        limit: 200
-        enabled: true
-
 springdoc:
   api-docs:
     enabled: true

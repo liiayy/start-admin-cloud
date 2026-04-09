@@ -1,8 +1,10 @@
 package cn.muziseo.service.system.module.permission.manager;
 
 import cn.muziseo.common.db.service.impl.BaseServiceImpl;
+import cn.muziseo.service.system.module.permission.controller.request.RolePageRequest;
 import cn.muziseo.service.system.module.permission.repository.entity.RoleEntity;
 import cn.muziseo.service.system.module.permission.repository.mapper.RoleMapper;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +24,6 @@ public class RoleManager extends BaseServiceImpl<RoleMapper, RoleEntity> {
 
     /**
      * 根据角色代码获取角色
-     *
-     * @param code 角色代码
-     * @return 角色实体
      */
     public RoleEntity getByCode(String code) {
         return queryChain()
@@ -33,13 +32,27 @@ public class RoleManager extends BaseServiceImpl<RoleMapper, RoleEntity> {
     }
 
     /**
-     * 检查角色代码是否存在
-     *
-     * @param code 角色代码
-     * @return 是否存在
+     * 检查角色代码是否存在（排除指定ID）
      */
-    public boolean existsByCode(String code) {
-        return exists(QueryWrapper.create()
-                .where(RoleEntity::getCode).eq(code));
+    public boolean existsByCode(String code, Long excludeId) {
+        QueryWrapper wrapper = QueryWrapper.create()
+                .where(RoleEntity::getCode).eq(code);
+        if (excludeId != null) {
+            wrapper.and(RoleEntity::getId).ne(excludeId);
+        }
+        return exists(wrapper);
+    }
+
+    /**
+     * 分页查询角色
+     */
+    public Page<RoleEntity> pageRole(RolePageRequest request) {
+        QueryWrapper wrapper = QueryWrapper.create()
+                .where(RoleEntity::getName).like(request.getName(), request.getName() != null)
+                .and(RoleEntity::getCode).like(request.getCode(), request.getCode() != null)
+                .and(RoleEntity::getStatus).eq(request.getStatus(), request.getStatus() != null)
+                .orderBy(RoleEntity::getSort, true)
+                .orderBy(RoleEntity::getId, false);
+        return page(new Page<>(request.getPageNum(), request.getPageSize()), wrapper);
     }
 }

@@ -1,7 +1,11 @@
 package cn.muziseo.service.system.module.permission.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.service.system.module.permission.controller.request.MenuAddRequest;
+import cn.muziseo.service.system.module.permission.controller.request.MenuUpdateRequest;
+import cn.muziseo.service.system.module.permission.controller.vo.MenuTreeVO;
+import cn.muziseo.service.system.module.permission.controller.vo.MenuVO;
 import cn.muziseo.service.system.module.permission.repository.entity.MenuEntity;
 import cn.muziseo.service.system.module.permission.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,14 +19,8 @@ import java.util.List;
 
 /**
  * 菜单管理 Controller
- * <p>
- * 提供菜单的增删改查、分配权限等功能
  *
  * @author 木子软件
- * @Date 2026-01-07
- * @Wechat liiayy
- * @Email 773582348@qq.com
- * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Tag(name = "菜单管理")
 @RestController
@@ -33,38 +31,46 @@ public class MenuController {
     @Resource
     private MenuService menuService;
 
-    /**
-     * 新增菜单
-     * <p>
-     * 创建新的菜单项，支持创建目录、菜单、按钮等类型
-     *
-     * @param request 菜单新增请求参数
-     * @return 新增后的菜单列表
-     */
-    @Operation(summary = "新增菜单")
-    @PostMapping("/add")
-    public ResponseDTO<List<MenuEntity>> add(@Valid @RequestBody MenuAddRequest request) {
-        log.info("新增菜单: title={}, type={}", request.getName(), request.getType());
-        List<MenuEntity> menuList = menuService.addMenu(request);
-        log.info("新增菜单成功: title={}, menuCount={}", request.getName(), menuList.size());
-        return ResponseDTO.success(menuList);
+    @Operation(summary = "获取菜单树")
+    @GetMapping("/tree")
+    public ResponseDTO<List<MenuTreeVO>> tree() {
+        return ResponseDTO.success(menuService.getMenuTree());
     }
 
-    /**
-     * 根据角色ID列表获取菜单
-     * <p>
-     * 查询指定角色拥有的菜单列表，用于前端动态渲染菜单
-     *
-     * @param roleIds 角色 ID 列表
-     * @return 菜单列表
-     */
-    @Operation(summary = "获取当前用户菜单（示例）")
+    @Operation(summary = "获取菜单详情")
+    @GetMapping("/get")
+    public ResponseDTO<MenuVO> get(@RequestParam Long id) {
+        return ResponseDTO.success(menuService.getMenu(id));
+    }
+
+    @Operation(summary = "新增菜单")
+    @PostMapping("/add")
+    public ResponseDTO<Void> add(@Valid @RequestBody MenuAddRequest request) {
+        log.info("新增菜单: name={}, type={}", request.getName(), request.getType());
+        menuService.addMenu(request);
+        return ResponseDTO.success();
+    }
+
+    @Operation(summary = "修改菜单")
+    @PutMapping("/update")
+    public ResponseDTO<Void> update(@Valid @RequestBody MenuUpdateRequest request) {
+        log.info("修改菜单: id={}", request.getId());
+        menuService.updateMenu(request);
+        return ResponseDTO.success();
+    }
+
+    @Operation(summary = "删除菜单")
+    @DeleteMapping("/delete")
+    public ResponseDTO<Void> delete(@RequestParam Long id) {
+        log.info("删除菜单: id={}", id);
+        menuService.deleteMenu(id);
+        return ResponseDTO.success();
+    }
+
+    @Operation(summary = "获取当前用户菜单")
     @GetMapping("/list-by-role")
     public ResponseDTO<List<MenuEntity>> listByRoles(@RequestParam List<Long> roleIds) {
         log.debug("查询角色菜单: roleIds={}", roleIds);
-        List<MenuEntity> menuList = menuService.getMenusByRoleIds(roleIds);
-        log.info("查询角色菜单成功: roleIds={}, menuCount={}", roleIds, menuList.size());
-        return ResponseDTO.success(menuList);
+        return ResponseDTO.success(menuService.getMenusByRoleIds(roleIds));
     }
-
 }

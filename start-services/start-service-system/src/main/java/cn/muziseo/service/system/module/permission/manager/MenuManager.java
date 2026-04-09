@@ -48,6 +48,21 @@ public class MenuManager extends BaseServiceImpl<MenuMapper, MenuEntity> {
     }
 
     /**
+     * 检查权限标识是否存在（排除指定ID）
+     */
+    public boolean existsByPermission(String permission, Long excludeId) {
+        if (permission == null || permission.isEmpty()) {
+            return false;
+        }
+        QueryWrapper wrapper = QueryWrapper.create()
+                .where(MenuEntity::getPermission).eq(permission);
+        if (excludeId != null) {
+            wrapper.and(MenuEntity::getId).ne(excludeId);
+        }
+        return exists(wrapper);
+    }
+
+    /**
      * 构建菜单树
      *
      * @param menus    所有菜单列表

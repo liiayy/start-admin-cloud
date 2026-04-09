@@ -40,9 +40,6 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
 
     /**
      * 根据角色ID获取用户ID列表
-     *
-     * @param roleId 角色ID
-     * @return 用户ID列表
      */
     public List<Long> getUserIdsByRoleId(Long roleId) {
         return queryChain()
@@ -50,6 +47,22 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
                 .list()
                 .stream()
                 .map(UserRoleEntity::getUserId)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 根据多个角色ID获取用户ID列表
+     */
+    public List<Long> getUserIdsByRoleIds(List<Long> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return List.of();
+        }
+        return queryChain()
+                .where(UserRoleEntity::getRoleId).in(roleIds)
+                .list()
+                .stream()
+                .map(UserRoleEntity::getUserId)
+                .distinct()
                 .collect(Collectors.toList());
     }
 

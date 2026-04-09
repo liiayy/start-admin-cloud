@@ -1,9 +1,15 @@
 package cn.muziseo.service.system.module.permission.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.db.page.PageResponse;
+import cn.muziseo.service.system.enums.RoleErrorCode;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
 import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
 import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
+import cn.muziseo.service.system.module.permission.controller.request.RolePageRequest;
+import cn.muziseo.service.system.module.permission.controller.request.RoleUpdateRequest;
+import cn.muziseo.service.system.module.permission.controller.vo.RoleVO;
 import cn.muziseo.service.system.module.permission.manager.RoleManager;
 import cn.muziseo.service.system.module.permission.manager.RoleMenuManager;
 import cn.muziseo.service.system.module.permission.repository.entity.RoleEntity;
@@ -19,14 +25,8 @@ import java.util.stream.Collectors;
 
 /**
  * 角色业务实现
- * <p>
- * 实现角色的增删改查、分配菜单等功能
  *
  * @author 木子软件
- * @Date 2026-01-29
- * @Wechat liiayy
- * @Email 773582348@qq.com
- * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
 @Slf4j
@@ -46,29 +46,108 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<RoleEntity> getRolesByUserId(Long userId) {
-        // 调用Manager层查询角色ID
         List<Long> roleIds = userRoleManager.getRoleIdsByUserId(userId);
-
         if (roleIds.isEmpty()) {
             return List.of();
         }
-
         return roleManager.listByIds(roleIds);
     }
 
     @Override
+    public PageResponse<RoleVO> pageRole(RolePageRequest request) {
+        var page = roleManager.pageRole(request);
+        List<RoleVO> voList = page.getRecords().stream()
+                .map(this::toRoleVO)
+                .collect(Collectors.toList());
+
+        PageResponse<RoleVO> response = new PageResponse<>();
+        response.setList(voList);
+        response.setTotal(page.getTotalRow());
+        return response;
+    }
+
+    @Override
+    public RoleVO getRole(Long id) {
+        RoleEntity entity = roleManager.getById(id);
+        if (entity == null) {
+            throw new BusinessException(RoleErrorCode.ROLE_NOT_EXISTS);
+        }
+        return toRoleVO(entity);
+    }
+
+    @Override
     public void addRole(RoleAddRequest request) {
-        RoleEntity roleEntity = BeanUtil.copyProperties(request, RoleEntity.class);
-        roleManager.save(roleEntity);
+        if (roleManager.existsByCode(request.getCode(), null)) {
+            throw new BusinessException(RoleErrorCode.ROLE_CODE_EXISTS);
+        }
+        RoleEntity entity = BeanUtil.copyProperties(request, RoleEntity.class);
+        if (entity.getStatus() == null) {
+            entity.setStatus(0);
+        }
+        roleManager.save(entity);
+        log.info("新增角色成功: id={}, code={}", entity.getId(), entity.getCode());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateRole(RoleUpdateRequest request) {
+        RoleEntity existing = roleManager.getById(request.getId());
+        if (existing == null) {
+            throw new BusinessException(RoleErrorCode.ROLE_NOT_EXISTS);
+        }
+        if (roleManager.existsByCode(request.getCode(), request.getId())) {
+            throw new BusinessException(RoleErrorCode.ROLE_CODE_EXISTS);
+        }
+        RoleEntity entity = BeanUtil.copyProperties(request, RoleEntity.class);
+        roleManager.updateById(entity);
+
+        // 刷新拥有该角色的用户 Session
+        List<Long> userIds = userRoleManager.getUserIdsByRoleId(request.getId());
+        saSessionRefreshService.refreshUserSessions(userIds);
+        log.info("修改角色成功: id={}, 影响用户数={}", request.getId(), userIds.size());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteRole(Long id) {
+        RoleEntity existing = roleManager.getById(id);
+        if (existing == null) {
+            throw new BusinessException(RoleErrorCode.ROLE_NOT_EXISTS);
+        }
+        // 检查是否有用户关联
+        List<Long> userIds = userRoleManager.getUserIdsByRoleId(id);
+        if (!userIds.isEmpty()) {
+            throw new BusinessException(RoleErrorCode.ROLE_HAS_USERS);
+        }
+        roleMenuManager.deleteByRoleId(id);
+        userRoleManager.deleteByRoleId(id);
+        roleManager.removeById(id);
+
+        saSessionRefreshService.refreshUserSessions(userIds);
+        log.info("删除角色成功: id={}", id);
+    }
+
+    @Override
+    public void updateStatus(Long id, Integer status) {
+        RoleEntity existing = roleManager.getById(id);
+        if (existing == null) {
+            throw new BusinessException(RoleErrorCode.ROLE_NOT_EXISTS);
+        }
+        RoleEntity entity = new RoleEntity();
+        entity.setId(id);
+        entity.setStatus(status);
+        roleManager.updateById(entity);
+
+        // 刷新拥有该角色的用户 Session
+        List<Long> userIds = userRoleManager.getUserIdsByRoleId(id);
+        saSessionRefreshService.refreshUserSessions(userIds);
+        log.info("更新角色状态: id={}, status={}, 影响用户数={}", id, status, userIds.size());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void assignMenus(Long roleId, List<Long> menuIds) {
-        // 1. 删除原有关联
         roleMenuManager.deleteByRoleId(roleId);
-
-        // 2. 插入新关联
         if (menuIds != null && !menuIds.isEmpty()) {
             List<RoleMenuEntity> list = menuIds.stream().map(menuId -> RoleMenuEntity.builder()
                     .roleId(roleId)
@@ -77,9 +156,23 @@ public class RoleServiceImpl implements RoleService {
             roleMenuManager.saveBatch(list);
         }
 
-        // 3. 刷新拥有该角色的所有用户的 Session
+        // 刷新拥有该角色的所有用户的 Session
         List<Long> userIds = userRoleManager.getUserIdsByRoleId(roleId);
         saSessionRefreshService.refreshUserSessions(userIds);
-        log.info("分配角色菜单并刷新 Session: roleId={}, 影响用户数={}", roleId, userIds.size());
+        log.info("分配角色菜单: roleId={}, 影响用户数={}", roleId, userIds.size());
+    }
+
+    private RoleVO toRoleVO(RoleEntity entity) {
+        return RoleVO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .code(entity.getCode())
+                .sort(entity.getSort())
+                .status(entity.getStatus())
+                .dataScope(entity.getDataScope())
+                .type(entity.getType())
+                .remark(entity.getRemark())
+                .createTime(entity.getCreateTime())
+                .build();
     }
 }

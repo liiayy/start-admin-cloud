@@ -50,6 +50,19 @@ public class RoleMenuManager extends BaseServiceImpl<RoleMenuMapper, RoleMenuEnt
     }
 
     /**
+     * 根据菜单ID获取角色ID列表
+     */
+    public List<Long> getRoleIdsByMenuId(Long menuId) {
+        return queryChain()
+                .where(RoleMenuEntity::getMenuId).eq(menuId)
+                .list()
+                .stream()
+                .map(RoleMenuEntity::getRoleId)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 根据菜单ID删除关联
      *
      * @param menuId 菜单ID

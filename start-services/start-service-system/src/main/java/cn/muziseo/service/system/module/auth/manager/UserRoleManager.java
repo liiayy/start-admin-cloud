@@ -39,6 +39,21 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
     }
 
     /**
+     * 根据角色ID获取用户ID列表
+     *
+     * @param roleId 角色ID
+     * @return 用户ID列表
+     */
+    public List<Long> getUserIdsByRoleId(Long roleId) {
+        return queryChain()
+                .where(UserRoleEntity::getRoleId).eq(roleId)
+                .list()
+                .stream()
+                .map(UserRoleEntity::getUserId)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 根据用户ID删除角色关联
      *
      * @param userId 用户ID
@@ -56,5 +71,26 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
     public void deleteByRoleId(Long roleId) {
         remove(QueryWrapper.create()
                 .where(UserRoleEntity::getRoleId).eq(roleId));
+    }
+
+    /**
+     * 批量插入用户角色关联
+     *
+     * @param userId  用户ID
+     * @param roleIds 角色ID列表
+     */
+    public void batchInsert(Long userId, List<Long> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return;
+        }
+        List<UserRoleEntity> entities = roleIds.stream()
+                .map(roleId -> {
+                    UserRoleEntity entity = new UserRoleEntity();
+                    entity.setUserId(userId);
+                    entity.setRoleId(roleId);
+                    return entity;
+                })
+                .collect(Collectors.toList());
+        saveBatch(entities);
     }
 }

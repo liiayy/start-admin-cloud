@@ -23,6 +23,7 @@
         <module>start-common-cache</module>
         <module>start-common-sentinel</module>
         <module>start-common-satoken</module>
+        <module>start-common-satoken-integration</module>
         <module>start-commom-test</module>
         <module>start-common-env</module>
     </modules>

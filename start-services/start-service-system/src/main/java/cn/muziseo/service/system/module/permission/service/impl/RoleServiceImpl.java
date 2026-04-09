@@ -2,6 +2,7 @@ package cn.muziseo.service.system.module.permission.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
+import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
 import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
 import cn.muziseo.service.system.module.permission.manager.RoleManager;
 import cn.muziseo.service.system.module.permission.manager.RoleMenuManager;
@@ -40,6 +41,9 @@ public class RoleServiceImpl implements RoleService {
     @Resource
     private RoleMenuManager roleMenuManager;
 
+    @Resource
+    private SaSessionRefreshService saSessionRefreshService;
+
     @Override
     public List<RoleEntity> getRolesByUserId(Long userId) {
         // 调用Manager层查询角色ID
@@ -72,5 +76,10 @@ public class RoleServiceImpl implements RoleService {
                     .build()).collect(Collectors.toList());
             roleMenuManager.saveBatch(list);
         }
+
+        // 3. 刷新拥有该角色的所有用户的 Session
+        List<Long> userIds = userRoleManager.getUserIdsByRoleId(roleId);
+        saSessionRefreshService.refreshUserSessions(userIds);
+        log.info("分配角色菜单并刷新 Session: roleId={}, 影响用户数={}", roleId, userIds.size());
     }
 }

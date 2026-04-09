@@ -58,6 +58,10 @@
             <groupId>cn.muziseo</groupId>
             <artifactId>start-common-satoken</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-satoken-integration</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

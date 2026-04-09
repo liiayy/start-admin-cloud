@@ -1,6 +1,8 @@
 package cn.muziseo.service.system.module.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.service.system.enums.DictErrorCode;
 import cn.muziseo.service.system.module.system.controller.request.DictAddRequest;
 import cn.muziseo.service.system.module.system.manager.DictManager;
 import cn.muziseo.service.system.module.system.manager.DictTypeManager;
@@ -49,7 +51,7 @@ public class DictServiceImpl implements DictService {
 
         // 检查字典类型是否存在
         if (dictTypeManager.getByCode(request.getDictTypeCode()) == null) {
-            throw new RuntimeException("字典类型不存在");
+            throw new BusinessException(DictErrorCode.DICT_TYPE_NOT_EXISTS);
         }
 
         DictEntity entity = BeanUtil.copyProperties(request, DictEntity.class);
@@ -66,7 +68,7 @@ public class DictServiceImpl implements DictService {
 
         DictEntity existing = dictManager.getById(id);
         if (existing == null) {
-            throw new RuntimeException("字典数据不存在");
+            throw new BusinessException(DictErrorCode.DICT_DATA_NOT_EXISTS);
         }
 
         DictEntity entity = BeanUtil.copyProperties(request, DictEntity.class);
@@ -81,7 +83,7 @@ public class DictServiceImpl implements DictService {
 
         DictEntity existing = dictManager.getById(id);
         if (existing == null) {
-            throw new RuntimeException("字典数据不存在");
+            throw new BusinessException(DictErrorCode.DICT_DATA_NOT_EXISTS);
         }
 
         dictManager.removeById(id);

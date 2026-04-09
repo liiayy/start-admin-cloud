@@ -3,6 +3,7 @@ package cn.muziseo.service.system.module.auth.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.service.system.enums.UserErrorCode;
 import cn.muziseo.service.system.module.auth.controller.request.LoginRequest;
 import cn.muziseo.service.system.module.auth.controller.vo.LoginUserVO;
 import cn.muziseo.service.system.module.auth.controller.vo.LoginVO;
@@ -101,7 +102,7 @@ public class AuthController {
         UserEntity user = userService.getUserById(userId);
         if (user == null) {
             log.warn("用户不存在: userId={}", userId);
-            throw new BusinessException("用户不存在");
+            throw new BusinessException(UserErrorCode.USER_NOT_EXISTS);
         }
 
         // 2. 获取角色列表

@@ -1,6 +1,8 @@
 package cn.muziseo.service.system.module.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.service.system.enums.SystemErrorCode;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigAddRequest;
 import cn.muziseo.service.system.module.system.manager.SystemConfigManager;
 import cn.muziseo.service.system.module.system.repository.entity.SystemConfigEntity;
@@ -46,7 +48,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
         // 检查配置键是否存在
         if (systemConfigManager.existsByConfigKey(request.getConfigKey())) {
-            throw new RuntimeException("配置键已存在");
+            throw new BusinessException(SystemErrorCode.CONFIG_KEY_EXISTS);
         }
 
         SystemConfigEntity entity = BeanUtil.copyProperties(request, SystemConfigEntity.class);
@@ -63,13 +65,13 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
         SystemConfigEntity existing = systemConfigManager.getById(id);
         if (existing == null) {
-            throw new RuntimeException("系统配置不存在");
+            throw new BusinessException(SystemErrorCode.CONFIG_NOT_EXISTS);
         }
 
         // 系统内置配置不允许修改配置键
         if (existing.getIsSystem() != null && existing.getIsSystem() == 1) {
             if (!existing.getConfigKey().equals(request.getConfigKey())) {
-                throw new RuntimeException("系统内置配置不允许修改配置键");
+                throw new BusinessException(SystemErrorCode.CONFIG_BUILTIN_CANNOT_MODIFY);
             }
         }
 
@@ -86,12 +88,12 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
         SystemConfigEntity existing = systemConfigManager.getById(id);
         if (existing == null) {
-            throw new RuntimeException("系统配置不存在");
+            throw new BusinessException(SystemErrorCode.CONFIG_NOT_EXISTS);
         }
 
         // 系统内置配置不允许删除
         if (existing.getIsSystem() != null && existing.getIsSystem() == 1) {
-            throw new RuntimeException("系统内置配置不允许删除");
+            throw new BusinessException(SystemErrorCode.CONFIG_BUILTIN_CANNOT_DELETE);
         }
 
         systemConfigManager.removeById(id);

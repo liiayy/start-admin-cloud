@@ -1,6 +1,8 @@
 package cn.muziseo.service.system.module.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.service.system.enums.DictErrorCode;
 import cn.muziseo.service.system.module.system.controller.request.DictTypeAddRequest;
 import cn.muziseo.service.system.module.system.manager.DictManager;
 import cn.muziseo.service.system.module.system.manager.DictTypeManager;
@@ -44,7 +46,7 @@ public class DictTypeServiceImpl implements DictTypeService {
 
         // 检查字典类型编码是否存在
         if (dictTypeManager.existsByCode(request.getCode())) {
-            throw new RuntimeException("字典类型编码已存在");
+            throw new BusinessException(DictErrorCode.DICT_TYPE_CODE_EXISTS);
         }
 
         DictTypeEntity entity = BeanUtil.copyProperties(request, DictTypeEntity.class);
@@ -61,7 +63,7 @@ public class DictTypeServiceImpl implements DictTypeService {
 
         DictTypeEntity existing = dictTypeManager.getById(id);
         if (existing == null) {
-            throw new RuntimeException("字典类型不存在");
+            throw new BusinessException(DictErrorCode.DICT_TYPE_NOT_EXISTS);
         }
 
         DictTypeEntity entity = BeanUtil.copyProperties(request, DictTypeEntity.class);
@@ -76,13 +78,13 @@ public class DictTypeServiceImpl implements DictTypeService {
 
         DictTypeEntity dictType = dictTypeManager.getById(id);
         if (dictType == null) {
-            throw new RuntimeException("字典类型不存在");
+            throw new BusinessException(DictErrorCode.DICT_TYPE_NOT_EXISTS);
         }
 
         // 检查是否有字典数据
         long count = dictManager.listByDictTypeCode(dictType.getCode()).size();
         if (count > 0) {
-            throw new RuntimeException("该字典类型下存在字典数据，无法删除");
+            throw new BusinessException(DictErrorCode.DICT_TYPE_HAS_DATA);
         }
 
         dictTypeManager.removeById(id);

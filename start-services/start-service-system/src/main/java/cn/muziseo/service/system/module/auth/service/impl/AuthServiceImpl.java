@@ -3,6 +3,7 @@ package cn.muziseo.service.system.module.auth.service.impl;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.service.system.enums.UserErrorCode;
 import cn.muziseo.service.system.module.auth.controller.request.LoginRequest;
 import cn.muziseo.service.system.module.auth.controller.vo.LoginVO;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
@@ -44,12 +45,12 @@ public class AuthServiceImpl implements AuthService {
         UserEntity user = userService.getByUsername(request.getUsername());
         if (user == null || !user.getPassword().equals(request.getPassword())) {
             // 这里的密码比较目前是明文，实际生产应使用 BCryptPasswordEncoder
-            throw new BusinessException("账号或密码错误");
+            throw new BusinessException(UserErrorCode.LOGIN_FAILED);
         }
 
         // 2. 校验状态
         if (user.getStatus() != null && user.getStatus() == 1) {
-            throw new BusinessException("账号已被停用");
+            throw new BusinessException(UserErrorCode.USER_DISABLED);
         }
 
         // 3. 登录

@@ -1,6 +1,8 @@
 package cn.muziseo.service.system.module.organization.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.service.system.enums.DeptErrorCode;
 import cn.muziseo.service.system.module.organization.controller.request.DeptAddRequest;
 import cn.muziseo.service.system.module.organization.manager.DeptManager;
 import cn.muziseo.service.system.module.organization.repository.entity.DeptEntity;
@@ -76,7 +78,7 @@ public class DeptServiceImpl implements DeptService {
         // 调用Manager层检查是否有子部门
         long count = deptManager.countByParentId(id);
         if (count > 0) {
-            throw new RuntimeException("存在子部门，无法删除");
+            throw new BusinessException(DeptErrorCode.DEPT_HAS_CHILDREN);
         }
 
         // 检查是否有用户关联

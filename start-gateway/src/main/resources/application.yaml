@@ -47,8 +47,8 @@ sa-token:
 
 cors:
   allowed-origins: "http://localhost:9000,http://localhost:5173,http://127.0.0.1:3000"
-  allowed-methods: "GET, POST, PUT, DELETE, OPTIONS"
-  allowed-headers: "Origin, Content-Type, Accept, Authorization, X-Requested-With"
+  allowed-methods: "*"
+  allowed-headers: "*"
   exposed-headers: "Authorization, Content-Disposition, X-Request-ID"
   allow-credentials: true
   max-age: "3600"

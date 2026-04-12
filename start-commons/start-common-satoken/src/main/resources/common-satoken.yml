@@ -10,4 +10,4 @@ sa-token:
   # 关闭 cookie 鉴权 从根源杜绝 csrf 漏洞风险
   is-read-cookie: false
   # token前缀
-  token-prefix: "Bearer"
+  token-prefix: Bearer

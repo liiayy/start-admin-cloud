@@ -39,11 +39,26 @@ server:
 
 # Sa-Token 配置（网关层只校验 JWT，不查 Redis）
 sa-token:
+  # token名称 (同时也是cookie名称)
   token-name: Authorization
-  token-prefix: Bearer
-  is-read-cookie: false
+  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+  is-share: false
+  # jwt秘钥
+  jwt-secret-key: abcdefghijklmnopqrstuvwxyz
+  # 关闭无状态模式下不支持的活跃度校验
+  dynamic-active-timeout: false
+  active-timeout: -1
+  # 允许从 请求参数 读取 token
+  is-read-body: true
+  # 允许从 header 读取 token
   is-read-header: true
-  is-read-body: false
+  # 关闭 cookie 鉴权 从根源杜绝 csrf 漏洞风险
+  is-read-cookie: false
+  # token前缀
+  token-prefix: Bearer
+  timeout: -1
 
 cors:
   allowed-origins: "http://localhost:9000,http://localhost:5173,http://127.0.0.1:3000"

@@ -18,6 +18,22 @@ public class SaTokenConfig {
 
     @Bean
     public StpLogic getStpLogicJwt() {
-        return new StpLogicJwtForSimple();
+        return new cn.dev33.satoken.jwt.StpLogicJwtForStateless();
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setStpLogic(StpLogic stpLogic) {
+        cn.dev33.satoken.stp.StpUtil.setStpLogic(stpLogic);
+    }
+
+    /**
+     * 注册 Sa-Token 全局过滤器，解决 WebFlux 环境下的上下文初始化问题
+     */
+    @Bean
+    public cn.dev33.satoken.reactor.filter.SaReactorFilter getSaReactorFilter() {
+        return new cn.dev33.satoken.reactor.filter.SaReactorFilter()
+                .addInclude("/**")
+                .setAuth(obj -> {})
+                .setError(e -> e.getMessage());
     }
 }

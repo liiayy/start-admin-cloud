@@ -59,6 +59,9 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // 【关键修复】手动绑定 Reactor 上下文，确保 StpUtil 能读取到环境变量和请求信息
+        cn.dev33.satoken.reactor.context.SaReactorSyncHolder.setContext(exchange);
+
         String path = exchange.getRequest().getPath().value();
 
         // 1. 白名单放行
@@ -71,8 +74,8 @@ public class AuthFilter implements GlobalFilter, Ordered {
         try {
             loginId = StpUtil.getLoginIdDefaultNull();
         } catch (Exception e) {
-            log.warn("Token 解析异常: path={}, msg={}", path, e.getMessage());
-            return writeError(exchange, HttpStatus.UNAUTHORIZED.value(), "无效的认证凭证");
+            log.error("Token 解析异常: path={}", path, e);
+            return writeError(exchange, HttpStatus.UNAUTHORIZED.value(), "无效的认证凭证: " + e.getMessage());
         }
 
         if (loginId == null) {

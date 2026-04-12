@@ -22,7 +22,7 @@ public class SaTokenConfiguration {
 
     @Bean
     public StpLogic getStpLogicJwt() {
-        return new StpLogicJwtForSimple();
+        return new cn.dev33.satoken.jwt.StpLogicJwtForMixin();
     }
 
     @Bean

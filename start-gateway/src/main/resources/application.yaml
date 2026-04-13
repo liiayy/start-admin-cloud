@@ -60,7 +60,16 @@ sa-token:
   token-prefix: Bearer
   timeout: -1
 
-cors:
+# 白名单配置（不需要登录认证的路径）
+gateway:
+  auth:
+    white-paths:
+      - /auth/login
+      - /auth/captcha
+    white-prefixes:
+      - /swagger-ui
+      - /v3/api-docs
+      - /actuator
   allowed-origins: "http://localhost:9000,http://localhost:5173,http://127.0.0.1:3000"
   allowed-methods: "*"
   allowed-headers: "*"

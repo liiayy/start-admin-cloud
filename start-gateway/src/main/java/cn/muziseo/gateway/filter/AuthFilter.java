@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.gateway.config.AuthWhiteProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -18,9 +19,6 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Sa-Token 认证过滤器
@@ -37,25 +35,7 @@ import java.util.Set;
 public class AuthFilter implements GlobalFilter, Ordered {
 
     private final ObjectMapper objectMapper;
-
-    /**
-     * 白名单路径前缀（不需要认证）
-     * <p>
-     * 网关看到的路径是带路由前缀的，如 /api/system/auth/login
-     */
-    private static final Set<String> WHITE_PREFIXES = Set.of(
-            "/auth/login",
-            "/auth/captcha"
-    );
-
-    /**
-     * 白名单路径前缀（文档、监控等）
-     */
-    private static final Set<String> WHITE_PATH_PREFIXES = Set.of(
-            "/swagger-ui",
-            "/v3/api-docs",
-            "/actuator"
-    );
+    private final AuthWhiteProperties authWhiteProperties;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -97,17 +77,17 @@ public class AuthFilter implements GlobalFilter, Ordered {
      * 需要匹配去掉路由前缀后的实际路径
      */
     private boolean isWhitePath(String path) {
-        // 精确匹配文档和监控路径
-        for (String prefix : WHITE_PATH_PREFIXES) {
+        // 前缀匹配：文档、监控等全局路径
+        for (String prefix : authWhiteProperties.getWhitePrefixes()) {
             if (path.startsWith(prefix)) {
                 return true;
             }
         }
 
-        // 匹配业务白名单：/api/system/auth/login → 提取 /auth/login
+        // 精确匹配：业务白名单 /api/system/auth/login → 提取 /auth/login
         String actualPath = extractActualPath(path);
         if (actualPath != null) {
-            for (String white : WHITE_PREFIXES) {
+            for (String white : authWhiteProperties.getWhitePaths()) {
                 if (actualPath.equals(white) || actualPath.startsWith(white + "/")) {
                     return true;
                 }

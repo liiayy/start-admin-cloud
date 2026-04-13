@@ -53,4 +53,7 @@ public class UserVO {
 
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
+
+    @Schema(description = "角色ID数组")
+    private List<Long> roleIds;
 }

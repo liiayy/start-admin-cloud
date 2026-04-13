@@ -12,6 +12,8 @@ import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
 import cn.muziseo.service.system.module.auth.service.UserService;
+import cn.muziseo.service.system.module.organization.manager.DeptManager;
+import cn.muziseo.service.system.module.organization.repository.entity.DeptEntity;
 import cn.muziseo.service.system.module.permission.service.MenuService;
 import cn.muziseo.service.system.module.permission.service.RoleService;
 import jakarta.annotation.Resource;
@@ -33,6 +35,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private UserManager userManager;
+
+    @Resource
+    private DeptManager deptManager;
 
     @Resource
     private UserRoleManager userRoleManager;
@@ -179,12 +184,26 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserVO toUserVO(UserEntity entity) {
+        // 解析部门名称
+        String deptName = null;
+        if (entity.getDeptId() != null) {
+            DeptEntity dept = deptManager.getById(entity.getDeptId());
+            if (dept != null) {
+                deptName = dept.getName();
+            }
+        }
+
+        // 获取用户角色ID列表
+        List<Long> roleIds = userRoleManager.getRoleIdsByUserId(entity.getId());
+
         return UserVO.builder()
                 .id(entity.getId())
                 .username(entity.getUsername())
                 .nickname(entity.getNickname())
                 .deptId(entity.getDeptId())
+                .deptName(deptName)
                 .postIds(entity.getPostIds())
+                .roleIds(roleIds)
                 .mobile(entity.getMobile())
                 .email(entity.getEmail())
                 .sex(entity.getSex())

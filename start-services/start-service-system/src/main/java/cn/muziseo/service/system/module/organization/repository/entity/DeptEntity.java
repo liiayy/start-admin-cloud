@@ -66,4 +66,9 @@ public class DeptEntity extends BaseEntity {
      */
     private Integer status;
 
+    /**
+     * 备注
+     */
+    private String remark;
+
 }

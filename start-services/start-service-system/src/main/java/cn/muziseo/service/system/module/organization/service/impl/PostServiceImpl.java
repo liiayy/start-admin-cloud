@@ -2,10 +2,14 @@ package cn.muziseo.service.system.module.organization.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.PostErrorCode;
 import cn.muziseo.service.system.module.organization.controller.request.PostAddRequest;
+import cn.muziseo.service.system.module.organization.controller.request.PostPageRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.PostVO;
+import cn.muziseo.service.system.module.organization.manager.DeptManager;
 import cn.muziseo.service.system.module.organization.manager.PostManager;
+import cn.muziseo.service.system.module.organization.repository.entity.DeptEntity;
 import cn.muziseo.service.system.module.organization.repository.entity.PostEntity;
 import cn.muziseo.service.system.module.organization.service.PostService;
 import jakarta.annotation.Resource;
@@ -27,11 +31,33 @@ public class PostServiceImpl implements PostService {
     @Resource
     private PostManager postManager;
 
+    @Resource
+    private DeptManager deptManager;
+
     @Override
     public List<PostVO> list() {
         return postManager.listAll().stream()
                 .map(this::toPostVO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PageResponse<PostVO> pagePost(PostPageRequest request) {
+        // 解析部门过滤（部门+子部门）
+        List<Long> deptIds = null;
+        if (request.getDeptId() != null) {
+            deptIds = deptManager.getDeptAndChildIds(request.getDeptId());
+        }
+
+        var page = postManager.pagePost(request, deptIds);
+        List<PostVO> voList = page.getRecords().stream()
+                .map(this::toPostVO)
+                .collect(Collectors.toList());
+
+        PageResponse<PostVO> response = new PageResponse<>();
+        response.setList(voList);
+        response.setTotal(page.getTotalRow());
+        return response;
     }
 
     @Override
@@ -106,8 +132,17 @@ public class PostServiceImpl implements PostService {
      * Entity → PostVO
      */
     private PostVO toPostVO(PostEntity entity) {
+        String deptName = null;
+        if (entity.getDeptId() != null) {
+            DeptEntity dept = deptManager.getById(entity.getDeptId());
+            if (dept != null) {
+                deptName = dept.getName();
+            }
+        }
         return PostVO.builder()
                 .id(entity.getId())
+                .deptId(entity.getDeptId())
+                .deptName(deptName)
                 .code(entity.getCode())
                 .name(entity.getName())
                 .sort(entity.getSort())

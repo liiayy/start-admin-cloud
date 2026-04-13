@@ -32,6 +32,11 @@ public class PostEntity extends BaseEntity {
     private Long id;
 
     /**
+     * 所属部门ID
+     */
+    private Long deptId;
+
+    /**
      * 岗位编码
      */
     private String code;

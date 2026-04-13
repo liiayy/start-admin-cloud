@@ -145,6 +145,7 @@ public class DeptServiceImpl implements DeptService {
                 .phone(entity.getPhone())
                 .email(entity.getEmail())
                 .status(entity.getStatus())
+                .remark(entity.getRemark())
                 .createTime(entity.getCreateTime())
                 .build();
     }
@@ -164,6 +165,8 @@ public class DeptServiceImpl implements DeptService {
                         .phone(d.getPhone())
                         .email(d.getEmail())
                         .status(d.getStatus())
+                        .remark(d.getRemark())
+                        .createTime(d.getCreateTime())
                         .children(buildTree(allDepts, d.getId()))
                         .build())
                 .collect(Collectors.toList());

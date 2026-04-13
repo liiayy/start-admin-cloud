@@ -6,6 +6,7 @@ import cn.muziseo.service.system.module.organization.repository.mapper.DeptMappe
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,5 +70,28 @@ public class DeptManager extends BaseServiceImpl<DeptMapper, DeptEntity> {
     public long countByParentId(Long parentId) {
         return count(QueryWrapper.create()
                 .where(DeptEntity::getParentId).eq(parentId));
+    }
+
+    /**
+     * 获取指定部门及其所有子部门的ID列表
+     *
+     * @param deptId 部门ID，null时返回空列表
+     * @return 包含自身及所有子部门的ID列表
+     */
+    public List<Long> getDeptAndChildIds(Long deptId) {
+        if (deptId == null) {
+            return List.of();
+        }
+        List<Long> ids = new ArrayList<>();
+        ids.add(deptId);
+        collectChildIds(deptId, ids);
+        return ids;
+    }
+
+    private void collectChildIds(Long parentId, List<Long> ids) {
+        for (DeptEntity child : listByParentId(parentId)) {
+            ids.add(child.getId());
+            collectChildIds(child.getId(), ids);
+        }
     }
 }

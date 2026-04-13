@@ -1,8 +1,10 @@
 package cn.muziseo.service.system.module.organization.manager;
 
 import cn.muziseo.common.db.service.impl.BaseServiceImpl;
+import cn.muziseo.service.system.module.organization.controller.request.PostPageRequest;
 import cn.muziseo.service.system.module.organization.repository.entity.PostEntity;
 import cn.muziseo.service.system.module.organization.repository.mapper.PostMapper;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 
@@ -58,5 +60,20 @@ public class PostManager extends BaseServiceImpl<PostMapper, PostEntity> {
             qw.and(PostEntity::getId).ne(excludeId);
         }
         return exists(qw);
+    }
+
+    /**
+     * 分页查询岗位（支持部门+子部门过滤）
+     */
+    public Page<PostEntity> pagePost(PostPageRequest request, List<Long> deptIds) {
+        QueryWrapper wrapper = QueryWrapper.create();
+        if (deptIds != null && !deptIds.isEmpty()) {
+            wrapper.and(PostEntity::getDeptId).in(deptIds);
+        }
+        wrapper.and(PostEntity::getName).like(request.getName(), request.getName() != null)
+               .and(PostEntity::getStatus).eq(request.getStatus(), request.getStatus() != null)
+               .orderBy(PostEntity::getSort, true)
+               .orderBy(PostEntity::getId, false);
+        return page(new Page<>(request.getPageNum(), request.getPageSize()), wrapper);
     }
 }

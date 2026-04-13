@@ -38,4 +38,7 @@ public class DeptAddRequest {
     @Schema(description = "状态（0正常 1停用）")
     private Integer status;
 
+    @Schema(description = "备注")
+    private String remark;
+
 }

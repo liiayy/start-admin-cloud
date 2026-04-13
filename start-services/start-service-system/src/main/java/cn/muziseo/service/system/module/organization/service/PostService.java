@@ -1,6 +1,8 @@
 package cn.muziseo.service.system.module.organization.service;
 
+import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.organization.controller.request.PostAddRequest;
+import cn.muziseo.service.system.module.organization.controller.request.PostPageRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.PostVO;
 
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.List;
 public interface PostService {
 
     List<PostVO> list();
+
+    PageResponse<PostVO> pagePost(PostPageRequest request);
 
     PostVO getById(Long id);
 

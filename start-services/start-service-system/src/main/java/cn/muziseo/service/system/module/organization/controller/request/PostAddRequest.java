@@ -15,6 +15,9 @@ import lombok.Data;
 @Schema(description = "岗位添加请求")
 public class PostAddRequest {
 
+    @Schema(description = "所属部门ID")
+    private Long deptId;
+
     @Schema(description = "岗位编码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "岗位编码不能为空")
     private String code;

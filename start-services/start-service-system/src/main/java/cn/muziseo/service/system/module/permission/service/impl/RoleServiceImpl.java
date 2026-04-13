@@ -84,6 +84,9 @@ public class RoleServiceImpl implements RoleService {
         if (entity.getStatus() == null) {
             entity.setStatus(0);
         }
+        if (entity.getType() == null) {
+            entity.setType(2);
+        }
         roleManager.save(entity);
         log.info("新增角色成功: id={}, code={}", entity.getId(), entity.getCode());
     }

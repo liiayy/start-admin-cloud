@@ -40,6 +40,9 @@ public class DeptVO {
     @Schema(description = "状态（0正常 1停用）")
     private Integer status;
 
+    @Schema(description = "备注")
+    private String remark;
+
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
 }

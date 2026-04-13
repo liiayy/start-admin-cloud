@@ -1,7 +1,9 @@
 package cn.muziseo.service.system.module.organization.controller;
 
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.organization.controller.request.PostAddRequest;
+import cn.muziseo.service.system.module.organization.controller.request.PostPageRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.PostVO;
 import cn.muziseo.service.system.module.organization.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +35,12 @@ public class PostController {
     @GetMapping("/list")
     public ResponseDTO<List<PostVO>> list() {
         return ResponseDTO.success(postService.list());
+    }
+
+    @Operation(summary = "分页查询岗位")
+    @GetMapping("/page")
+    public ResponseDTO<PageResponse<PostVO>> page(PostPageRequest request) {
+        return ResponseDTO.success(postService.pagePost(request));
     }
 
     @Operation(summary = "获取岗位详情")

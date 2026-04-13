@@ -19,6 +19,12 @@ public class PostVO {
     @Schema(description = "岗位ID")
     private Long id;
 
+    @Schema(description = "所属部门ID")
+    private Long deptId;
+
+    @Schema(description = "所属部门名称")
+    private String deptName;
+
     @Schema(description = "岗位编码")
     private String code;
 

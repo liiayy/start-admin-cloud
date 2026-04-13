@@ -46,13 +46,17 @@ public class PostManager extends BaseServiceImpl<PostMapper, PostEntity> {
     }
 
     /**
-     * 检查岗位编码是否存在
+     * 检查岗位编码是否已存在
      *
-     * @param code 岗位编码
+     * @param code      岗位编码
+     * @param excludeId 排除的岗位ID（更新时排除自身）
      * @return 是否存在
      */
-    public boolean existsByCode(String code) {
-        return exists(QueryWrapper.create()
-                .where(PostEntity::getCode).eq(code));
+    public boolean existsByCode(String code, Long excludeId) {
+        QueryWrapper qw = QueryWrapper.create().where(PostEntity::getCode).eq(code);
+        if (excludeId != null) {
+            qw.and(PostEntity::getId).ne(excludeId);
+        }
+        return exists(qw);
     }
 }

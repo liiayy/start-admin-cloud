@@ -7,7 +7,6 @@ import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 部门表 Manager 层
@@ -47,31 +46,18 @@ public class DeptManager extends BaseServiceImpl<DeptMapper, DeptEntity> {
     }
 
     /**
-     * 获取部门树形结构
+     * 检查部门名称是否已存在
      *
-     * @return 部门树
+     * @param name      部门名称
+     * @param excludeId 排除的部门ID（更新时排除自身）
+     * @return 是否存在
      */
-    public List<DeptEntity> tree() {
-        List<DeptEntity> allDepts = listAll();
-        return buildTree(allDepts, 0L);
-    }
-
-    /**
-     * 构建部门树
-     *
-     * @param depts    所有部门列表
-     * @param parentId 父部门ID
-     * @return 树形结构
-     */
-    private List<DeptEntity> buildTree(List<DeptEntity> depts, Long parentId) {
-        return depts.stream()
-                .filter(dept -> parentId.equals(dept.getParentId()))
-                .peek(dept -> {
-                    // 注意：需要在DeptEntity中添加children字段
-                    List<DeptEntity> children = buildTree(depts, dept.getId());
-                    // dept.setChildren(children);
-                })
-                .collect(Collectors.toList());
+    public boolean existsByName(String name, Long excludeId) {
+        QueryWrapper qw = QueryWrapper.create().where(DeptEntity::getName).eq(name);
+        if (excludeId != null) {
+            qw.and(DeptEntity::getId).ne(excludeId);
+        }
+        return exists(qw);
     }
 
     /**

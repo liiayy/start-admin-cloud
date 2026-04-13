@@ -5,8 +5,11 @@ import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.muziseo.common.core.factory.YmlPropertySourceFactory;
 import cn.muziseo.common.satoken.core.dao.StartSaTokenDao;
+import cn.muziseo.common.satoken.core.feign.FeignAuthInterceptor;
 import cn.muziseo.common.satoken.core.handler.SaTokenExceptionHandler;
+import feign.RequestInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
 
@@ -33,5 +36,16 @@ public class SaTokenConfiguration {
     @Bean
     public SaTokenExceptionHandler saTokenExceptionHandler() {
         return new SaTokenExceptionHandler();
+    }
+
+    /**
+     * Feign 拦截器：微服务间调用时透传认证上下文
+     * <p>
+     * 仅当 classpath 中存在 Feign 时生效（即引入了 spring-cloud-starter-openfeign 的服务）
+     */
+    @Bean
+    @ConditionalOnClass(RequestInterceptor.class)
+    public FeignAuthInterceptor feignAuthInterceptor() {
+        return new FeignAuthInterceptor();
     }
 }

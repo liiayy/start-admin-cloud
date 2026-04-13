@@ -53,6 +53,13 @@
             <artifactId>start-service-system-api</artifactId>
             <version>${revision}</version>
         </dependency>
+
+        <!-- Feign 微服务调用时透传用户上下文（可选依赖） -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
 </project>

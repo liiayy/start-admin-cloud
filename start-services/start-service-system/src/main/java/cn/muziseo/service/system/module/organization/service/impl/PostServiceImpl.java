@@ -2,6 +2,7 @@ package cn.muziseo.service.system.module.organization.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.db.annotation.DataScope;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.PostErrorCode;
 import cn.muziseo.service.system.module.organization.controller.request.PostAddRequest;
@@ -42,6 +43,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @DataScope
     public PageResponse<PostVO> pagePost(PostPageRequest request) {
         // 解析部门过滤（部门+子部门）
         List<Long> deptIds = null;

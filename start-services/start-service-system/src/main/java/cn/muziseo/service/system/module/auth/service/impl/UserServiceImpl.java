@@ -2,6 +2,7 @@ package cn.muziseo.service.system.module.auth.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.db.annotation.DataScope;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.common.satoken.core.util.PasswordUtils;
 import cn.muziseo.service.system.enums.UserErrorCode;
@@ -62,6 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @DataScope
     public PageResponse<UserVO> pageUser(UserPageRequest request) {
         var page = userManager.pageUser(request);
         List<UserVO> voList = page.getRecords().stream()

@@ -173,6 +173,7 @@ public class RoleServiceImpl implements RoleService {
                 .sort(entity.getSort())
                 .status(entity.getStatus())
                 .dataScope(entity.getDataScope())
+                .dataScopeDeptIds(entity.getDataScopeDeptIds())
                 .type(entity.getType())
                 .remark(entity.getRemark())
                 .createTime(entity.getCreateTime())

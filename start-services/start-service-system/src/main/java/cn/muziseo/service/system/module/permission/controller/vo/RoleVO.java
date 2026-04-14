@@ -34,6 +34,9 @@ public class RoleVO {
     @Schema(description = "数据范围")
     private Integer dataScope;
 
+    @Schema(description = "数据范围自定义部门ID列表（JSON字符串）")
+    private String dataScopeDeptIds;
+
     @Schema(description = "角色类型")
     private Integer type;
 

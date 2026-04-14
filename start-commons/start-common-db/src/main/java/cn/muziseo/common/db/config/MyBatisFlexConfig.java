@@ -1,6 +1,7 @@
 package cn.muziseo.common.db.config;
 
 import cn.muziseo.common.core.factory.YmlPropertySourceFactory;
+import cn.muziseo.common.db.datascope.DataScopeDialect;
 import cn.muziseo.common.db.decipher.Decipher;
 import cn.muziseo.common.db.listener.EntityInsertListener;
 import cn.muziseo.common.db.listener.EntityUpdateListener;
@@ -9,6 +10,8 @@ import com.mybatisflex.core.audit.AuditManager;
 import com.mybatisflex.core.audit.ConsoleMessageCollector;
 import com.mybatisflex.core.audit.MessageCollector;
 import com.mybatisflex.core.datasource.DataSourceDecipher;
+import com.mybatisflex.core.dialect.DbType;
+import com.mybatisflex.core.dialect.DialectFactory;
 import com.mybatisflex.core.mybatis.FlexConfiguration;
 import com.mybatisflex.core.query.QueryColumnBehavior;
 import com.mybatisflex.spring.boot.ConfigurationCustomizer;
@@ -103,6 +106,9 @@ public class MyBatisFlexConfig implements ConfigurationCustomizer, MyBatisFlexCu
      */
     @Override
     public void customize(FlexGlobalConfig globalConfig) {
+        // 注册数据权限方言（prepareAuth 机制）
+        DialectFactory.registerDialect(DbType.POSTGRE_SQL, new DataScopeDialect());
+
         // 注册全局数据填充监听器
         // 注册为全局监听器，在监听器内部判断类型
         globalConfig.registerInsertListener(new EntityInsertListener());

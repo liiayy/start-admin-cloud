@@ -31,6 +31,11 @@ public class TimestampLocalDateTimeSerializer extends JsonSerializer<LocalDateTi
     public static final TimestampLocalDateTimeSerializer INSTANCE = new TimestampLocalDateTimeSerializer();
 
     /**
+     * 默认日期时间格式化器
+     */
+    private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    /**
      * 持有当前上下文的格式化器
      */
     private DateTimeFormatter formatter;
@@ -65,8 +70,8 @@ public class TimestampLocalDateTimeSerializer extends JsonSerializer<LocalDateTi
             return;
         }
 
-        // 优先级 2：默认输出毫秒时间戳
-        gen.writeNumber(value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        // 优先级 2：默认输出格式化字符串
+        gen.writeString(DEFAULT_FORMATTER.format(value));
     }
 
     /**

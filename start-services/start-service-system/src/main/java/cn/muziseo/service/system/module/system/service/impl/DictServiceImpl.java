@@ -2,8 +2,11 @@ package cn.muziseo.service.system.module.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.DictErrorCode;
-import cn.muziseo.service.system.module.system.controller.request.DictAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.DictDataAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.DictDataPageRequest;
+import cn.muziseo.service.system.module.system.controller.vo.DictDataVO;
 import cn.muziseo.service.system.module.system.manager.DictManager;
 import cn.muziseo.service.system.module.system.manager.DictTypeManager;
 import cn.muziseo.service.system.module.system.repository.entity.DictEntity;
@@ -31,26 +34,31 @@ public class DictServiceImpl implements DictService {
     private DictTypeManager dictTypeManager;
 
     @Override
-    public List<DictEntity> list() {
-        return dictManager.list();
+    public List<DictDataVO> listByDictType(String dictType) {
+        return dictManager.listByDictType(dictType).stream()
+                .map(this::toDictDataVO)
+                .toList();
     }
 
     @Override
-    public List<DictEntity> listByDictTypeCode(String dictTypeCode) {
-        return dictManager.listByDictTypeCode(dictTypeCode);
+    public PageResponse<DictDataVO> pageDictData(DictDataPageRequest request) {
+        var page = dictManager.pageDictData(request);
+        List<DictDataVO> voList = page.getRecords().stream()
+                .map(this::toDictDataVO)
+                .toList();
+        return new PageResponse<>(voList, (int) page.getTotalRow());
     }
 
     @Override
-    public DictEntity getById(Long id) {
-        return dictManager.getById(id);
+    public DictDataVO getDictDataById(Long id) {
+        DictEntity entity = dictManager.getById(id);
+        return toDictDataVO(entity);
     }
 
     @Override
-    public void addDict(DictAddRequest request) {
-        log.info("新增字典数据: dictTypeCode={}, label={}", request.getDictTypeCode(), request.getLabel());
-
+    public void addDictData(DictDataAddRequest request) {
         // 检查字典类型是否存在
-        if (dictTypeManager.getByCode(request.getDictTypeCode()) == null) {
+        if (dictTypeManager.getByType(request.getDictType()) == null) {
             throw new BusinessException(DictErrorCode.DICT_TYPE_NOT_EXISTS);
         }
 
@@ -59,13 +67,10 @@ public class DictServiceImpl implements DictService {
             entity.setStatus(0);
         }
         dictManager.save(entity);
-        log.info("新增字典数据成功: id={}", entity.getId());
     }
 
     @Override
-    public void updateDict(Long id, DictAddRequest request) {
-        log.info("更新字典数据: id={}", id);
-
+    public void updateDictData(Long id, DictDataAddRequest request) {
         DictEntity existing = dictManager.getById(id);
         if (existing == null) {
             throw new BusinessException(DictErrorCode.DICT_DATA_NOT_EXISTS);
@@ -74,19 +79,36 @@ public class DictServiceImpl implements DictService {
         DictEntity entity = BeanUtil.copyProperties(request, DictEntity.class);
         entity.setId(id);
         dictManager.updateById(entity);
-        log.info("更新字典数据成功: id={}", id);
     }
 
     @Override
-    public void deleteDict(Long id) {
-        log.info("删除字典数据: id={}", id);
-
+    public void deleteDictData(Long id) {
         DictEntity existing = dictManager.getById(id);
         if (existing == null) {
             throw new BusinessException(DictErrorCode.DICT_DATA_NOT_EXISTS);
         }
 
         dictManager.removeById(id);
-        log.info("删除字典数据成功: id={}", id);
+    }
+
+    /**
+     * Entity 转 VO
+     */
+    private DictDataVO toDictDataVO(DictEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        return DictDataVO.builder()
+                .id(entity.getId())
+                .dictType(entity.getDictType())
+                .label(entity.getLabel())
+                .value(entity.getValue())
+                .sort(entity.getSort())
+                .status(entity.getStatus())
+                .colorType(entity.getColorType())
+                .cssClass(entity.getCssClass())
+                .remark(entity.getRemark())
+                .createTime(entity.getCreateTime())
+                .build();
     }
 }

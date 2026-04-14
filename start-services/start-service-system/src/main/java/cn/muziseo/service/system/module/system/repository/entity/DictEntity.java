@@ -8,12 +8,12 @@ import lombok.*;
 /**
  * 字典数据实体
  * <p>
- * 对应数据库表 system_dict，用于存储字典数据信息
+ * 对应数据库表 system_dict_data，用于存储字典数据信息
  *
  * @author 木子软件
  * @Date 2026-02-27
  */
-@Table("system_dict")
+@Table("system_dict_data")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -29,9 +29,9 @@ public class DictEntity extends BaseEntity {
     private Long id;
 
     /**
-     * 字典类型编码
+     * 字典类型
      */
-    private String dictTypeCode;
+    private String dictType;
 
     /**
      * 字典标签
@@ -57,5 +57,15 @@ public class DictEntity extends BaseEntity {
      * 备注
      */
     private String remark;
+
+    /**
+     * 颜色类型
+     */
+    private String colorType;
+
+    /**
+     * CSS 样式
+     */
+    private String cssClass;
 
 }

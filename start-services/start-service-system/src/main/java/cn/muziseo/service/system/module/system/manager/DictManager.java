@@ -1,8 +1,10 @@
 package cn.muziseo.service.system.module.system.manager;
 
 import cn.muziseo.common.db.service.impl.BaseServiceImpl;
+import cn.muziseo.service.system.module.system.controller.request.DictDataPageRequest;
 import cn.muziseo.service.system.module.system.repository.entity.DictEntity;
 import cn.muziseo.service.system.module.system.repository.mapper.DictMapper;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 
@@ -18,20 +20,33 @@ import java.util.List;
 public class DictManager extends BaseServiceImpl<DictMapper, DictEntity> {
 
     /**
-     * 根据字典类型编码获取字典数据列表
+     * 根据字典类型获取字典数据列表
      */
-    public List<DictEntity> listByDictTypeCode(String dictTypeCode) {
+    public List<DictEntity> listByDictType(String dictType) {
         return list(QueryWrapper.create()
-                .where(DictEntity::getDictTypeCode).eq(dictTypeCode)
+                .where(DictEntity::getDictType).eq(dictType)
                 .orderBy(DictEntity::getSort, true)
                 .orderBy(DictEntity::getId, true));
     }
 
     /**
-     * 根据字典类型编码删除字典数据
+     * 分页查询字典数据
      */
-    public void deleteByDictTypeCode(String dictTypeCode) {
+    public Page<DictEntity> pageDictData(DictDataPageRequest request) {
+        QueryWrapper wrapper = QueryWrapper.create()
+                .where(DictEntity::getDictType).eq(request.getDictType(), request.getDictType() != null)
+                .and(DictEntity::getLabel).like(request.getLabel(), request.getLabel() != null)
+                .and(DictEntity::getStatus).eq(request.getStatus(), request.getStatus() != null)
+                .orderBy(DictEntity::getId, false);
+
+        return page(new Page<>(request.getPageNum(), request.getPageSize()), wrapper);
+    }
+
+    /**
+     * 根据字典类型删除字典数据
+     */
+    public void deleteByDictType(String dictType) {
         remove(QueryWrapper.create()
-                .where(DictEntity::getDictTypeCode).eq(dictTypeCode));
+                .where(DictEntity::getDictType).eq(dictType));
     }
 }

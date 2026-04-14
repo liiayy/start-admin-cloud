@@ -1,8 +1,11 @@
 package cn.muziseo.service.system.module.system.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.system.controller.request.DictTypeAddRequest;
-import cn.muziseo.service.system.module.system.repository.entity.DictTypeEntity;
+import cn.muziseo.service.system.module.system.controller.request.DictTypePageRequest;
+import cn.muziseo.service.system.module.system.controller.vo.DictTypeVO;
 import cn.muziseo.service.system.module.system.service.DictTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,59 +31,48 @@ public class DictTypeController {
     @Resource
     private DictTypeService dictTypeService;
 
-    /**
-     * 获取字典类型列表
-     */
     @Operation(summary = "获取字典类型列表")
+    @SaCheckPermission("system:dict:query")
     @GetMapping("/list")
-    public ResponseDTO<List<DictTypeEntity>> list() {
-        List<DictTypeEntity> list = dictTypeService.list();
-        return ResponseDTO.success(list);
+    public ResponseDTO<List<DictTypeVO>> list() {
+        return ResponseDTO.success(dictTypeService.list());
     }
 
-    /**
-     * 根据ID获取字典类型
-     */
+    @Operation(summary = "分页查询字典类型")
+    @SaCheckPermission("system:dict:query")
+    @GetMapping("/page")
+    public ResponseDTO<PageResponse<DictTypeVO>> page(DictTypePageRequest request) {
+        return ResponseDTO.success(dictTypeService.pageDictType(request));
+    }
+
     @Operation(summary = "获取字典类型详情")
-    @GetMapping("/{id}")
-    public ResponseDTO<DictTypeEntity> getById(@PathVariable Long id) {
-        DictTypeEntity dictType = dictTypeService.getById(id);
-        return ResponseDTO.success(dictType);
+    @SaCheckPermission("system:dict:query")
+    @GetMapping("/get")
+    public ResponseDTO<DictTypeVO> get(@RequestParam Long id) {
+        return ResponseDTO.success(dictTypeService.getDictTypeById(id));
     }
 
-    /**
-     * 新增字典类型
-     */
     @Operation(summary = "新增字典类型")
+    @SaCheckPermission("system:dict:create")
     @PostMapping("/add")
     public ResponseDTO<Void> add(@Valid @RequestBody DictTypeAddRequest request) {
-        log.info("新增字典类型: code={}, name={}", request.getCode(), request.getName());
         dictTypeService.addDictType(request);
-        log.info("新增字典类型成功: code={}", request.getCode());
         return ResponseDTO.success();
     }
 
-    /**
-     * 更新字典类型
-     */
     @Operation(summary = "更新字典类型")
-    @PutMapping("/{id}")
-    public ResponseDTO<Void> update(@PathVariable Long id, @Valid @RequestBody DictTypeAddRequest request) {
-        log.info("更新字典类型: id={}", id);
+    @SaCheckPermission("system:dict:update")
+    @PutMapping("/update")
+    public ResponseDTO<Void> update(@RequestParam Long id, @Valid @RequestBody DictTypeAddRequest request) {
         dictTypeService.updateDictType(id, request);
-        log.info("更新字典类型成功: id={}", id);
         return ResponseDTO.success();
     }
 
-    /**
-     * 删除字典类型
-     */
     @Operation(summary = "删除字典类型")
-    @DeleteMapping("/{id}")
-    public ResponseDTO<Void> delete(@PathVariable Long id) {
-        log.info("删除字典类型: id={}", id);
+    @SaCheckPermission("system:dict:delete")
+    @DeleteMapping("/delete")
+    public ResponseDTO<Void> delete(@RequestParam Long id) {
         dictTypeService.deleteDictType(id);
-        log.info("删除字典类型成功: id={}", id);
         return ResponseDTO.success();
     }
 }

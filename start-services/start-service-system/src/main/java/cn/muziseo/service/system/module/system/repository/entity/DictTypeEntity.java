@@ -29,19 +29,14 @@ public class DictTypeEntity extends BaseEntity {
     private Long id;
 
     /**
-     * 字典类型编码
+     * 字典类型
      */
-    private String code;
+    private String type;
 
     /**
      * 字典类型名称
      */
     private String name;
-
-    /**
-     * 显示顺序
-     */
-    private Integer sort;
 
     /**
      * 状态（0正常 1停用）

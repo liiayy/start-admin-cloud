@@ -1,7 +1,9 @@
 package cn.muziseo.service.system.module.system.service;
 
+import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.system.controller.request.DictTypeAddRequest;
-import cn.muziseo.service.system.module.system.repository.entity.DictTypeEntity;
+import cn.muziseo.service.system.module.system.controller.request.DictTypePageRequest;
+import cn.muziseo.service.system.module.system.controller.vo.DictTypeVO;
 
 import java.util.List;
 
@@ -16,12 +18,17 @@ public interface DictTypeService {
     /**
      * 获取所有字典类型列表
      */
-    List<DictTypeEntity> list();
+    List<DictTypeVO> list();
+
+    /**
+     * 分页查询字典类型
+     */
+    PageResponse<DictTypeVO> pageDictType(DictTypePageRequest request);
 
     /**
      * 根据ID获取字典类型
      */
-    DictTypeEntity getById(Long id);
+    DictTypeVO getDictTypeById(Long id);
 
     /**
      * 添加字典类型

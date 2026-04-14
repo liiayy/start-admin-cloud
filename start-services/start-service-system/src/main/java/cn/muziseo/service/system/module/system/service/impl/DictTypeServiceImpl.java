@@ -2,8 +2,11 @@ package cn.muziseo.service.system.module.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.DictErrorCode;
 import cn.muziseo.service.system.module.system.controller.request.DictTypeAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.DictTypePageRequest;
+import cn.muziseo.service.system.module.system.controller.vo.DictTypeVO;
 import cn.muziseo.service.system.module.system.manager.DictManager;
 import cn.muziseo.service.system.module.system.manager.DictTypeManager;
 import cn.muziseo.service.system.module.system.repository.entity.DictTypeEntity;
@@ -31,21 +34,31 @@ public class DictTypeServiceImpl implements DictTypeService {
     private DictManager dictManager;
 
     @Override
-    public List<DictTypeEntity> list() {
-        return dictTypeManager.listAll();
+    public List<DictTypeVO> list() {
+        return dictTypeManager.listAll().stream()
+                .map(this::toDictTypeVO)
+                .toList();
     }
 
     @Override
-    public DictTypeEntity getById(Long id) {
-        return dictTypeManager.getById(id);
+    public PageResponse<DictTypeVO> pageDictType(DictTypePageRequest request) {
+        var page = dictTypeManager.pageDictType(request);
+        List<DictTypeVO> voList = page.getRecords().stream()
+                .map(this::toDictTypeVO)
+                .toList();
+        return new PageResponse<>(voList, (int) page.getTotalRow());
+    }
+
+    @Override
+    public DictTypeVO getDictTypeById(Long id) {
+        DictTypeEntity entity = dictTypeManager.getById(id);
+        return toDictTypeVO(entity);
     }
 
     @Override
     public void addDictType(DictTypeAddRequest request) {
-        log.info("新增字典类型: code={}, name={}", request.getCode(), request.getName());
-
-        // 检查字典类型编码是否存在
-        if (dictTypeManager.existsByCode(request.getCode())) {
+        // 检查字典类型是否已存在
+        if (dictTypeManager.existsByType(request.getType())) {
             throw new BusinessException(DictErrorCode.DICT_TYPE_CODE_EXISTS);
         }
 
@@ -54,40 +67,56 @@ public class DictTypeServiceImpl implements DictTypeService {
             entity.setStatus(0);
         }
         dictTypeManager.save(entity);
-        log.info("新增字典类型成功: code={}", entity.getCode());
     }
 
     @Override
     public void updateDictType(Long id, DictTypeAddRequest request) {
-        log.info("更新字典类型: id={}", id);
-
         DictTypeEntity existing = dictTypeManager.getById(id);
         if (existing == null) {
             throw new BusinessException(DictErrorCode.DICT_TYPE_NOT_EXISTS);
         }
 
+        // 如果类型编码变更，检查新编码是否已被占用
+        if (!existing.getType().equals(request.getType())
+                && dictTypeManager.existsByType(request.getType())) {
+            throw new BusinessException(DictErrorCode.DICT_TYPE_CODE_EXISTS);
+        }
+
         DictTypeEntity entity = BeanUtil.copyProperties(request, DictTypeEntity.class);
         entity.setId(id);
         dictTypeManager.updateById(entity);
-        log.info("更新字典类型成功: id={}", id);
     }
 
     @Override
     public void deleteDictType(Long id) {
-        log.info("删除字典类型: id={}", id);
-
         DictTypeEntity dictType = dictTypeManager.getById(id);
         if (dictType == null) {
             throw new BusinessException(DictErrorCode.DICT_TYPE_NOT_EXISTS);
         }
 
         // 检查是否有字典数据
-        long count = dictManager.listByDictTypeCode(dictType.getCode()).size();
+        long count = dictManager.listByDictType(dictType.getType()).size();
         if (count > 0) {
             throw new BusinessException(DictErrorCode.DICT_TYPE_HAS_DATA);
         }
 
         dictTypeManager.removeById(id);
-        log.info("删除字典类型成功: id={}", id);
+    }
+
+    /**
+     * Entity 转 VO
+     */
+    private DictTypeVO toDictTypeVO(DictTypeEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        return DictTypeVO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .type(entity.getType())
+                .status(entity.getStatus())
+                .remark(entity.getRemark())
+                .createTime(entity.getCreateTime())
+                .build();
     }
 }

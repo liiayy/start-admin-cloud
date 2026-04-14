@@ -1,8 +1,10 @@
 package cn.muziseo.service.system.module.system.manager;
 
 import cn.muziseo.common.db.service.impl.BaseServiceImpl;
+import cn.muziseo.service.system.module.system.controller.request.DictTypePageRequest;
 import cn.muziseo.service.system.module.system.repository.entity.DictTypeEntity;
 import cn.muziseo.service.system.module.system.repository.mapper.DictTypeMapper;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 
@@ -18,28 +20,40 @@ import java.util.List;
 public class DictTypeManager extends BaseServiceImpl<DictTypeMapper, DictTypeEntity> {
 
     /**
-     * 获取所有字典类型列表（按排序）
+     * 获取所有字典类型列表
      */
     public List<DictTypeEntity> listAll() {
         return list(QueryWrapper.create()
-                .orderBy(DictTypeEntity::getSort, true)
                 .orderBy(DictTypeEntity::getId, true));
     }
 
     /**
-     * 根据字典类型编码获取字典类型
+     * 分页查询字典类型
      */
-    public DictTypeEntity getByCode(String code) {
+    public Page<DictTypeEntity> pageDictType(DictTypePageRequest request) {
+        QueryWrapper wrapper = QueryWrapper.create()
+                .where(DictTypeEntity::getName).like(request.getName(), request.getName() != null)
+                .and(DictTypeEntity::getType).like(request.getType(), request.getType() != null)
+                .and(DictTypeEntity::getStatus).eq(request.getStatus(), request.getStatus() != null)
+                .orderBy(DictTypeEntity::getId, false);
+
+        return page(new Page<>(request.getPageNum(), request.getPageSize()), wrapper);
+    }
+
+    /**
+     * 根据字典类型获取字典类型实体
+     */
+    public DictTypeEntity getByType(String type) {
         return queryChain()
-                .where(DictTypeEntity::getCode).eq(code)
+                .where(DictTypeEntity::getType).eq(type)
                 .one();
     }
 
     /**
-     * 检查字典类型编码是否存在
+     * 检查字典类型是否存在
      */
-    public boolean existsByCode(String code) {
+    public boolean existsByType(String type) {
         return exists(QueryWrapper.create()
-                .where(DictTypeEntity::getCode).eq(code));
+                .where(DictTypeEntity::getType).eq(type));
     }
 }

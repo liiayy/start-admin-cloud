@@ -1,7 +1,9 @@
 package cn.muziseo.service.system.module.system.service;
 
-import cn.muziseo.service.system.module.system.controller.request.DictAddRequest;
-import cn.muziseo.service.system.module.system.repository.entity.DictEntity;
+import cn.muziseo.common.db.page.PageResponse;
+import cn.muziseo.service.system.module.system.controller.request.DictDataAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.DictDataPageRequest;
+import cn.muziseo.service.system.module.system.controller.vo.DictDataVO;
 
 import java.util.List;
 
@@ -14,32 +16,32 @@ import java.util.List;
 public interface DictService {
 
     /**
-     * 获取所有字典数据列表
-     */
-    List<DictEntity> list();
-
-    /**
      * 根据字典类型编码获取字典数据列表
      */
-    List<DictEntity> listByDictTypeCode(String dictTypeCode);
+    List<DictDataVO> listByDictType(String dictType);
+
+    /**
+     * 分页查询字典数据
+     */
+    PageResponse<DictDataVO> pageDictData(DictDataPageRequest request);
 
     /**
      * 根据ID获取字典数据
      */
-    DictEntity getById(Long id);
+    DictDataVO getDictDataById(Long id);
 
     /**
      * 添加字典数据
      */
-    void addDict(DictAddRequest request);
+    void addDictData(DictDataAddRequest request);
 
     /**
      * 更新字典数据
      */
-    void updateDict(Long id, DictAddRequest request);
+    void updateDictData(Long id, DictDataAddRequest request);
 
     /**
      * 删除字典数据
      */
-    void deleteDict(Long id);
+    void deleteDictData(Long id);
 }

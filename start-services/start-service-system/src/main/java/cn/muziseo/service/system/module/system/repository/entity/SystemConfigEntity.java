@@ -44,9 +44,9 @@ public class SystemConfigEntity extends BaseEntity {
     private String configValue;
 
     /**
-     * 是否系统内置
+     * 是否系统内置（Y=是，N=否）
      */
-    private Boolean builtin;
+    private String builtin;
 
     /**
      * 备注

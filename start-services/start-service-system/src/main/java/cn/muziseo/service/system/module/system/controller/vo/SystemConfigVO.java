@@ -28,8 +28,8 @@ public class SystemConfigVO {
     @Schema(description = "参数键值")
     private String configValue;
 
-    @Schema(description = "是否系统内置")
-    private Boolean builtin;
+    @Schema(description = "是否系统内置（Y=是，N=否）")
+    private String builtin;
 
     @Schema(description = "备注")
     private String remark;

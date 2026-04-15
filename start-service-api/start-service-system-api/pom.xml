@@ -21,6 +21,11 @@
             <groupId>cn.muziseo</groupId>
             <artifactId>start-common-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-cache</artifactId>
+            <optional>true</optional>
+        </dependency>
         <!-- RPC 远程调用相关 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

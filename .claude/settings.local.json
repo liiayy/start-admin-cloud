@@ -6,5 +6,8 @@
       "Bash(dir:*)",
       "Bash(mvn:*)"
     ]
+  },
+  "mcpServers": {
+
   }
 }

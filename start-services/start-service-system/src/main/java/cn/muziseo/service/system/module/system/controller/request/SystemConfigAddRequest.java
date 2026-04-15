@@ -28,6 +28,6 @@ public class SystemConfigAddRequest {
     @Schema(description = "备注")
     private String remark;
 
-    @Schema(description = "是否系统内置")
-    private Boolean builtin;
+    @Schema(description = "是否系统内置（Y=是，N=否）")
+    private String builtin;
 }

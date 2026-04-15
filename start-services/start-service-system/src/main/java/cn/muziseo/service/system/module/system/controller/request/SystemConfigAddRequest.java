@@ -5,32 +5,29 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * 系统配置添加请求
+ * 系统参数添加/更新请求
  *
  * @author 木子软件
- * @Date 2026-02-27
  */
 @Data
-@Schema(description = "系统配置添加请求")
+@Schema(description = "系统参数添加请求")
 public class SystemConfigAddRequest {
 
-    @Schema(description = "配置键", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "配置键不能为空")
+    @Schema(description = "参数名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "参数名称不能为空")
+    private String name;
+
+    @Schema(description = "参数键名", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "参数键名不能为空")
     private String configKey;
 
-    @Schema(description = "配置值", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "配置值不能为空")
+    @Schema(description = "参数键值", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "参数键值不能为空")
     private String configValue;
-
-    @Schema(description = "配置名称")
-    private String configName;
-
-    @Schema(description = "配置类型（string:字符串 number:数字 boolean:布尔）")
-    private String configType;
-
-    @Schema(description = "是否系统内置（0否 1是）")
-    private Integer isSystem;
 
     @Schema(description = "备注")
     private String remark;
+
+    @Schema(description = "是否系统内置")
+    private Boolean builtin;
 }

@@ -1,12 +1,12 @@
 package cn.muziseo.service.system.module.system.service;
 
+import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigAddRequest;
-import cn.muziseo.service.system.module.system.repository.entity.SystemConfigEntity;
-
-import java.util.List;
+import cn.muziseo.service.system.module.system.controller.request.SystemConfigPageRequest;
+import cn.muziseo.service.system.module.system.controller.vo.SystemConfigVO;
 
 /**
- * 系统配置业务接口
+ * 系统参数业务接口
  *
  * @author 木子软件
  * @Date 2026-02-27
@@ -14,32 +14,32 @@ import java.util.List;
 public interface SystemConfigService {
 
     /**
-     * 获取所有系统配置列表
+     * 分页查询系统参数
      */
-    List<SystemConfigEntity> list();
+    PageResponse<SystemConfigVO> pageConfig(SystemConfigPageRequest request);
 
     /**
-     * 根据ID获取系统配置
+     * 根据ID获取系统参数
      */
-    SystemConfigEntity getById(Long id);
+    SystemConfigVO getConfigById(Long id);
 
     /**
-     * 根据配置键获取配置值
+     * 根据参数键名获取参数键值
      */
     String getConfigValue(String configKey);
 
     /**
-     * 添加系统配置
+     * 添加系统参数
      */
     void addConfig(SystemConfigAddRequest request);
 
     /**
-     * 更新系统配置
+     * 更新系统参数
      */
     void updateConfig(Long id, SystemConfigAddRequest request);
 
     /**
-     * 删除系统配置
+     * 删除系统参数
      */
     void deleteConfig(Long id);
 }

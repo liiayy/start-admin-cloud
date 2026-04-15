@@ -2,8 +2,11 @@ package cn.muziseo.service.system.module.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.SystemErrorCode;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.SystemConfigPageRequest;
+import cn.muziseo.service.system.module.system.controller.vo.SystemConfigVO;
 import cn.muziseo.service.system.module.system.manager.SystemConfigManager;
 import cn.muziseo.service.system.module.system.repository.entity.SystemConfigEntity;
 import cn.muziseo.service.system.module.system.service.SystemConfigService;
@@ -14,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 系统配置业务实现
+ * 系统参数业务实现
  *
  * @author 木子软件
  * @Date 2026-02-27
@@ -27,13 +30,17 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     private SystemConfigManager systemConfigManager;
 
     @Override
-    public List<SystemConfigEntity> list() {
-        return systemConfigManager.list();
+    public PageResponse<SystemConfigVO> pageConfig(SystemConfigPageRequest request) {
+        var page = systemConfigManager.pageConfig(request);
+        List<SystemConfigVO> voList = page.getRecords().stream()
+                .map(this::toConfigVO)
+                .toList();
+        return new PageResponse<>(voList, (int) page.getTotalRow());
     }
 
     @Override
-    public SystemConfigEntity getById(Long id) {
-        return systemConfigManager.getById(id);
+    public SystemConfigVO getConfigById(Long id) {
+        return toConfigVO(systemConfigManager.getById(id));
     }
 
     @Override
@@ -44,59 +51,74 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
     @Override
     public void addConfig(SystemConfigAddRequest request) {
-        log.info("新增系统配置: configKey={}", request.getConfigKey());
-
-        // 检查配置键是否存在
+        // 检查参数键名是否已存在
         if (systemConfigManager.existsByConfigKey(request.getConfigKey())) {
             throw new BusinessException(SystemErrorCode.CONFIG_KEY_EXISTS);
         }
 
         SystemConfigEntity entity = BeanUtil.copyProperties(request, SystemConfigEntity.class);
-        if (entity.getIsSystem() == null) {
-            entity.setIsSystem(0);
+        if (entity.getBuiltin() == null) {
+            entity.setBuiltin(false);
         }
         systemConfigManager.save(entity);
-        log.info("新增系统配置成功: configKey={}", entity.getConfigKey());
     }
 
     @Override
     public void updateConfig(Long id, SystemConfigAddRequest request) {
-        log.info("更新系统配置: id={}", id);
-
         SystemConfigEntity existing = systemConfigManager.getById(id);
         if (existing == null) {
             throw new BusinessException(SystemErrorCode.CONFIG_NOT_EXISTS);
         }
 
-        // 系统内置配置不允许修改配置键
-        if (existing.getIsSystem() != null && existing.getIsSystem() == 1) {
-            if (!existing.getConfigKey().equals(request.getConfigKey())) {
-                throw new BusinessException(SystemErrorCode.CONFIG_BUILTIN_CANNOT_MODIFY);
-            }
+        // 系统内置参数不允许修改键名
+        if (Boolean.TRUE.equals(existing.getBuiltin())
+                && !existing.getConfigKey().equals(request.getConfigKey())) {
+            throw new BusinessException(SystemErrorCode.CONFIG_BUILTIN_CANNOT_MODIFY);
+        }
+
+        // 如果键名变更，检查新键名是否已存在
+        if (!existing.getConfigKey().equals(request.getConfigKey())
+                && systemConfigManager.existsByConfigKey(request.getConfigKey())) {
+            throw new BusinessException(SystemErrorCode.CONFIG_KEY_EXISTS);
         }
 
         SystemConfigEntity entity = BeanUtil.copyProperties(request, SystemConfigEntity.class);
         entity.setId(id);
-        entity.setIsSystem(existing.getIsSystem());
+        // 保留原有的 builtin 标记，不允许通过编辑修改
+        entity.setBuiltin(existing.getBuiltin());
         systemConfigManager.updateById(entity);
-        log.info("更新系统配置成功: id={}", id);
     }
 
     @Override
     public void deleteConfig(Long id) {
-        log.info("删除系统配置: id={}", id);
-
         SystemConfigEntity existing = systemConfigManager.getById(id);
         if (existing == null) {
             throw new BusinessException(SystemErrorCode.CONFIG_NOT_EXISTS);
         }
 
-        // 系统内置配置不允许删除
-        if (existing.getIsSystem() != null && existing.getIsSystem() == 1) {
+        // 系统内置参数不允许删除
+        if (Boolean.TRUE.equals(existing.getBuiltin())) {
             throw new BusinessException(SystemErrorCode.CONFIG_BUILTIN_CANNOT_DELETE);
         }
 
         systemConfigManager.removeById(id);
-        log.info("删除系统配置成功: id={}", id);
+    }
+
+    /**
+     * Entity 转 VO
+     */
+    private SystemConfigVO toConfigVO(SystemConfigEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        return SystemConfigVO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .configKey(entity.getConfigKey())
+                .configValue(entity.getConfigValue())
+                .builtin(entity.getBuiltin())
+                .remark(entity.getRemark())
+                .createTime(entity.getCreateTime())
+                .build();
     }
 }

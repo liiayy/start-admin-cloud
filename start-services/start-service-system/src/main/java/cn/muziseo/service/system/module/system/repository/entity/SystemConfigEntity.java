@@ -6,9 +6,9 @@ import com.mybatisflex.annotation.Table;
 import lombok.*;
 
 /**
- * 系统配置实体
+ * 系统参数实体
  * <p>
- * 对应数据库表 system_config，用于存储系统配置参数信息
+ * 对应数据库表 system_config
  *
  * @author 木子软件
  * @Date 2026-02-27
@@ -23,35 +23,30 @@ import lombok.*;
 public class SystemConfigEntity extends BaseEntity {
 
     /**
-     * 配置ID
+     * 参数主键
      */
     @Id
     private Long id;
 
     /**
-     * 配置键
+     * 参数名称
+     */
+    private String name;
+
+    /**
+     * 参数键名
      */
     private String configKey;
 
     /**
-     * 配置值
+     * 参数键值
      */
     private String configValue;
 
     /**
-     * 配置名称
+     * 是否系统内置
      */
-    private String configName;
-
-    /**
-     * 配置类型（string:字符串 number:数字 boolean:布尔）
-     */
-    private String configType;
-
-    /**
-     * 是否系统内置（0否 1是）
-     */
-    private Integer isSystem;
+    private Boolean builtin;
 
     /**
      * 备注

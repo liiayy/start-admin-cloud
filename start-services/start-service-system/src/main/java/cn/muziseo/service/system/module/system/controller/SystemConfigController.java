@@ -1,8 +1,11 @@
 package cn.muziseo.service.system.module.system.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigAddRequest;
-import cn.muziseo.service.system.module.system.repository.entity.SystemConfigEntity;
+import cn.muziseo.service.system.module.system.controller.request.SystemConfigPageRequest;
+import cn.muziseo.service.system.module.system.controller.vo.SystemConfigVO;
 import cn.muziseo.service.system.module.system.service.SystemConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,15 +14,13 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
- * 系统配置管理 Controller
+ * 系统参数管理 Controller
  *
  * @author 木子软件
  * @Date 2026-02-27
  */
-@Tag(name = "系统配置管理")
+@Tag(name = "系统参数管理")
 @RestController
 @Slf4j
 @RequestMapping("/system/config")
@@ -28,69 +29,47 @@ public class SystemConfigController {
     @Resource
     private SystemConfigService systemConfigService;
 
-    /**
-     * 获取系统配置列表
-     */
-    @Operation(summary = "获取系统配置列表")
-    @GetMapping("/list")
-    public ResponseDTO<List<SystemConfigEntity>> list() {
-        List<SystemConfigEntity> list = systemConfigService.list();
-        return ResponseDTO.success(list);
+    @Operation(summary = "分页查询系统参数")
+    @SaCheckPermission("system:config:query")
+    @GetMapping("/page")
+    public ResponseDTO<PageResponse<SystemConfigVO>> page(SystemConfigPageRequest request) {
+        return ResponseDTO.success(systemConfigService.pageConfig(request));
     }
 
-    /**
-     * 根据ID获取系统配置
-     */
-    @Operation(summary = "获取系统配置详情")
-    @GetMapping("/{id}")
-    public ResponseDTO<SystemConfigEntity> getById(@PathVariable Long id) {
-        SystemConfigEntity config = systemConfigService.getById(id);
-        return ResponseDTO.success(config);
+    @Operation(summary = "获取系统参数详情")
+    @SaCheckPermission("system:config:query")
+    @GetMapping("/get")
+    public ResponseDTO<SystemConfigVO> get(@RequestParam Long id) {
+        return ResponseDTO.success(systemConfigService.getConfigById(id));
     }
 
-    /**
-     * 根据配置键获取配置值
-     */
-    @Operation(summary = "获取配置值")
+    @Operation(summary = "根据键名获取参数值")
     @GetMapping("/value")
     public ResponseDTO<String> getConfigValue(@RequestParam String configKey) {
-        String value = systemConfigService.getConfigValue(configKey);
-        return ResponseDTO.success(value);
+        return ResponseDTO.success(systemConfigService.getConfigValue(configKey));
     }
 
-    /**
-     * 新增系统配置
-     */
-    @Operation(summary = "新增系统配置")
+    @Operation(summary = "新增系统参数")
+    @SaCheckPermission("system:config:create")
     @PostMapping("/add")
     public ResponseDTO<Void> add(@Valid @RequestBody SystemConfigAddRequest request) {
-        log.info("新增系统配置: configKey={}", request.getConfigKey());
         systemConfigService.addConfig(request);
-        log.info("新增系统配置成功: configKey={}", request.getConfigKey());
         return ResponseDTO.success();
     }
 
-    /**
-     * 更新系统配置
-     */
-    @Operation(summary = "更新系统配置")
-    @PutMapping("/{id}")
-    public ResponseDTO<Void> update(@PathVariable Long id, @Valid @RequestBody SystemConfigAddRequest request) {
-        log.info("更新系统配置: id={}", id);
+    @Operation(summary = "更新系统参数")
+    @SaCheckPermission("system:config:update")
+    @PutMapping("/update")
+    public ResponseDTO<Void> update(@RequestParam Long id, @Valid @RequestBody SystemConfigAddRequest request) {
         systemConfigService.updateConfig(id, request);
-        log.info("更新系统配置成功: id={}", id);
         return ResponseDTO.success();
     }
 
-    /**
-     * 删除系统配置
-     */
-    @Operation(summary = "删除系统配置")
-    @DeleteMapping("/{id}")
-    public ResponseDTO<Void> delete(@PathVariable Long id) {
-        log.info("删除系统配置: id={}", id);
+    @Operation(summary = "删除系统参数")
+    @SaCheckPermission("system:config:delete")
+    @DeleteMapping("/delete")
+    public ResponseDTO<Void> delete(@RequestParam Long id) {
         systemConfigService.deleteConfig(id);
-        log.info("删除系统配置成功: id={}", id);
         return ResponseDTO.success();
     }
 }

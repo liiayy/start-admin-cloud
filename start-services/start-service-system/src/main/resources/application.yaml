@@ -19,5 +19,8 @@ spring:
       # 加载环境特定的配置文件
       - optional:application-${spring.profiles.active}.yaml
       - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
+  threads:
+    virtual:
+      enabled: true
 
 

@@ -1,5 +1,6 @@
 package cn.muziseo.service.system.module.system.service;
 
+import cn.muziseo.common.core.domain.dto.DictDataSimpleDTO;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.system.controller.request.DictDataAddRequest;
 import cn.muziseo.service.system.module.system.controller.request.DictDataPageRequest;
@@ -16,9 +17,14 @@ import java.util.List;
 public interface DictService {
 
     /**
-     * 根据字典类型编码获取字典数据列表
+     * 根据字典类型编码获取字典数据列表（前端页面管理用，包含全部字段）
      */
     List<DictDataVO> listByDictType(String dictType);
+
+    /**
+     * 根据字典类型编码获取精简字典数据列表（RPC 传输 & 缓存用）
+     */
+    List<DictDataSimpleDTO> listSimpleByDictType(String dictType);
 
     /**
      * 分页查询字典数据

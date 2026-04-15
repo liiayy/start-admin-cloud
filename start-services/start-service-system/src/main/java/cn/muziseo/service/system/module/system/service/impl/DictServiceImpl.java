@@ -1,6 +1,8 @@
 package cn.muziseo.service.system.module.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.cache.dict.DictCacheManager;
+import cn.muziseo.common.core.domain.dto.DictDataSimpleDTO;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.DictErrorCode;
@@ -41,6 +43,13 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    public List<DictDataSimpleDTO> listSimpleByDictType(String dictType) {
+        return dictManager.listByDictType(dictType).stream()
+                .map(this::toDictDataSimpleDTO)
+                .toList();
+    }
+
+    @Override
     public PageResponse<DictDataVO> pageDictData(DictDataPageRequest request) {
         var page = dictManager.pageDictData(request);
         List<DictDataVO> voList = page.getRecords().stream()
@@ -67,6 +76,9 @@ public class DictServiceImpl implements DictService {
             entity.setStatus(0);
         }
         dictManager.save(entity);
+
+        // 清除该字典类型的二级缓存
+        DictCacheManager.evictCache(request.getDictType());
     }
 
     @Override
@@ -79,6 +91,12 @@ public class DictServiceImpl implements DictService {
         DictEntity entity = BeanUtil.copyProperties(request, DictEntity.class);
         entity.setId(id);
         dictManager.updateById(entity);
+
+        // 清除该字典类型的二级缓存（如果类型变了，两个都清）
+        DictCacheManager.evictCache(existing.getDictType());
+        if (!existing.getDictType().equals(request.getDictType())) {
+            DictCacheManager.evictCache(request.getDictType());
+        }
     }
 
     @Override
@@ -89,10 +107,13 @@ public class DictServiceImpl implements DictService {
         }
 
         dictManager.removeById(id);
+
+        // 清除该字典类型的二级缓存
+        DictCacheManager.evictCache(existing.getDictType());
     }
 
     /**
-     * Entity 转 VO
+     * Entity 转 VO（完整版，用于管理后台详情）
      */
     private DictDataVO toDictDataVO(DictEntity entity) {
         if (entity == null) {
@@ -109,6 +130,22 @@ public class DictServiceImpl implements DictService {
                 .cssClass(entity.getCssClass())
                 .remark(entity.getRemark())
                 .createTime(entity.getCreateTime())
+                .build();
+    }
+
+    /**
+     * Entity 转 SimpleDTO（精简版，用于缓存 & RPC 传输）
+     */
+    private DictDataSimpleDTO toDictDataSimpleDTO(DictEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        return DictDataSimpleDTO.builder()
+                .label(entity.getLabel())
+                .value(entity.getValue())
+                .dictType(entity.getDictType())
+                .colorType(entity.getColorType())
+                .cssClass(entity.getCssClass())
                 .build();
     }
 }

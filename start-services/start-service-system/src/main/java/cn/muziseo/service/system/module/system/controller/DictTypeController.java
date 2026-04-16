@@ -53,7 +53,7 @@ public class DictTypeController {
     }
 
     @Operation(summary = "新增字典类型")
-    @SaCheckPermission("system:dict:create")
+    @SaCheckPermission("system:dict:add")
     @PostMapping("/add")
     public ResponseDTO<Void> add(@Valid @RequestBody DictTypeAddRequest request) {
         dictTypeService.addDictType(request);

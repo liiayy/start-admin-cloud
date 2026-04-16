@@ -50,7 +50,7 @@ public class SystemConfigController {
     }
 
     @Operation(summary = "新增系统参数")
-    @SaCheckPermission("system:config:create")
+    @SaCheckPermission("system:config:add")
     @PostMapping("/add")
     public ResponseDTO<Void> add(@Valid @RequestBody SystemConfigAddRequest request) {
         systemConfigService.addConfig(request);

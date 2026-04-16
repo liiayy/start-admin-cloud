@@ -32,28 +32,25 @@ public class DictController {
     private DictService dictService;
 
     @Operation(summary = "根据类型获取字典数据列表")
-    @SaCheckPermission("system:dict:query")
     @GetMapping("/list-by-type")
     public ResponseDTO<List<DictDataVO>> listByType(@RequestParam String dictType) {
         return ResponseDTO.success(dictService.listByDictType(dictType));
     }
 
     @Operation(summary = "分页查询字典数据")
-    @SaCheckPermission("system:dict:query")
     @GetMapping("/page")
     public ResponseDTO<PageResponse<DictDataVO>> page(DictDataPageRequest request) {
         return ResponseDTO.success(dictService.pageDictData(request));
     }
 
     @Operation(summary = "获取字典数据详情")
-    @SaCheckPermission("system:dict:query")
     @GetMapping("/get")
     public ResponseDTO<DictDataVO> get(@RequestParam Long id) {
         return ResponseDTO.success(dictService.getDictDataById(id));
     }
 
     @Operation(summary = "新增字典数据")
-    @SaCheckPermission("system:dict:create")
+    @SaCheckPermission("system:dict:add")
     @PostMapping("/add")
     public ResponseDTO<Void> add(@Valid @RequestBody DictDataAddRequest request) {
         dictService.addDictData(request);

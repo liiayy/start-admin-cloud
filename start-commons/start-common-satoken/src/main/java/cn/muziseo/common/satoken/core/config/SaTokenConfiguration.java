@@ -1,6 +1,7 @@
 package cn.muziseo.common.satoken.core.config;
 
 import cn.dev33.satoken.dao.SaTokenDao;
+import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.muziseo.common.core.factory.YmlPropertySourceFactory;
@@ -12,6 +13,8 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Sa-Token 基础配置
@@ -21,7 +24,7 @@ import org.springframework.context.annotation.PropertySource;
  */
 @AutoConfiguration
 @PropertySource(value = "classpath:common-satoken.yml", factory = YmlPropertySourceFactory.class)
-public class SaTokenConfiguration {
+public class SaTokenConfiguration implements WebMvcConfigurer {
 
     @Bean
     public StpLogic getStpLogicJwt() {
@@ -47,5 +50,12 @@ public class SaTokenConfiguration {
     @ConditionalOnClass(RequestInterceptor.class)
     public FeignAuthInterceptor feignAuthInterceptor() {
         return new FeignAuthInterceptor();
+    }
+
+    // 注册 Sa-Token 拦截器，打开注解式鉴权功能
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // 注册 Sa-Token 拦截器，打开注解式鉴权功能
+        registry.addInterceptor(new SaInterceptor()).addPathPatterns("/**");
     }
 }

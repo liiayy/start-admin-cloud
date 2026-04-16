@@ -1,5 +1,6 @@
 package cn.muziseo.service.system.module.organization.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.service.system.module.organization.controller.request.DeptAddRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptTreeVO;
@@ -50,6 +51,7 @@ public class DeptController {
 
     @Operation(summary = "新增部门")
     @PostMapping("/add")
+    @SaCheckPermission("system:dept:add")
     public ResponseDTO<Void> add(@Valid @RequestBody DeptAddRequest request) {
         deptService.addDept(request);
         return ResponseDTO.success();
@@ -57,6 +59,7 @@ public class DeptController {
 
     @Operation(summary = "更新部门")
     @PutMapping("/{id}")
+    @SaCheckPermission("system:dept:update")
     public ResponseDTO<Void> update(@PathVariable Long id, @Valid @RequestBody DeptAddRequest request) {
         deptService.updateDept(id, request);
         return ResponseDTO.success();
@@ -64,6 +67,7 @@ public class DeptController {
 
     @Operation(summary = "删除部门")
     @DeleteMapping("/{id}")
+    @SaCheckPermission("system:dept:delete")
     public ResponseDTO<Void> delete(@PathVariable Long id) {
         deptService.deleteDept(id);
         return ResponseDTO.success();
@@ -71,6 +75,7 @@ public class DeptController {
 
     @Operation(summary = "更新部门状态")
     @PutMapping("/update-status")
+    @SaCheckPermission("system:dept:update")
     public ResponseDTO<Void> updateStatus(@RequestParam Long id, @RequestParam Integer status) {
         deptService.updateStatus(id, status);
         return ResponseDTO.success();

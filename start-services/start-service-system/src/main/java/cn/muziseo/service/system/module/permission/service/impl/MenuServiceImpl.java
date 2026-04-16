@@ -13,6 +13,7 @@ import cn.muziseo.service.system.module.permission.manager.MenuManager;
 import cn.muziseo.service.system.module.permission.manager.RoleMenuManager;
 import cn.muziseo.service.system.module.permission.repository.entity.MenuEntity;
 import cn.muziseo.service.system.module.permission.service.MenuService;
+import com.mybatisflex.core.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public List<MenuTreeVO> getMenuTree() {
         List<MenuEntity> allMenus = menuManager.list(
-                com.mybatisflex.core.query.QueryWrapper.create()
+                QueryWrapper.create()
                         .orderBy(MenuEntity::getSort, true)
                         .orderBy(MenuEntity::getId, true));
         return buildTree(allMenus, 0L);

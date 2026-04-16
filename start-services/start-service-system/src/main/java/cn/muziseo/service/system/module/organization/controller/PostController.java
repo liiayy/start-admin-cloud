@@ -1,5 +1,6 @@
 package cn.muziseo.service.system.module.organization.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.organization.controller.request.PostAddRequest;
@@ -51,6 +52,7 @@ public class PostController {
 
     @Operation(summary = "新增岗位")
     @PostMapping("/add")
+    @SaCheckPermission("system:post:add")
     public ResponseDTO<Void> add(@Valid @RequestBody PostAddRequest request) {
         postService.addPost(request);
         return ResponseDTO.success();
@@ -58,6 +60,7 @@ public class PostController {
 
     @Operation(summary = "更新岗位")
     @PutMapping("/{id}")
+    @SaCheckPermission("system:post:update")
     public ResponseDTO<Void> update(@PathVariable Long id, @Valid @RequestBody PostAddRequest request) {
         postService.updatePost(id, request);
         return ResponseDTO.success();
@@ -65,6 +68,7 @@ public class PostController {
 
     @Operation(summary = "删除岗位")
     @DeleteMapping("/{id}")
+    @SaCheckPermission("system:post:delete")
     public ResponseDTO<Void> delete(@PathVariable Long id) {
         postService.deletePost(id);
         return ResponseDTO.success();
@@ -72,6 +76,7 @@ public class PostController {
 
     @Operation(summary = "更新岗位状态")
     @PutMapping("/update-status")
+    @SaCheckPermission("system:post:update")
     public ResponseDTO<Void> updateStatus(@RequestParam Long id, @RequestParam Integer status) {
         postService.updateStatus(id, status);
         return ResponseDTO.success();

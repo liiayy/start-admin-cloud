@@ -1,5 +1,6 @@
 package cn.muziseo.service.system.module.permission.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
@@ -33,18 +34,21 @@ public class RoleController {
 
     @Operation(summary = "分页查询角色")
     @GetMapping("/page")
+    @SaCheckPermission("system:role:query")
     public ResponseDTO<PageResponse<RoleVO>> page(RolePageRequest request) {
         return ResponseDTO.success(roleService.pageRole(request));
     }
 
     @Operation(summary = "获取角色详情")
     @GetMapping("/get")
+    @SaCheckPermission("system:role:query")
     public ResponseDTO<RoleVO> get(@RequestParam Long id) {
         return ResponseDTO.success(roleService.getRole(id));
     }
 
     @Operation(summary = "新增角色")
     @PostMapping("/add")
+    @SaCheckPermission("system:role:add")
     public ResponseDTO<Void> add(@Valid @RequestBody RoleAddRequest request) {
         log.info("新增角色: code={}, name={}", request.getCode(), request.getName());
         roleService.addRole(request);
@@ -53,6 +57,7 @@ public class RoleController {
 
     @Operation(summary = "修改角色")
     @PutMapping("/update")
+    @SaCheckPermission("system:role:update")
     public ResponseDTO<Void> update(@Valid @RequestBody RoleUpdateRequest request) {
         log.info("修改角色: id={}", request.getId());
         roleService.updateRole(request);
@@ -61,6 +66,7 @@ public class RoleController {
 
     @Operation(summary = "删除角色")
     @DeleteMapping("/delete")
+    @SaCheckPermission("system:role:delete")
     public ResponseDTO<Void> delete(@RequestParam Long id) {
         log.info("删除角色: id={}", id);
         roleService.deleteRole(id);
@@ -69,6 +75,7 @@ public class RoleController {
 
     @Operation(summary = "更新角色状态")
     @PutMapping("/update-status")
+    @SaCheckPermission("system:role:update")
     public ResponseDTO<Void> updateStatus(@Valid @RequestBody RoleUpdateStatusRequest request) {
         log.info("更新角色状态: id={}, status={}", request.getId(), request.getStatus());
         roleService.updateStatus(request.getId(), request.getStatus());
@@ -77,6 +84,7 @@ public class RoleController {
 
     @Operation(summary = "分配菜单")
     @PostMapping("/assign-menus")
+    @SaCheckPermission("system:role:update")
     public ResponseDTO<Void> assignMenus(@RequestParam Long roleId, @RequestBody List<Long> menuIds) {
         log.info("分配角色菜单: roleId={}, menuCount={}", roleId, menuIds.size());
         roleService.assignMenus(roleId, menuIds);

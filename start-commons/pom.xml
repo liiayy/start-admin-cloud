@@ -26,6 +26,7 @@
         <module>start-common-satoken-integration</module>
         <module>start-commom-test</module>
         <module>start-common-env</module>
+        <module>start-common-http</module>
     </modules>
 
     <properties>

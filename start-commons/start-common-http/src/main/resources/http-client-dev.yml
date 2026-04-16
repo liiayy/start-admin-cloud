@@ -1,0 +1,14 @@
+# HTTP 客户端默认配置 (Forest)
+forest:
+  backend: okhttp3
+  max-connections: 1000
+  timeout: 5000
+  connect-timeout: 3000
+  log-enabled: true
+
+# 高德地图默认配置
+gaode:
+  map:
+    enabled: true
+    api-key: your_api_key_here
+    timeout: 5000

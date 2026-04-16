@@ -36,6 +36,7 @@
         <jsoup.version>1.21.2</jsoup.version>
         <sa-token.version>1.44.0</sa-token.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <forest.version>1.5.36</forest.version>
 
 
     </properties>
@@ -153,6 +154,12 @@
             </dependency>
 
             <dependency>
+                <groupId>cn.muziseo</groupId>
+                <artifactId>start-common-http</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
                 <version>${springdoc.version}</version>
@@ -254,6 +261,12 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct</artifactId>
                 <version>${mapstruct.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.dtflys.forest</groupId>
+                <artifactId>forest-spring-boot3-starter</artifactId>
+                <version>${forest.version}</version>
             </dependency>
 
 

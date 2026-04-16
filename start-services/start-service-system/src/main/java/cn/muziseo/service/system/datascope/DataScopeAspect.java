@@ -1,16 +1,10 @@
 package cn.muziseo.service.system.datascope;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.muziseo.common.cache.datascope.DataScopeCacheManager;
+import cn.muziseo.common.core.domain.dto.DataScopeInfo;
 import cn.muziseo.common.db.annotation.DataScope;
 import cn.muziseo.common.db.datascope.DataScopeContext;
-import cn.muziseo.common.db.datascope.DataScopeInfo;
-import cn.muziseo.service.system.module.auth.manager.UserManager;
-import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
-import cn.muziseo.service.system.module.organization.manager.DeptManager;
-import cn.muziseo.service.system.module.permission.repository.entity.RoleEntity;
-import cn.muziseo.service.system.module.permission.service.RoleService;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -19,8 +13,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.List;
+
 
 /**
  * 数据权限切面
@@ -37,106 +30,34 @@ import java.util.List;
 public class DataScopeAspect {
 
     @Resource
-    private UserManager userManager;
-
-    @Resource
-    private RoleService roleService;
-
-    @Resource
-    private DeptManager deptManager;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private DataScopeService dataScopeService;
 
     @Before("@annotation(dataScope)")
     public void doBefore(JoinPoint point, DataScope dataScope) {
-        DataScopeInfo info = new DataScopeInfo();
-
         try {
-            // 1. 获取当前用户 ID
             Long userId = StpUtil.getLoginIdAsLong();
+            
+            // 使用缓存管理器（Provider端直连 Service）
+            DataScopeInfo info = DataScopeCacheManager.getDataScope(userId, id -> {
+                log.info("[本地数据权限] 缓存未命中，执行计算: userId={}", id);
+                return dataScopeService.getDataScopeInfo(id);
+            });
+            
+            DataScopeContext.set(info);
 
-            // 2. 获取用户实体（取 deptId）
-            UserEntity user = userManager.getById(userId);
-            if (user == null) {
-                info.setFilter(false);
-                DataScopeContext.set(info);
-                return;
-            }
-
-            // 3. 获取用户角色列表，找到范围最大的（dataScope 值最小）
-            List<RoleEntity> roles = roleService.getRolesByUserId(userId);
-            if (roles.isEmpty()) {
-                info.setFilter(false);
-                DataScopeContext.set(info);
-                return;
-            }
-
-            int maxScope = Integer.MAX_VALUE;
-            String customDeptIds = null;
-            for (RoleEntity role : roles) {
-                Integer scope = role.getDataScope();
-                if (scope != null && scope < maxScope) {
-                    maxScope = scope;
-                }
-                if (scope != null && scope == 2 && customDeptIds == null) {
-                    customDeptIds = role.getDataScopeDeptIds();
-                }
-            }
-
-            if (maxScope == Integer.MAX_VALUE) {
-                maxScope = 1;
-            }
-
-            // 4. 根据范围计算 deptIds
-            switch (maxScope) {
-                case 1: // 全部数据权限
-                    info.setFilter(false);
-                    break;
-                case 2: // 自定义数据权限
-                    info.setFilter(true);
-                    info.setDeptIds(parseCustomDeptIds(customDeptIds));
-                    break;
-                case 3: // 本部门数据权限
-                    info.setFilter(true);
-                    info.setDeptIds(user.getDeptId() != null
-                            ? List.of(user.getDeptId())
-                            : Collections.emptyList());
-                    break;
-                case 4: // 本部门及以下数据权限
-                    info.setFilter(true);
-                    info.setDeptIds(deptManager.getDeptAndChildIds(user.getDeptId()));
-                    break;
-                default:
-                    info.setFilter(false);
-                    break;
-            }
-
-            log.debug("数据权限过滤: userId={}, scope={}, filter={}, deptIds={}",
-                    userId, maxScope, info.isFilter(), info.getDeptIds());
+            log.debug("数据权限过滤: userId={}, filter={}, deptIds={}",
+                    userId, info.isFilter(), info.getDeptIds());
         }
         catch (Exception e) {
-            log.warn("数据权限解析异常，跳过过滤: {}", e.getMessage());
+            log.warn("数据权限解析异常: {}", e.getMessage());
+            DataScopeInfo info = new DataScopeInfo();
             info.setFilter(false);
+            DataScopeContext.set(info);
         }
-
-        DataScopeContext.set(info);
     }
 
     @After("@annotation(cn.muziseo.common.db.annotation.DataScope)")
     public void doAfter() {
         DataScopeContext.clear();
-    }
-
-    private List<Long> parseCustomDeptIds(String json) {
-        if (json == null || json.isBlank()) {
-            return Collections.emptyList();
-        }
-        try {
-            return objectMapper.readValue(json, new TypeReference<List<Long>>() {});
-        }
-        catch (Exception e) {
-            log.warn("解析自定义部门ID失败: {}", e.getMessage());
-            return Collections.emptyList();
-        }
     }
 }

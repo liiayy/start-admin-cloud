@@ -1,5 +1,6 @@
 package cn.muziseo.common.db.datascope;
 
+import cn.muziseo.common.core.domain.dto.DataScopeInfo;
 import java.util.HashSet;
 import java.util.Set;
 

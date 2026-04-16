@@ -1,4 +1,5 @@
 package cn.muziseo.common.db.datascope;
+import cn.muziseo.common.core.domain.dto.DataScopeInfo;
 
 import com.mybatisflex.core.dialect.KeywordWrap;
 import com.mybatisflex.core.dialect.LimitOffsetProcessor;

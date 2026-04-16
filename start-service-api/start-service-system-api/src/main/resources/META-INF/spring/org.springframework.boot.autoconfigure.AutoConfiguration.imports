@@ -1,1 +1,2 @@
 cn.muziseo.service.system.module.config.api.ConfigApiAutoConfiguration
+cn.muziseo.service.system.module.auth.api.PermissionApiAutoConfiguration

@@ -12,6 +12,7 @@ import cn.muziseo.service.system.module.auth.manager.UserManager;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.auth.repository.entity.UserRoleEntity;
+import cn.muziseo.common.cache.datascope.DataScopeCacheManager;
 import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
 import cn.muziseo.service.system.module.auth.service.UserService;
 import cn.muziseo.service.system.module.organization.manager.DeptManager;
@@ -145,6 +146,11 @@ public class UserServiceImpl implements UserService {
         entity.setAvatar(request.getAvatar());
         entity.setRemark(request.getRemark());
         userManager.updateById(entity);
+        
+        // 如果修改了部门，需要刷新数据权限缓存
+        if (request.getDeptId() != null && !Objects.equals(request.getDeptId(), existing.getDeptId())) {
+            DataScopeCacheManager.evictCache(request.getId());
+        }
         log.info("更新用户成功: id={}", request.getId());
     }
 
@@ -211,7 +217,11 @@ public class UserServiceImpl implements UserService {
     public void assignRole(UserRoleAssignRequest request) {
         userRoleManager.deleteByUserId(request.getUserId());
         userRoleManager.batchInsert(request.getUserId(), request.getRoleIds());
+        
+        // 刷新权限相关的缓存
         saSessionRefreshService.refreshUserSession(request.getUserId());
+        DataScopeCacheManager.evictCache(request.getUserId());
+        
         log.info("分配用户角色: userId={}, roleIds={}", request.getUserId(), request.getRoleIds());
     }
 

@@ -5,6 +5,7 @@ import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.RoleErrorCode;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
+import cn.muziseo.common.cache.datascope.DataScopeCacheManager;
 import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
 import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
 import cn.muziseo.service.system.module.permission.controller.request.RolePageRequest;
@@ -105,9 +106,11 @@ public class RoleServiceImpl implements RoleService {
         RoleEntity entity = BeanUtil.copyProperties(request, RoleEntity.class);
         roleManager.updateById(entity);
 
-        // 刷新拥有该角色的用户 Session
+        // 刷新拥有该角色的用户 Session 和 数据权限缓存
         List<Long> userIds = userRoleManager.getUserIdsByRoleId(request.getId());
         saSessionRefreshService.refreshUserSessions(userIds);
+        userIds.forEach(DataScopeCacheManager::evictCache);
+        
         log.info("修改角色成功: id={}, 影响用户数={}", request.getId(), userIds.size());
     }
 
@@ -143,9 +146,11 @@ public class RoleServiceImpl implements RoleService {
         entity.setStatus(status);
         roleManager.updateById(entity);
 
-        // 刷新拥有该角色的用户 Session
+        // 刷新拥有该角色的用户 Session 和 数据权限缓存
         List<Long> userIds = userRoleManager.getUserIdsByRoleId(id);
         saSessionRefreshService.refreshUserSessions(userIds);
+        userIds.forEach(DataScopeCacheManager::evictCache);
+        
         log.info("更新角色状态: id={}, status={}, 影响用户数={}", id, status, userIds.size());
     }
 

@@ -76,6 +76,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addRole(RoleAddRequest request) {
         if (roleManager.existsByCode(request.getCode(), null)) {
             throw new BusinessException(RoleErrorCode.ROLE_CODE_EXISTS);
@@ -131,6 +132,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Long id, Integer status) {
         RoleEntity existing = roleManager.getById(id);
         if (existing == null) {

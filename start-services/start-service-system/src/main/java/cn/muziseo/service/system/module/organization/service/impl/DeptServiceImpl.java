@@ -12,8 +12,10 @@ import cn.muziseo.service.system.module.organization.service.DeptService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +53,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addDept(DeptAddRequest request) {
         // 校验名称唯一
         if (deptManager.existsByName(request.getName(), null)) {
@@ -75,6 +78,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateDept(Long id, DeptAddRequest request) {
         DeptEntity dept = deptManager.getById(id);
         if (dept == null) {
@@ -102,6 +106,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteDept(Long id) {
         DeptEntity dept = deptManager.getById(id);
         if (dept == null) {
@@ -120,6 +125,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Long id, Integer status) {
         DeptEntity dept = deptManager.getById(id);
         if (dept == null) {
@@ -151,11 +157,15 @@ public class DeptServiceImpl implements DeptService {
     }
 
     /**
-     * 构建部门树
+     * 构建部门树 (O(N) 优化版)
      */
-    private List<DeptTreeVO> buildTree(List<DeptEntity> allDepts, Long parentId) {
-        return allDepts.stream()
-                .filter(d -> parentId.equals(d.getParentId()))
+    private List<DeptTreeVO> buildTree(List<DeptEntity> allDepts, Long rootId) {
+        if (allDepts == null || allDepts.isEmpty()) {
+            return List.of();
+        }
+
+        // 按父 ID 分组转换为 VO
+        Map<Long, List<DeptTreeVO>> parentMap = allDepts.stream()
                 .map(d -> DeptTreeVO.builder()
                         .id(d.getId())
                         .name(d.getName())
@@ -167,8 +177,21 @@ public class DeptServiceImpl implements DeptService {
                         .status(d.getStatus())
                         .remark(d.getRemark())
                         .createTime(d.getCreateTime())
-                        .children(buildTree(allDepts, d.getId()))
                         .build())
+                .collect(Collectors.groupingBy(DeptTreeVO::getParentId));
+
+        // 构建嵌套结构
+        List<DeptTreeVO> allVos = parentMap.values().stream()
+                .flatMap(List::stream)
                 .collect(Collectors.toList());
+
+        allVos.forEach(vo -> {
+            List<DeptTreeVO> children = parentMap.get(vo.getId());
+            if (children != null) {
+                vo.setChildren(children);
+            }
+        });
+
+        return parentMap.getOrDefault(rootId, List.of());
     }
 }

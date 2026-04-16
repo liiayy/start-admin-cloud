@@ -6,7 +6,6 @@ import cn.muziseo.service.system.module.permission.controller.request.MenuAddReq
 import cn.muziseo.service.system.module.permission.controller.request.MenuUpdateRequest;
 import cn.muziseo.service.system.module.permission.controller.vo.MenuTreeVO;
 import cn.muziseo.service.system.module.permission.controller.vo.MenuVO;
-import cn.muziseo.service.system.module.permission.repository.entity.MenuEntity;
 import cn.muziseo.service.system.module.permission.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -69,7 +68,7 @@ public class MenuController {
 
     @Operation(summary = "获取当前用户菜单")
     @GetMapping("/list-by-role")
-    public ResponseDTO<List<MenuEntity>> listByRoles(@RequestParam List<Long> roleIds) {
+    public ResponseDTO<List<MenuVO>> listByRoles(@RequestParam List<Long> roleIds) {
         log.debug("查询角色菜单: roleIds={}", roleIds);
         return ResponseDTO.success(menuService.getMenusByRoleIds(roleIds));
     }

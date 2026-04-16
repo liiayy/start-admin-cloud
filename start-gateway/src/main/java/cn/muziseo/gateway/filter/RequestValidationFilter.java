@@ -20,6 +20,8 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -40,7 +42,35 @@ public class RequestValidationFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(final ServerWebExchange exchange, final GatewayFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
+        MediaType contentType = request.getHeaders().getContentType();
+        long contentLength = request.getHeaders().getContentLength();
+
+        // 1. 过滤不适合读取 Body 的请求（如文件上传、二进制流、过大的请求）
+        if (isBinaryOrTooLarge(contentType, contentLength)) {
+            return chain.filter(exchange);
+        }
+
         return readBody(exchange, chain);
+    }
+
+    /**
+     * 判断是否为二进制内容或请求体过大（防止 OOM）
+     */
+    private boolean isBinaryOrTooLarge(MediaType contentType, long contentLength) {
+        // 请求体超过 2MB 则不处理
+        if (contentLength > 2 * 1024 * 1024) {
+            return true;
+        }
+        // 如果没有内容类型，或者是文件上传/二进制流，跳过读取
+        if (contentType == null) {
+            return false;
+        }
+        return contentType.includes(MediaType.MULTIPART_FORM_DATA)
+                || contentType.includes(MediaType.APPLICATION_OCTET_STREAM)
+                || contentType.includes(MediaType.IMAGE_GIF)
+                || contentType.includes(MediaType.IMAGE_JPEG)
+                || contentType.includes(MediaType.IMAGE_PNG);
     }
 
     /**
@@ -51,7 +81,7 @@ public class RequestValidationFilter implements GlobalFilter, Ordered {
      * @return Mono<Void>
      */
     private Mono<Void> readBody(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("current thread readBody : {}", Thread.currentThread().getName());
+        log.debug("开始读取请求体: path={}", exchange.getRequest().getPath());
 
         ServerRequest serverRequest = ServerRequest.create(exchange, serverCodecConfigurer.getReaders());
 
@@ -85,15 +115,12 @@ public class RequestValidationFilter implements GlobalFilter, Ordered {
      * @return 处理后的请求体
      */
     private String handle(String originalBody, ServerWebExchange exchange, Map<String, String> headMap) {
-        log.info("current thread verify: {}", Thread.currentThread().getName());
-        ServerHttpRequest request = exchange.getRequest();
-        String requestBody = originalBody;
-        // 这里处理自己的请求体逻辑
-        // requestBody = ....
-        // 这里处理自己的请求头逻辑，如果不需要可以去掉
-        // headMap = ...
-        log.info("请求路径: {}, 请求体: {}", exchange.getRequest().getPath(), originalBody);
-        return requestBody;
+        String path = exchange.getRequest().getPath().value();
+        // 生产环境严禁在 INFO 级别打印全量 Body，改为 DEBUG
+        log.debug("请求校验 - 路径: {}, 请求体: {}", path, originalBody);
+        
+        // 此处可扩展脱敏逻辑或特定参数校验
+        return originalBody;
     }
 
     /**

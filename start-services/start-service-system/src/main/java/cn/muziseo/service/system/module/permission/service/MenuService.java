@@ -18,7 +18,7 @@ public interface MenuService {
     /**
      * 获取角色菜单列表
      */
-    List<MenuEntity> getMenusByRoleIds(List<Long> roleIds);
+    List<MenuVO> getMenusByRoleIds(List<Long> roleIds);
 
     /**
      * 获取菜单树

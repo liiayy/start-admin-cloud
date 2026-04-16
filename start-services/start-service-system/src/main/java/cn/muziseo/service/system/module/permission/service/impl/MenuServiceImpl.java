@@ -18,7 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +45,7 @@ public class MenuServiceImpl implements MenuService {
     private SaSessionRefreshService saSessionRefreshService;
 
     @Override
-    public List<MenuEntity> getMenusByRoleIds(List<Long> roleIds) {
+    public List<MenuVO> getMenusByRoleIds(List<Long> roleIds) {
         if (roleIds == null || roleIds.isEmpty()) {
             return List.of();
         }
@@ -51,7 +53,9 @@ public class MenuServiceImpl implements MenuService {
         if (menuIds.isEmpty()) {
             return List.of();
         }
-        return menuManager.listByIds(menuIds);
+        return menuManager.listByIds(menuIds).stream()
+                .map(this::toMenuVO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -73,6 +77,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addMenu(MenuAddRequest request) {
         if (request.getPermission() != null && !request.getPermission().isEmpty()) {
             if (menuManager.existsByPermission(request.getPermission(), null)) {
@@ -152,17 +157,38 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /**
-     * 构建菜单树
+     * 构建菜单树 (O(N) 优化版，使用 Map 避免递归遍历所有元素)
      */
-    private List<MenuTreeVO> buildTree(List<MenuEntity> menus, Long parentId) {
-        return menus.stream()
-                .filter(menu -> parentId.equals(menu.getParentId()))
-                .map(menu -> {
-                    MenuTreeVO vo = toMenuTreeVO(menu);
-                    vo.setChildren(buildTree(menus, menu.getId()));
-                    return vo;
-                })
+    private List<MenuTreeVO> buildTree(List<MenuEntity> menus, Long rootId) {
+        if (menus == null || menus.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 1. 将所有元素转换为 VO 并按父 ID 分组
+        Map<Long, List<MenuTreeVO>> parentMap = menus.stream()
+                .collect(Collectors.groupingBy(
+                        MenuEntity::getParentId,
+                        Collectors.mapping(this::toMenuTreeVO, Collectors.toList())
+                ));
+
+        // 2. 将列表转换为以 ID 为 Key 的 Map，方便查找
+        List<MenuTreeVO> allVos = parentMap.values().stream()
+                .flatMap(List::stream)
                 .collect(Collectors.toList());
+
+        Map<Long, MenuTreeVO> voMap = allVos.stream()
+                .collect(Collectors.toMap(MenuTreeVO::getId, vo -> vo));
+
+        // 3. 构建嵌套结构
+        allVos.forEach(vo -> {
+            List<MenuTreeVO> children = parentMap.get(vo.getId());
+            if (children != null) {
+                vo.setChildren(children);
+            }
+        });
+
+        // 4. 返回根节点下的数据
+        return parentMap.getOrDefault(rootId, Collections.emptyList());
     }
 
     private MenuVO toMenuVO(MenuEntity entity) {

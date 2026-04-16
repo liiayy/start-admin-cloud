@@ -10,7 +10,7 @@ import cn.muziseo.service.system.module.auth.controller.vo.LoginVO;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.auth.service.AuthService;
 import cn.muziseo.service.system.module.auth.service.UserService;
-import cn.muziseo.service.system.module.permission.repository.entity.MenuEntity;
+import cn.muziseo.service.system.module.permission.controller.vo.MenuVO;
 import cn.muziseo.service.system.module.permission.repository.entity.RoleEntity;
 import cn.muziseo.service.system.module.permission.service.MenuService;
 import cn.muziseo.service.system.module.permission.service.RoleService;
@@ -113,9 +113,9 @@ public class AuthController {
         // 3. 获取权限列表
         Set<String> permissions = Set.of();
         if (!roleIds.isEmpty()) {
-            List<MenuEntity> menus = menuService.getMenusByRoleIds(roleIds);
+            List<MenuVO> menus = menuService.getMenusByRoleIds(roleIds);
             permissions = menus.stream()
-                    .map(MenuEntity::getPermission)
+                    .map(MenuVO::getPermission)
                     .filter(p -> p != null && !p.isEmpty())
                     .collect(Collectors.toSet());
         }

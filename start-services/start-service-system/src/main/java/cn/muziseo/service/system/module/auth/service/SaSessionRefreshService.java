@@ -2,7 +2,7 @@ package cn.muziseo.service.system.module.auth.service;
 
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.muziseo.service.system.module.permission.repository.entity.MenuEntity;
+import cn.muziseo.service.system.module.permission.controller.vo.MenuVO;
 import cn.muziseo.service.system.module.permission.repository.entity.RoleEntity;
 import cn.muziseo.service.system.module.permission.service.MenuService;
 import cn.muziseo.service.system.module.permission.service.RoleService;
@@ -92,9 +92,9 @@ public class SaSessionRefreshService {
 
         Set<String> permissions = Set.of();
         if (!roleIds.isEmpty()) {
-            List<MenuEntity> menus = menuService.getMenusByRoleIds(roleIds);
+            List<MenuVO> menus = menuService.getMenusByRoleIds(roleIds);
             permissions = menus.stream()
-                    .map(MenuEntity::getPermission)
+                    .map(MenuVO::getPermission)
                     .filter(p -> p != null && !p.isEmpty())
                     .collect(Collectors.toSet());
         }

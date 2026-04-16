@@ -1,5 +1,7 @@
 package cn.muziseo.service.system.module.auth.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.auth.controller.request.*;
@@ -29,18 +31,21 @@ public class UserController {
 
     @Operation(summary = "分页查询用户")
     @GetMapping("/page")
+    @SaCheckPermission("system:user:query")
     public ResponseDTO<PageResponse<UserVO>> page(UserPageRequest request) {
         return ResponseDTO.success(userService.pageUser(request));
     }
 
     @Operation(summary = "获取用户详情")
     @GetMapping("/get")
+    @SaCheckPermission("system:user:query")
     public ResponseDTO<UserVO> get(@RequestParam Long id) {
         return ResponseDTO.success(userService.getUser(id));
     }
 
     @Operation(summary = "创建用户")
     @PostMapping("/create")
+    @SaCheckPermission("system:user:add")
     public ResponseDTO<Void> create(@Valid @RequestBody UserAddRequest request) {
         log.info("创建用户: username={}", request.getUsername());
         userService.createUser(request);
@@ -49,6 +54,7 @@ public class UserController {
 
     @Operation(summary = "更新用户")
     @PutMapping("/update")
+    @SaCheckPermission("system:user:update")
     public ResponseDTO<Void> update(@Valid @RequestBody UserUpdateRequest request) {
         log.info("更新用户: id={}", request.getId());
         userService.updateUser(request);
@@ -57,6 +63,7 @@ public class UserController {
 
     @Operation(summary = "删除用户")
     @DeleteMapping("/delete")
+    @SaCheckPermission("system:user:delete")
     public ResponseDTO<Void> delete(@RequestParam Long id) {
         log.info("删除用户: id={}", id);
         userService.deleteUser(id);
@@ -65,6 +72,7 @@ public class UserController {
 
     @Operation(summary = "更新用户状态")
     @PutMapping("/update-status")
+    @SaCheckPermission("system:user:update")
     public ResponseDTO<Void> updateStatus(@Valid @RequestBody UserUpdateStatusRequest request) {
         log.info("更新用户状态: id={}, status={}", request.getId(), request.getStatus());
         userService.updateStatus(request);
@@ -73,6 +81,7 @@ public class UserController {
 
     @Operation(summary = "重置密码（管理员）")
     @PutMapping("/reset-password")
+    @SaCheckPermission("system:user:reset-password")
     public ResponseDTO<Void> resetPassword(@Valid @RequestBody UserResetPasswordRequest request) {
         log.info("重置用户密码: id={}", request.getId());
         userService.resetPassword(request);
@@ -81,6 +90,7 @@ public class UserController {
 
     @Operation(summary = "修改密码（用户自己）")
     @PutMapping("/update-password")
+    @SaCheckLogin
     public ResponseDTO<Void> updatePassword(@Valid @RequestBody UserUpdatePasswordRequest request) {
         userService.updatePassword(request);
         return ResponseDTO.success();
@@ -88,6 +98,7 @@ public class UserController {
 
     @Operation(summary = "分配用户角色")
     @PostMapping("/assign-role")
+    @SaCheckPermission("system:user:assign-role")
     public ResponseDTO<Void> assignRole(@Valid @RequestBody UserRoleAssignRequest request) {
         log.info("分配用户角色: userId={}", request.getUserId());
         userService.assignRole(request);

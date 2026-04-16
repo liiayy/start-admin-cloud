@@ -1,5 +1,6 @@
 package cn.muziseo.service.system.module.permission.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.service.system.module.permission.controller.request.MenuAddRequest;
@@ -32,18 +33,21 @@ public class MenuController {
 
     @Operation(summary = "获取菜单树")
     @GetMapping("/tree")
+    @SaCheckPermission("system:menu:query")
     public ResponseDTO<List<MenuTreeVO>> tree() {
         return ResponseDTO.success(menuService.getMenuTree());
     }
 
     @Operation(summary = "获取菜单详情")
     @GetMapping("/get")
+    @SaCheckPermission("system:menu:query")
     public ResponseDTO<MenuVO> get(@RequestParam Long id) {
         return ResponseDTO.success(menuService.getMenu(id));
     }
 
     @Operation(summary = "新增菜单")
     @PostMapping("/add")
+    @SaCheckPermission("system:menu:add")
     public ResponseDTO<Void> add(@Valid @RequestBody MenuAddRequest request) {
         log.info("新增菜单: name={}, type={}", request.getName(), request.getType());
         menuService.addMenu(request);
@@ -52,6 +56,7 @@ public class MenuController {
 
     @Operation(summary = "修改菜单")
     @PutMapping("/update")
+    @SaCheckPermission("system:menu:update")
     public ResponseDTO<Void> update(@Valid @RequestBody MenuUpdateRequest request) {
         log.info("修改菜单: id={}", request.getId());
         menuService.updateMenu(request);
@@ -60,6 +65,7 @@ public class MenuController {
 
     @Operation(summary = "删除菜单")
     @DeleteMapping("/delete")
+    @SaCheckPermission("system:menu:delete")
     public ResponseDTO<Void> delete(@RequestParam Long id) {
         log.info("删除菜单: id={}", id);
         menuService.deleteMenu(id);
@@ -68,6 +74,7 @@ public class MenuController {
 
     @Operation(summary = "获取当前用户菜单")
     @GetMapping("/list-by-role")
+    @SaCheckPermission("system:menu:query")
     public ResponseDTO<List<MenuVO>> listByRoles(@RequestParam List<Long> roleIds) {
         log.debug("查询角色菜单: roleIds={}", roleIds);
         return ResponseDTO.success(menuService.getMenusByRoleIds(roleIds));

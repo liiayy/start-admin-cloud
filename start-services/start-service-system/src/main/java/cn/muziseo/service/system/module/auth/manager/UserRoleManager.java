@@ -51,6 +51,22 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
     }
 
     /**
+     * 根据用户ID列表批量获取角色关联
+     *
+     * @param userIds 用户ID列表
+     * @return 角色关联列表
+     */
+    public List<UserRoleEntity> listByUserIds(List<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return List.of();
+        }
+        return queryChain()
+                .where(UserRoleEntity::getUserId).in(userIds)
+                .list();
+    }
+
+
+    /**
      * 根据多个角色ID获取用户ID列表
      */
     public List<Long> getUserIdsByRoleIds(List<Long> roleIds) {

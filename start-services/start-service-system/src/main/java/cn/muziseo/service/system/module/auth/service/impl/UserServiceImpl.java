@@ -11,6 +11,7 @@ import cn.muziseo.service.system.module.auth.controller.vo.UserVO;
 import cn.muziseo.service.system.module.auth.manager.UserManager;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
+import cn.muziseo.service.system.module.auth.repository.entity.UserRoleEntity;
 import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
 import cn.muziseo.service.system.module.auth.service.UserService;
 import cn.muziseo.service.system.module.organization.manager.DeptManager;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -66,8 +69,32 @@ public class UserServiceImpl implements UserService {
     @DataScope
     public PageResponse<UserVO> pageUser(UserPageRequest request) {
         var page = userManager.pageUser(request);
-        List<UserVO> voList = page.getRecords().stream()
-                .map(this::toUserVO)
+        List<UserEntity> records = page.getRecords();
+        if (records.isEmpty()) {
+            return new PageResponse<>(List.of(), 0);
+        }
+
+        // 1. 批量获取部门名称 (O(1) 替代 O(N))
+        List<Long> deptIds = records.stream()
+                .map(UserEntity::getDeptId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<Long, String> deptMap = deptManager.listByIds(deptIds).stream()
+                .collect(Collectors.toMap(DeptEntity::getId, DeptEntity::getName));
+
+        // 2. 批量获取用户角色 (O(1) 替代 O(N))
+        List<Long> userIds = records.stream()
+                .map(UserEntity::getId)
+                .collect(Collectors.toList());
+        Map<Long, List<Long>> userRoleMap = userRoleManager.listByUserIds(userIds).stream()
+                .collect(Collectors.groupingBy(
+                        UserRoleEntity::getUserId,
+                        Collectors.mapping(UserRoleEntity::getRoleId, Collectors.toList())
+                ));
+
+        List<UserVO> voList = records.stream()
+                .map(entity -> toUserVO(entity, deptMap, userRoleMap))
                 .collect(Collectors.toList());
 
         PageResponse<UserVO> response = new PageResponse<>();
@@ -134,6 +161,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateStatus(UserUpdateStatusRequest request) {
         UserEntity existing = userManager.getById(request.getId());
         if (existing == null) {
@@ -147,6 +175,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void resetPassword(UserResetPasswordRequest request) {
         UserEntity existing = userManager.getById(request.getId());
         if (existing == null) {
@@ -160,6 +189,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updatePassword(UserUpdatePasswordRequest request) {
         Long userId = cn.dev33.satoken.stp.StpUtil.getLoginIdAsLong();
         UserEntity existing = userManager.getById(userId);
@@ -186,9 +216,18 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserVO toUserVO(UserEntity entity) {
+        return toUserVO(entity, null, null);
+    }
+
+    /**
+     * 将 Entity 转换为 VO，支持传入预取的缓存数据以优化性能
+     */
+    private UserVO toUserVO(UserEntity entity, Map<Long, String> deptMap, Map<Long, List<Long>> userRoleMap) {
         // 解析部门名称
         String deptName = null;
-        if (entity.getDeptId() != null) {
+        if (deptMap != null) {
+            deptName = deptMap.get(entity.getDeptId());
+        } else if (entity.getDeptId() != null) {
             DeptEntity dept = deptManager.getById(entity.getDeptId());
             if (dept != null) {
                 deptName = dept.getName();
@@ -196,7 +235,12 @@ public class UserServiceImpl implements UserService {
         }
 
         // 获取用户角色ID列表
-        List<Long> roleIds = userRoleManager.getRoleIdsByUserId(entity.getId());
+        List<Long> roleIds;
+        if (userRoleMap != null) {
+            roleIds = userRoleMap.getOrDefault(entity.getId(), List.of());
+        } else {
+            roleIds = userRoleManager.getRoleIdsByUserId(entity.getId());
+        }
 
         return UserVO.builder()
                 .id(entity.getId())

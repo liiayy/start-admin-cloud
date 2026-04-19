@@ -66,6 +66,7 @@ gateway:
     white-paths:
       - /auth/login
       - /auth/captcha
+      - /system/config/value
     white-prefixes:
       - /swagger-ui
       - /v3/api-docs

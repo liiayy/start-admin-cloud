@@ -21,6 +21,9 @@ public enum UserErrorCode implements IErrorCode {
     EMAIL_EXISTS(30006, "邮箱已存在"),
     OLD_PASSWORD_ERROR(30007, "原密码错误"),
     SUPER_ADMIN_PROTECTED(30008, "超级管理员受到保护，禁止该操作"),
+    CAPTCHA_EMPTY(30009, "验证码不能为空"),
+    CAPTCHA_EXPIRED(30010, "验证码已过期"),
+    CAPTCHA_ERROR(30011, "验证码错误"),
     ;
 
     private final int code;

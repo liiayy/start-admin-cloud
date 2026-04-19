@@ -19,4 +19,10 @@ public class LoginRequest {
     @NotBlank(message = "密码不能为空")
     private String password;
 
+    @Schema(description = "验证码")
+    private String code;
+
+    @Schema(description = "唯一标识")
+    private String uuid;
+
 }

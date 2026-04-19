@@ -46,7 +46,8 @@ public class SystemConfigController {
     @Operation(summary = "根据键名获取参数值")
     @GetMapping("/value")
     public ResponseDTO<String> getConfigValue(@RequestParam String configKey) {
-        return ResponseDTO.success(systemConfigService.getConfigValue(configKey));
+        String value = systemConfigService.getConfigValue(configKey);
+        return ResponseDTO.success("操作成功", value);
     }
 
     @Operation(summary = "新增系统参数")

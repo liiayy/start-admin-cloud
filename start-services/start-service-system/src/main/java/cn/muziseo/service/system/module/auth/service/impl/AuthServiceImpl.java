@@ -2,7 +2,10 @@ package cn.muziseo.service.system.module.auth.service.impl;
 
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.muziseo.common.cache.utils.RedisUtils;
+import cn.muziseo.common.core.constant.ConfigConstants;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.cache.config.ConfigUtils;
 import cn.muziseo.common.satoken.core.util.PasswordUtils;
 import cn.muziseo.service.system.enums.UserErrorCode;
 import cn.muziseo.service.system.module.auth.controller.request.LoginRequest;
@@ -42,6 +45,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginVO login(LoginRequest request) {
+        // 0. 校验验证码
+        validateCaptcha(request);
+
         String username = request.getUsername();
         String failKey = LOGIN_FAIL_KEY + username;
 
@@ -91,6 +97,38 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout() {
         StpUtil.logout();
+    }
+
+    /**
+     * 校验验证码
+     */
+    private void validateCaptcha(LoginRequest request) {
+        boolean captchaEnabled = ConfigUtils.getBoolean(ConfigConstants.CAPTCHA_ENABLED, true);
+        if (!captchaEnabled) {
+            return;
+        }
+
+        String code = request.getCode();
+        String uuid = request.getUuid();
+
+        if (code == null || code.isEmpty()) {
+            throw new BusinessException(UserErrorCode.CAPTCHA_EMPTY);
+        }
+        if (uuid == null || uuid.isEmpty()) {
+            throw new BusinessException(UserErrorCode.CAPTCHA_EXPIRED);
+        }
+
+        String redisKey = "captcha_codes:" + uuid;
+        String captchaCode = RedisUtils.getCacheObject(redisKey);
+        // 验证后立即删除，防止重放攻击
+        RedisUtils.deleteObject(redisKey);
+
+        if (captchaCode == null) {
+            throw new BusinessException(UserErrorCode.CAPTCHA_EXPIRED);
+        }
+        if (!captchaCode.equalsIgnoreCase(code)) {
+            throw new BusinessException(UserErrorCode.CAPTCHA_ERROR);
+        }
     }
 
     /**

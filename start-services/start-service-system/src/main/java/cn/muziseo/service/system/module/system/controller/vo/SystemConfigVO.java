@@ -32,6 +32,8 @@ public class SystemConfigVO {
     private String builtin;
 
     @Schema(description = "备注")
+    private String isPublic;
+
     private String remark;
 
     @Schema(description = "创建时间")

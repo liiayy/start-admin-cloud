@@ -25,6 +25,9 @@ public class SystemConfigAddRequest {
     @NotBlank(message = "参数键值不能为空")
     private String configValue;
 
+    @Schema(description = "是否公开（Y=是，N=否）")
+    private String isPublic;
+
     @Schema(description = "备注")
     private String remark;
 

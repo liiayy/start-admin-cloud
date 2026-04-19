@@ -47,7 +47,11 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     @Override
     public String getConfigValue(String configKey) {
         SystemConfigEntity config = systemConfigManager.getByConfigKey(configKey);
-        return config != null ? config.getConfigValue() : null;
+        // 只有标记为公开的参数才允许外部获取
+        if (config != null && "Y".equals(config.getIsPublic())) {
+            return config.getConfigValue();
+        }
+        return null;
     }
 
     @Override
@@ -60,6 +64,9 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         SystemConfigEntity entity = BeanUtil.copyProperties(request, SystemConfigEntity.class);
         if (entity.getBuiltin() == null) {
             entity.setBuiltin("N");
+        }
+        if (entity.getIsPublic() == null) {
+            entity.setIsPublic("N");
         }
         systemConfigManager.save(entity);
         // 清除缓存（新增也要清，因为可能之前查过返回了空值标记）
@@ -127,6 +134,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
                 .configKey(entity.getConfigKey())
                 .configValue(entity.getConfigValue())
                 .builtin(entity.getBuiltin())
+                .isPublic(entity.getIsPublic())
                 .remark(entity.getRemark())
                 .createTime(entity.getCreateTime())
                 .build();

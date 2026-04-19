@@ -49,6 +49,11 @@ public class SystemConfigEntity extends BaseEntity {
     private String builtin;
 
     /**
+     * 是否公开（Y=是，N=否）
+     */
+    private String isPublic;
+
+    /**
      * 备注
      */
     private String remark;

@@ -21,7 +21,17 @@ public interface MenuService {
     List<MenuVO> getMenusByRoleIds(List<Long> roleIds);
 
     /**
-     * 获取菜单树
+     * 获取用户菜单树
+     *
+     * @param userId 用户ID
+     * @return 菜单树列表
+     */
+    List<MenuTreeVO> getUserMenuTree(Long userId);
+
+    /**
+     * 获取全量菜单树（管理用）
+     *
+     * @return 菜单树列表
      */
     List<MenuTreeVO> getMenuTree();
 

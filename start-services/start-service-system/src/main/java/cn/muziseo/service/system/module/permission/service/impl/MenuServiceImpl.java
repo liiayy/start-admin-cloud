@@ -60,6 +60,32 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public List<MenuTreeVO> getUserMenuTree(Long userId) {
+        List<MenuEntity> menus;
+        // 1. 超级管理员获取所有菜单 (假设 ID 1 为超级管理员)
+        if (userId == 1L) {
+            menus = menuManager.list(
+                    QueryWrapper.create()
+                            .orderBy(MenuEntity::getSort, true)
+                            .orderBy(MenuEntity::getId, true));
+        } else {
+            // 2. 普通用户根据角色获取菜单
+            List<Long> roleIds = userRoleManager.getRoleIdsByUserId(userId);
+            if (roleIds.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<Long> menuIds = roleMenuManager.getMenuIdsByRoleIds(roleIds);
+            if (menuIds.isEmpty()) {
+                return Collections.emptyList();
+            }
+            menus = menuManager.listByIds(menuIds).stream()
+                    .sorted(java.util.Comparator.comparing(MenuEntity::getSort).thenComparing(MenuEntity::getId))
+                    .collect(Collectors.toList());
+        }
+        return buildTree(menus, 0L);
+    }
+
+    @Override
     public List<MenuTreeVO> getMenuTree() {
         List<MenuEntity> allMenus = menuManager.list(
                 QueryWrapper.create()

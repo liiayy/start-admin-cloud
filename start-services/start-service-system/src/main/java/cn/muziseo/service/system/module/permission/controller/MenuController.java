@@ -31,11 +31,18 @@ public class MenuController {
     @Resource
     private MenuService menuService;
 
-    @Operation(summary = "获取菜单树")
+    @Operation(summary = "获取全量菜单树（管理用）")
     @GetMapping("/tree")
     @SaCheckPermission("system:menu:query")
     public ResponseDTO<List<MenuTreeVO>> tree() {
         return ResponseDTO.success(menuService.getMenuTree());
+    }
+
+    @Operation(summary = "获取当前用户菜单树")
+    @GetMapping("/user-tree")
+    public ResponseDTO<List<MenuTreeVO>> userTree() {
+        Long userId = StpUtil.getLoginIdAsLong();
+        return ResponseDTO.success(menuService.getUserMenuTree(userId));
     }
 
     @Operation(summary = "获取菜单详情")

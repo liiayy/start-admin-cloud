@@ -2,6 +2,7 @@ package cn.muziseo.service.system.module.auth.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.core.util.UserSecurityUtils;
 import cn.muziseo.common.db.annotation.DataScope;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.common.satoken.core.util.PasswordUtils;
@@ -157,9 +158,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long id) {
-        UserEntity existing = userManager.getById(id);
-        if (existing == null) {
-            throw new BusinessException(UserErrorCode.USER_NOT_EXISTS);
+        if (UserSecurityUtils.isSuperAdmin(id)) {
+            throw new BusinessException(UserErrorCode.SUPER_ADMIN_PROTECTED);
         }
         userRoleManager.deleteByUserId(id);
         userManager.removeById(id);
@@ -169,6 +169,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(UserUpdateStatusRequest request) {
+        if (UserSecurityUtils.isSuperAdmin(request.getId())) {
+            throw new BusinessException(UserErrorCode.SUPER_ADMIN_PROTECTED);
+        }
         UserEntity existing = userManager.getById(request.getId());
         if (existing == null) {
             throw new BusinessException(UserErrorCode.USER_NOT_EXISTS);

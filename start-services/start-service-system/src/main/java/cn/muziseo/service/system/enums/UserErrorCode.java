@@ -20,6 +20,7 @@ public enum UserErrorCode implements IErrorCode {
     PHONE_EXISTS(30005, "手机号已存在"),
     EMAIL_EXISTS(30006, "邮箱已存在"),
     OLD_PASSWORD_ERROR(30007, "原密码错误"),
+    SUPER_ADMIN_PROTECTED(30008, "超级管理员受到保护，禁止该操作"),
     ;
 
     private final int code;

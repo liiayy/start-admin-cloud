@@ -2,6 +2,7 @@ package cn.muziseo.service.system.module.permission.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.core.util.UserSecurityUtils;
 import cn.muziseo.service.system.enums.MenuErrorCode;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
 import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
@@ -62,8 +63,8 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public List<MenuTreeVO> getUserMenuTree(Long userId) {
         List<MenuEntity> menus;
-        // 1. 超级管理员获取所有菜单 (假设 ID 1 为超级管理员)
-        if (userId == 1L) {
+        // 1. 超级管理员获取所有菜单
+        if (UserSecurityUtils.isSuperAdmin(userId)) {
             menus = menuManager.list(
                     QueryWrapper.create()
                             .orderBy(MenuEntity::getSort, true)

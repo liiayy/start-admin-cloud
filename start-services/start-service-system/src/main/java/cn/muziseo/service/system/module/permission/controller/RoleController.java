@@ -1,6 +1,7 @@
 package cn.muziseo.service.system.module.permission.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaMode;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
@@ -34,7 +35,7 @@ public class RoleController {
 
     @Operation(summary = "分页查询角色")
     @GetMapping("/page")
-    @SaCheckPermission("system:role:query")
+    @SaCheckPermission(value = {"system:role:query", "system:user:query"}, mode = SaMode.OR)
     public ResponseDTO<PageResponse<RoleVO>> page(RolePageRequest request) {
         return ResponseDTO.success(roleService.pageRole(request));
     }

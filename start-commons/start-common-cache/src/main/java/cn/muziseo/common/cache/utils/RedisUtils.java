@@ -3,6 +3,7 @@ package cn.muziseo.common.cache.utils;
 import cn.muziseo.common.core.utils.spring.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.*;
 import org.redisson.api.options.KeysScanOptions;
 
@@ -15,6 +16,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Redis 工具类
+ *
+ * @author 木子软件
+ */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE) // 禁止实例化
 @SuppressWarnings(value = {"unchecked", "rawtypes"})
 public class RedisUtils {
@@ -214,6 +221,23 @@ public class RedisUtils {
     public static <T> T getCacheObject(final String key) {
         RBucket<T> rBucket = CLIENT.getBucket(key);
         return rBucket.get();
+    }
+
+    /**
+     * 获得缓存的基本对象（安全模式）。
+     * <p>如果反序列化失败，自动删除该脏数据并返回 null。</p>
+     *
+     * @param key 缓存键值
+     * @return 缓存键值对应的数据
+     */
+    public static <T> T getCacheObjectSafe(final String key) {
+        try {
+            return getCacheObject(key);
+        } catch (Exception e) {
+            log.warn("[RedisUtils] 缓存对象反序列化失败，自动清理脏数据: key={}, error={}", key, e.getMessage());
+            deleteObject(key);
+            return null;
+        }
     }
 
     /**

@@ -58,14 +58,7 @@ public class DictCacheManager {
         List<DictDataSimpleDTO> result = CAFFEINE.get(dictType, k -> {
             // 1. L1 未命中，查 L2（Redis）
             String redisKey = DictConstants.DICT_CACHE_KEY_PREFIX + dictType;
-            List<DictDataSimpleDTO> redisData = null;
-            try {
-                redisData = RedisUtils.getCacheObject(redisKey);
-            } catch (Exception e) {
-                // 如果序列化失败（例如 DTO 结构变更导致的脏数据），清理 Redis 缓存，强制走 DB 重新加载
-                log.warn("[DictCache] Redis 数据反序列化失败，自动清理并准备重新加载: dictType={}, error={}", dictType, e.getMessage());
-                RedisUtils.deleteObject(redisKey);
-            }
+            List<DictDataSimpleDTO> redisData = RedisUtils.getCacheObjectSafe(redisKey);
 
             if (redisData != null && !redisData.isEmpty()) {
                 log.debug("[DictCache] L2 命中: dictType={}", dictType);

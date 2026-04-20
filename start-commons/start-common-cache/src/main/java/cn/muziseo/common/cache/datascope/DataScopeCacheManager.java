@@ -23,10 +23,10 @@ public class DataScopeCacheManager {
 
     /**
      * 一级缓存（JVM 内存）
-     * 1 分钟过期，防止频繁 RPC/DB 调用
+     * 1 秒过期，防止频繁 RPC/DB 调用
      */
     private static final Cache<Long, DataScopeInfo> CAFFEINE = Caffeine.newBuilder()
-            .expireAfterWrite(1, TimeUnit.MINUTES)
+            .expireAfterWrite(1, TimeUnit.SECONDS)
             .initialCapacity(100)
             .maximumSize(1000)
             .build();

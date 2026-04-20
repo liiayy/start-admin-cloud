@@ -56,6 +56,12 @@
             <version>${revision}</version>
         </dependency>
 
+        <!-- 日志模块 -->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-log</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
     </dependencies>
 

@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * system 模块下，我们放通用业务，支撑上层的核心业务。
@@ -18,6 +19,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication(scanBasePackages = {"cn.muziseo.service.system"})
 @EnableDiscoveryClient
 @EnableFeignClients
+@EnableAsync
+@org.mybatis.spring.annotation.MapperScan("cn.muziseo.service.system.module.**.repository.mapper")
 public class SystemServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(SystemServerApplication.class, args);

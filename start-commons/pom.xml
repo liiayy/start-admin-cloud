@@ -27,6 +27,7 @@
         <module>start-commom-test</module>
         <module>start-common-env</module>
         <module>start-common-http</module>
+        <module>start-common-log</module>
     </modules>
 
     <properties>

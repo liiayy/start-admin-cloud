@@ -1,6 +1,7 @@
 package cn.muziseo.service.system.module.system.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.muziseo.common.cache.config.ConfigUtils;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigAddRequest;
@@ -46,7 +47,7 @@ public class SystemConfigController {
     @Operation(summary = "根据键名获取参数值")
     @GetMapping("/value")
     public ResponseDTO<String> getConfigValue(@RequestParam String configKey) {
-        String value = systemConfigService.getConfigValue(configKey);
+        String value = ConfigUtils.getString(configKey);
         return ResponseDTO.success("操作成功", value);
     }
 

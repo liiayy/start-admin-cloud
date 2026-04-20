@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.muziseo</groupId>
+        <artifactId>start-commons</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>start-common-log</artifactId>
+    <description>日志记录模块</description>
+
+    <dependencies>
+        <!-- 核心基础模块 -->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- Spring AOP -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <!-- IP归属地查询 -->
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+
+        <!-- Web依赖 (获取Request/Multipart) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Sa-Token (获取用户信息) -->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-satoken-integration</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- 系统服务接口 (远程日志调用) -->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-service-system-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -3,6 +3,8 @@ package cn.muziseo.service.system.module.permission.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaMode;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.log.annotation.Log;
+import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
 import cn.muziseo.service.system.module.permission.controller.request.RolePageRequest;
@@ -50,6 +52,7 @@ public class RoleController {
     @Operation(summary = "新增角色")
     @PostMapping("/add")
     @SaCheckPermission("system:role:add")
+    @Log(title = "角色管理", businessType = BusinessType.INSERT)
     public ResponseDTO<Void> add(@Valid @RequestBody RoleAddRequest request) {
         log.info("新增角色: code={}, name={}", request.getCode(), request.getName());
         roleService.addRole(request);
@@ -59,6 +62,7 @@ public class RoleController {
     @Operation(summary = "修改角色")
     @PutMapping("/update")
     @SaCheckPermission("system:role:update")
+    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> update(@Valid @RequestBody RoleUpdateRequest request) {
         log.info("修改角色: id={}", request.getId());
         roleService.updateRole(request);
@@ -68,6 +72,7 @@ public class RoleController {
     @Operation(summary = "删除角色")
     @DeleteMapping("/delete")
     @SaCheckPermission("system:role:delete")
+    @Log(title = "角色管理", businessType = BusinessType.DELETE)
     public ResponseDTO<Void> delete(@RequestParam Long id) {
         log.info("删除角色: id={}", id);
         roleService.deleteRole(id);
@@ -77,6 +82,7 @@ public class RoleController {
     @Operation(summary = "更新角色状态")
     @PutMapping("/update-status")
     @SaCheckPermission("system:role:update")
+    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> updateStatus(@Valid @RequestBody RoleUpdateStatusRequest request) {
         log.info("更新角色状态: id={}, status={}", request.getId(), request.getStatus());
         roleService.updateStatus(request.getId(), request.getStatus());

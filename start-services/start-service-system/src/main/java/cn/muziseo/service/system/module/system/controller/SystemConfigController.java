@@ -51,6 +51,12 @@ public class SystemConfigController {
         return ResponseDTO.success("操作成功", value);
     }
 
+    @Operation(summary = "批量获取系统参数值")
+    @GetMapping("/list-values")
+    public ResponseDTO<java.util.Map<String, String>> getConfigValues(@RequestParam java.util.List<String> configKeys) {
+        return ResponseDTO.success(systemConfigService.getConfigValues(configKeys));
+    }
+
     @Operation(summary = "新增系统参数")
     @SaCheckPermission("system:config:add")
     @PostMapping("/add")

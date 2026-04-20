@@ -64,7 +64,14 @@ public class ConfigCacheManager {
         String result = CAFFEINE.get(configKey, k -> {
             // 1. L1 未命中，查 L2（Redis）
             String redisKey = ConfigConstants.CONFIG_CACHE_KEY_PREFIX + configKey;
-            String redisData = RedisUtils.getCacheObject(redisKey);
+            String redisData = null;
+            try {
+                redisData = RedisUtils.getCacheObject(redisKey);
+            } catch (Exception e) {
+                // 如果序列化失败（例如旧版脏数据），清理 Redis 缓存并准备重新加载
+                log.warn("[ConfigCache] Redis 数据反序列化失败，自动清理并准备重新加载: configKey={}, error={}", configKey, e.getMessage());
+                RedisUtils.deleteObject(redisKey);
+            }
 
             if (redisData != null) {
                 log.debug("[ConfigCache] L2 命中: configKey={}", configKey);

@@ -67,6 +67,7 @@ gateway:
       - /auth/login
       - /auth/captcha
       - /system/config/value
+      - /system/config/list-values
     white-prefixes:
       - /swagger-ui
       - /v3/api-docs

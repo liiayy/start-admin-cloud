@@ -29,6 +29,11 @@ public interface SystemConfigService {
     String getConfigValue(String configKey);
 
     /**
+     * 批量根据参数键名获取参数键值（仅返回公开的参数）
+     */
+    java.util.Map<String, String> getConfigValues(java.util.List<String> configKeys);
+
+    /**
      * 添加系统参数
      */
     void addConfig(SystemConfigAddRequest request);

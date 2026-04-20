@@ -55,6 +55,20 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     }
 
     @Override
+    public java.util.Map<String, String> getConfigValues(java.util.List<String> configKeys) {
+        if (cn.hutool.core.collection.CollectionUtil.isEmpty(configKeys)) {
+            return java.util.Collections.emptyMap();
+        }
+        // 这里为了简单且保证安全过滤，直接循环调用 getConfigValue
+        // 注意：后续可以优化为 SQL IN 查询以提升极端性能，目前基于 getByConfigKey (带索引) 性能已足够
+        return configKeys.stream()
+                .distinct()
+                .map(key -> new java.util.AbstractMap.SimpleEntry<>(key, getConfigValue(key)))
+                .filter(e -> e.getValue() != null)
+                .collect(java.util.stream.Collectors.toMap(java.util.Map.Entry::getKey, java.util.Map.Entry::getValue));
+    }
+
+    @Override
     public void addConfig(SystemConfigAddRequest request) {
         // 检查参数键名是否已存在
         if (systemConfigManager.existsByConfigKey(request.getConfigKey())) {

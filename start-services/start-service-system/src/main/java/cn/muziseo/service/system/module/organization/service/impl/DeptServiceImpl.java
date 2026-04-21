@@ -6,7 +6,9 @@ import cn.muziseo.service.system.enums.DeptErrorCode;
 import cn.muziseo.service.system.module.organization.controller.request.DeptAddRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptTreeVO;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptVO;
+import cn.muziseo.service.system.module.auth.manager.UserManager;
 import cn.muziseo.service.system.module.organization.manager.DeptManager;
+import cn.muziseo.service.system.module.organization.manager.PostManager;
 import cn.muziseo.service.system.module.organization.repository.entity.DeptEntity;
 import cn.muziseo.service.system.module.organization.service.DeptService;
 import jakarta.annotation.Resource;
@@ -29,6 +31,12 @@ public class DeptServiceImpl implements DeptService {
 
     @Resource
     private DeptManager deptManager;
+
+    @Resource
+    private UserManager userManager;
+
+    @Resource
+    private PostManager postManager;
 
     @Override
     public List<DeptVO> list() {
@@ -118,7 +126,15 @@ public class DeptServiceImpl implements DeptService {
             throw new BusinessException(DeptErrorCode.DEPT_HAS_CHILDREN);
         }
 
-        // TODO: 检查是否有用户关联
+        // 检查是否有用户关联
+        if (userManager.countByDeptId(id) > 0) {
+            throw new BusinessException(DeptErrorCode.DEPT_HAS_USERS);
+        }
+
+        // 检查是否有岗位关联
+        if (postManager.countByDeptId(id) > 0) {
+            throw new BusinessException(DeptErrorCode.DEPT_HAS_POSTS);
+        }
 
         deptManager.removeById(id);
         log.info("删除部门成功: id={}", id);

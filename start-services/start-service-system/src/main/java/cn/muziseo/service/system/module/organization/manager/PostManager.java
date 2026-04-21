@@ -63,6 +63,14 @@ public class PostManager extends BaseServiceImpl<PostMapper, PostEntity> {
     }
 
     /**
+     * 统计部门下的岗位数量
+     */
+    public long countByDeptId(Long deptId) {
+        return count(QueryWrapper.create()
+                .where(PostEntity::getDeptId).eq(deptId));
+    }
+
+    /**
      * 分页查询岗位（支持部门+子部门过滤）
      */
     public Page<PostEntity> pagePost(PostPageRequest request, List<Long> deptIds) {

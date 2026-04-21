@@ -30,19 +30,41 @@ public class UserManager extends BaseServiceImpl<UserMapper, UserEntity> {
     }
 
     /**
-     * 检查用户名是否存在
+     * 检查用户名是否存在（支持排除指定用户ID）
      */
-    public boolean existsByUsername(String username) {
-        return exists(QueryWrapper.create()
-                .where(UserEntity::getUsername).eq(username));
+    public boolean existsByUsername(String username, Long excludeUserId) {
+        QueryWrapper wrapper = QueryWrapper.create()
+                .where(UserEntity::getUsername).eq(username);
+        if (excludeUserId != null) {
+            wrapper.and(UserEntity::getId).ne(excludeUserId);
+        }
+        return exists(wrapper);
     }
 
     /**
      * 检查手机号是否存在（排除指定用户ID）
      */
     public boolean existsByMobile(String mobile, Long excludeUserId) {
+        if (mobile == null || mobile.isEmpty()) {
+            return false;
+        }
         QueryWrapper wrapper = QueryWrapper.create()
                 .where(UserEntity::getMobile).eq(mobile);
+        if (excludeUserId != null) {
+            wrapper.and(UserEntity::getId).ne(excludeUserId);
+        }
+        return exists(wrapper);
+    }
+
+    /**
+     * 检查邮箱是否存在（排除指定用户ID）
+     */
+    public boolean existsByEmail(String email, Long excludeUserId) {
+        if (email == null || email.isEmpty()) {
+            return false;
+        }
+        QueryWrapper wrapper = QueryWrapper.create()
+                .where(UserEntity::getEmail).eq(email);
         if (excludeUserId != null) {
             wrapper.and(UserEntity::getId).ne(excludeUserId);
         }
@@ -55,6 +77,22 @@ public class UserManager extends BaseServiceImpl<UserMapper, UserEntity> {
     public java.util.List<UserEntity> listByDeptId(Long deptId) {
         return list(QueryWrapper.create()
                 .where(UserEntity::getDeptId).eq(deptId));
+    }
+
+    /**
+     * 统计部门下的用户数量
+     */
+    public long countByDeptId(Long deptId) {
+        return count(QueryWrapper.create()
+                .where(UserEntity::getDeptId).eq(deptId));
+    }
+
+    /**
+     * 统计拥有指定岗位的用户数量
+     */
+    public long countByPostId(Long postId) {
+        return count(QueryWrapper.create()
+                .where("? = ANY(post_ids)", postId));
     }
 
     /**

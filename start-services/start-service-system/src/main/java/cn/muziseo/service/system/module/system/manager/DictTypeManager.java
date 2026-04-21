@@ -50,10 +50,14 @@ public class DictTypeManager extends BaseServiceImpl<DictTypeMapper, DictTypeEnt
     }
 
     /**
-     * 检查字典类型是否存在
+     * 检查字典类型是否存在（支持排除指定ID）
      */
-    public boolean existsByType(String type) {
-        return exists(QueryWrapper.create()
-                .where(DictTypeEntity::getType).eq(type));
+    public boolean existsByType(String type, Long excludeId) {
+        QueryWrapper wrapper = QueryWrapper.create()
+                .where(DictTypeEntity::getType).eq(type);
+        if (excludeId != null) {
+            wrapper.and(DictTypeEntity::getId).ne(excludeId);
+        }
+        return exists(wrapper);
     }
 }

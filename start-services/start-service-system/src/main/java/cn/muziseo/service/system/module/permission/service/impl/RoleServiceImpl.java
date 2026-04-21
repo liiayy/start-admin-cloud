@@ -1,11 +1,11 @@
 package cn.muziseo.service.system.module.permission.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.cache.datascope.DataScopeCacheManager;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.RoleErrorCode;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
-import cn.muziseo.common.cache.datascope.DataScopeCacheManager;
 import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
 import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
 import cn.muziseo.service.system.module.permission.controller.request.RolePageRequest;
@@ -79,15 +79,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addRole(RoleAddRequest request) {
+        // 1. 校验代码唯一
         if (roleManager.existsByCode(request.getCode(), null)) {
             throw new BusinessException(RoleErrorCode.ROLE_CODE_EXISTS);
         }
+
         RoleEntity entity = BeanUtil.copyProperties(request, RoleEntity.class);
         if (entity.getStatus() == null) {
             entity.setStatus(0);
-        }
-        if (entity.getType() == null) {
-            entity.setType(2);
         }
         roleManager.save(entity);
         log.info("新增角色成功: id={}, code={}", entity.getId(), entity.getCode());
@@ -96,49 +95,50 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRole(RoleUpdateRequest request) {
-        RoleEntity existing = roleManager.getById(request.getId());
-        if (existing == null) {
+        RoleEntity role = roleManager.getById(request.getId());
+        if (role == null) {
             throw new BusinessException(RoleErrorCode.ROLE_NOT_EXISTS);
         }
+
+        // 1. 校验代码唯一
         if (roleManager.existsByCode(request.getCode(), request.getId())) {
             throw new BusinessException(RoleErrorCode.ROLE_CODE_EXISTS);
         }
+
         RoleEntity entity = BeanUtil.copyProperties(request, RoleEntity.class);
         roleManager.updateById(entity);
 
         // 刷新拥有该角色的用户 Session 和 数据权限缓存
-        List<Long> userIds = userRoleManager.getUserIdsByRoleId(request.getId());
-        saSessionRefreshService.refreshUserSessions(userIds);
-        userIds.forEach(DataScopeCacheManager::evictCache);
-        
-        log.info("修改角色成功: id={}, 影响用户数={}", request.getId(), userIds.size());
+        refreshUserCacheByRoleId(request.getId());
+
+        log.info("更新角色成功: id={}", request.getId());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteRole(Long id) {
-        RoleEntity existing = roleManager.getById(id);
-        if (existing == null) {
+        RoleEntity role = roleManager.getById(id);
+        if (role == null) {
             throw new BusinessException(RoleErrorCode.ROLE_NOT_EXISTS);
         }
-        // 检查是否有用户关联
-        List<Long> userIds = userRoleManager.getUserIdsByRoleId(id);
-        if (!userIds.isEmpty()) {
+
+        // 1. 检查是否有用户关联
+        if (userRoleManager.countByRoleId(id) > 0) {
             throw new BusinessException(RoleErrorCode.ROLE_HAS_USERS);
         }
-        roleMenuManager.deleteByRoleId(id);
-        userRoleManager.deleteByRoleId(id);
-        roleManager.removeById(id);
 
-        saSessionRefreshService.refreshUserSessions(userIds);
+        // 2. 清理角色菜单关联
+        roleMenuManager.deleteByRoleId(id);
+
+        roleManager.removeById(id);
         log.info("删除角色成功: id={}", id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Long id, Integer status) {
-        RoleEntity existing = roleManager.getById(id);
-        if (existing == null) {
+        RoleEntity role = roleManager.getById(id);
+        if (role == null) {
             throw new BusinessException(RoleErrorCode.ROLE_NOT_EXISTS);
         }
         RoleEntity entity = new RoleEntity();
@@ -147,29 +147,53 @@ public class RoleServiceImpl implements RoleService {
         roleManager.updateById(entity);
 
         // 刷新拥有该角色的用户 Session 和 数据权限缓存
-        List<Long> userIds = userRoleManager.getUserIdsByRoleId(id);
-        saSessionRefreshService.refreshUserSessions(userIds);
-        userIds.forEach(DataScopeCacheManager::evictCache);
-        
-        log.info("更新角色状态: id={}, status={}, 影响用户数={}", id, status, userIds.size());
+        refreshUserCacheByRoleId(id);
+
+        log.info("更新角色状态: id={}, status={}", id, status);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void assignMenus(Long roleId, List<Long> menuIds) {
-        roleMenuManager.deleteByRoleId(roleId);
-        if (menuIds != null && !menuIds.isEmpty()) {
-            List<RoleMenuEntity> list = menuIds.stream().map(menuId -> RoleMenuEntity.builder()
-                    .roleId(roleId)
-                    .menuId(menuId)
-                    .build()).collect(Collectors.toList());
-            roleMenuManager.saveBatch(list);
+        RoleEntity role = roleManager.getById(roleId);
+        if (role == null) {
+            throw new BusinessException(RoleErrorCode.ROLE_NOT_EXISTS);
         }
 
-        // 刷新拥有该角色的所有用户的 Session
+        // 1. 清理旧关联
+        roleMenuManager.deleteByRoleId(roleId);
+
+        // 2. 批量插入新关联
+        if (menuIds != null && !menuIds.isEmpty()) {
+            List<RoleMenuEntity> entities = menuIds.stream()
+                    .map(menuId -> {
+                        RoleMenuEntity entity = new RoleMenuEntity();
+                        entity.setRoleId(roleId);
+                        entity.setMenuId(menuId);
+                        return entity;
+                    })
+                    .collect(Collectors.toList());
+            roleMenuManager.saveBatch(entities);
+        }
+
+        // 3. 刷新权限缓存
         List<Long> userIds = userRoleManager.getUserIdsByRoleId(roleId);
-        saSessionRefreshService.refreshUserSessions(userIds);
-        log.info("分配角色菜单: roleId={}, 影响用户数={}", roleId, userIds.size());
+        if (userIds != null && !userIds.isEmpty()) {
+            saSessionRefreshService.refreshUserSessions(userIds);
+        }
+
+        log.info("分配角色菜单成功: roleId={}, menuCount={}", roleId, menuIds != null ? menuIds.size() : 0);
+    }
+
+    /**
+     * 刷新拥有指定角色的所有用户的 Session 和数据权限缓存
+     */
+    private void refreshUserCacheByRoleId(Long roleId) {
+        List<Long> userIds = userRoleManager.getUserIdsByRoleId(roleId);
+        if (userIds != null && !userIds.isEmpty()) {
+            saSessionRefreshService.refreshUserSessions(userIds);
+            userIds.forEach(DataScopeCacheManager::evictCache);
+        }
     }
 
     private RoleVO toRoleVO(RoleEntity entity) {

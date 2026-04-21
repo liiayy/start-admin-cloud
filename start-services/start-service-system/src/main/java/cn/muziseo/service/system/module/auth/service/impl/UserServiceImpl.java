@@ -117,9 +117,17 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createUser(UserAddRequest request) {
-        if (userManager.existsByUsername(request.getUsername())) {
+        // 1. 校验唯一性
+        if (userManager.existsByUsername(request.getUsername(), null)) {
             throw new BusinessException(UserErrorCode.USERNAME_EXISTS);
         }
+        if (userManager.existsByMobile(request.getMobile(), null)) {
+            throw new BusinessException(UserErrorCode.PHONE_EXISTS);
+        }
+        if (userManager.existsByEmail(request.getEmail(), null)) {
+            throw new BusinessException(UserErrorCode.EMAIL_EXISTS);
+        }
+
         UserEntity entity = BeanUtil.copyProperties(request, UserEntity.class);
         entity.setPassword(PasswordUtils.encode(request.getPassword()));
         if (entity.getStatus() == null) {
@@ -136,6 +144,15 @@ public class UserServiceImpl implements UserService {
         if (existing == null) {
             throw new BusinessException(UserErrorCode.USER_NOT_EXISTS);
         }
+
+        // 1. 校验唯一性
+        if (userManager.existsByMobile(request.getMobile(), request.getId())) {
+            throw new BusinessException(UserErrorCode.PHONE_EXISTS);
+        }
+        if (userManager.existsByEmail(request.getEmail(), request.getId())) {
+            throw new BusinessException(UserErrorCode.EMAIL_EXISTS);
+        }
+
         UserEntity entity = new UserEntity();
         entity.setId(request.getId());
         entity.setNickname(request.getNickname());

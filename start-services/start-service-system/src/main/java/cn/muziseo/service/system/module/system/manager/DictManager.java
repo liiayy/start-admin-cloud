@@ -49,4 +49,12 @@ public class DictManager extends BaseServiceImpl<DictMapper, DictEntity> {
         remove(QueryWrapper.create()
                 .where(DictEntity::getDictType).eq(dictType));
     }
+
+    /**
+     * 统计指定类型的字典数据数量
+     */
+    public long countByDictType(String dictType) {
+        return count(QueryWrapper.create()
+                .where(DictEntity::getDictType).eq(dictType));
+    }
 }

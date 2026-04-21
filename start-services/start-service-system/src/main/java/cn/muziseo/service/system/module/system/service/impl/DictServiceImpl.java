@@ -16,6 +16,7 @@ import cn.muziseo.service.system.module.system.service.DictService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -65,6 +66,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addDictData(DictDataAddRequest request) {
         // 检查字典类型是否存在
         if (dictTypeManager.getByType(request.getDictType()) == null) {
@@ -79,9 +81,11 @@ public class DictServiceImpl implements DictService {
 
         // 清除该字典类型的二级缓存
         DictCacheManager.evictCache(request.getDictType());
+        log.info("新增字典数据成功: id={}, type={}", entity.getId(), entity.getDictType());
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateDictData(Long id, DictDataAddRequest request) {
         DictEntity existing = dictManager.getById(id);
         if (existing == null) {
@@ -97,9 +101,11 @@ public class DictServiceImpl implements DictService {
         if (!existing.getDictType().equals(request.getDictType())) {
             DictCacheManager.evictCache(request.getDictType());
         }
+        log.info("更新字典数据成功: id={}", id);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteDictData(Long id) {
         DictEntity existing = dictManager.getById(id);
         if (existing == null) {
@@ -110,6 +116,7 @@ public class DictServiceImpl implements DictService {
 
         // 清除该字典类型的二级缓存
         DictCacheManager.evictCache(existing.getDictType());
+        log.info("删除字典数据成功: id={}", id);
     }
 
     /**

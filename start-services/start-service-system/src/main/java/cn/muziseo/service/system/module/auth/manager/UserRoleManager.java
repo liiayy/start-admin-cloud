@@ -103,6 +103,14 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
     }
 
     /**
+     * 统计拥有指定角色的用户数量
+     */
+    public long countByRoleId(Long roleId) {
+        return count(QueryWrapper.create()
+                .where(UserRoleEntity::getRoleId).eq(roleId));
+    }
+
+    /**
      * 批量插入用户角色关联
      *
      * @param userId  用户ID

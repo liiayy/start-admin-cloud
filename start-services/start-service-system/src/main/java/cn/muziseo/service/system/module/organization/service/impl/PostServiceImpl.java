@@ -8,6 +8,7 @@ import cn.muziseo.service.system.enums.PostErrorCode;
 import cn.muziseo.service.system.module.organization.controller.request.PostAddRequest;
 import cn.muziseo.service.system.module.organization.controller.request.PostPageRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.PostVO;
+import cn.muziseo.service.system.module.auth.manager.UserManager;
 import cn.muziseo.service.system.module.organization.manager.DeptManager;
 import cn.muziseo.service.system.module.organization.manager.PostManager;
 import cn.muziseo.service.system.module.organization.repository.entity.DeptEntity;
@@ -16,6 +17,7 @@ import cn.muziseo.service.system.module.organization.service.PostService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +36,9 @@ public class PostServiceImpl implements PostService {
 
     @Resource
     private DeptManager deptManager;
+
+    @Resource
+    private UserManager userManager;
 
     @Override
     public List<PostVO> list() {
@@ -72,6 +77,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addPost(PostAddRequest request) {
         // 校验编码唯一
         if (postManager.existsByCode(request.getCode(), null)) {
@@ -87,6 +93,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updatePost(Long id, PostAddRequest request) {
         PostEntity post = postManager.getById(id);
         if (post == null) {
@@ -105,19 +112,24 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deletePost(Long id) {
         PostEntity post = postManager.getById(id);
         if (post == null) {
             throw new BusinessException(PostErrorCode.POST_NOT_EXISTS);
         }
 
-        // TODO: 检查是否有用户关联
+        // 检查是否有用户关联
+        if (userManager.countByPostId(id) > 0) {
+            throw new BusinessException(PostErrorCode.POST_HAS_USERS);
+        }
 
         postManager.removeById(id);
         log.info("删除岗位成功: id={}", id);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Long id, Integer status) {
         PostEntity post = postManager.getById(id);
         if (post == null) {

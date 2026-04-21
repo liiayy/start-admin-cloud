@@ -138,7 +138,6 @@ public class RequestValidationFilter implements GlobalFilter, Ordered {
 
             @Override
             public HttpHeaders getHeaders() {
-                log.info("current thread getHeaders: {}", Thread.currentThread().getName());
                 long contentLength = headers.getContentLength();
                 HttpHeaders newHeaders = new HttpHeaders();
                 newHeaders.putAll(headers);

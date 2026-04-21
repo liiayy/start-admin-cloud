@@ -130,11 +130,7 @@ public class MenuServiceImpl implements MenuService {
         if (existing == null) {
             throw new BusinessException(MenuErrorCode.MENU_NOT_EXISTS);
         }
-        if (request.getPermission() != null && !request.getPermission().isEmpty()) {
-            if (menuManager.existsByPermission(request.getPermission(), request.getId())) {
-                throw new BusinessException(MenuErrorCode.MENU_PERMISSION_EXISTS);
-            }
-        }
+
         MenuEntity entity = BeanUtil.copyProperties(request, MenuEntity.class);
         menuManager.updateById(entity);
 

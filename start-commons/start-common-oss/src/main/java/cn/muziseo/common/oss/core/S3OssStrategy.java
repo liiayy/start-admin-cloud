@@ -15,6 +15,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -40,6 +41,9 @@ public class S3OssStrategy extends AbstractOssStrategy {
             AWSCredentials credentials = new BasicAWSCredentials(properties.getAccessKey(), properties.getSecretKey());
             ClientConfiguration clientConfig = new ClientConfiguration();
             clientConfig.setProtocol(properties.getIsHttps() ? Protocol.HTTPS : Protocol.HTTP);
+            // 优化连接池策略，防止 "Remote end is closed" 偶发异常
+            clientConfig.setConnectionTTL(60000); // 设置连接生存时间，防止复用过时的连接
+            clientConfig.setMaxErrorRetry(3);     // 遇到网络抖动自动重试
 
             AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard()
                     .withCredentials(new AWSStaticCredentialsProvider(credentials))
@@ -52,12 +56,12 @@ public class S3OssStrategy extends AbstractOssStrategy {
             String region = properties.getRegion();
 
             // 自动修正 Endpoint：如果用户在 Endpoint 中包含了 BucketName，则剔除它
-            // 否则在 Virtual Hosted Style 开启时，SDK 会拼接成 bucket.bucket.cos... 导致 400 错误
-            if (endpoint.startsWith(bucketName + ".")) {
+            if (StringUtils.hasText(endpoint) && StringUtils.hasText(bucketName) && endpoint.startsWith(bucketName + ".")) {
                 endpoint = endpoint.replace(bucketName + ".", "");
             }
 
-            if (endpoint.contains("aliyuncs.com") || endpoint.contains("myqcloud.com")) {
+
+            if (StringUtils.hasText(endpoint) && (endpoint.contains("aliyuncs.com") || endpoint.contains("myqcloud.com"))) {
                 builder.withPathStyleAccessEnabled(false);
             }
 
@@ -85,18 +89,14 @@ public class S3OssStrategy extends AbstractOssStrategy {
     private UploadResult upload(InputStream inputStream, String key, String contentType, Long length) {
         try {
             ObjectMetadata metadata = new ObjectMetadata();
-            if (contentType != null) {
-              m
-
-    etadata.setC
-    n
-        }
-        if (length != null) {
-            metadata.setContentLength(length);
+            if (StringUtils.hasText(contentType)) {
+                metadata.setContentType(contentType);
+            }
+            if (length != null) {
+                metadata.setContentLength(length);
             }
 
-            PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), key, inputStream,
-                    metadata);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), key, inputStream, metadata);
 
             // 如果是公共读桶，设置 ACL
             if (properties.getAccessPolicy() == AccessPolicyType.PUBLIC_READ) {
@@ -111,8 +111,8 @@ public class S3OssStrategy extends AbstractOssStrategy {
                     .service(properties.getConfigKey())
                     .build();
         } catch (Exception e) {
-            log.error("S3 文件上传失败: {}", e.getMessage());
-            throw new RuntimeException("文件上传异常", e);
+            log.error("S3 文件上传失败: key={}, message={}", key, e.getMessage());
+            throw new RuntimeException("文件上传异常: " + e.getMessage());
         }
     }
 
@@ -121,15 +121,15 @@ public class S3OssStrategy extends AbstractOssStrategy {
         try {
             client.deleteObject(properties.getBucketName(), key);
         } catch (Exception e) {
-            log.error("S3 文件删除失败: {}", e.getMessage());
-            throw new RuntimeException("文件删除异常", e);
+            log.error("S3 文件删除失败: key={}, message={}", key, e.getMessage());
+            throw new RuntimeException("文件删除异常: " + e.getMessage());
         }
     }
 
     @Override
     public String getUrl(String key) {
         // 如果配置了自定义域名
-        if (org.springframework.util.StringUtils.hasText(properties.getDomain())) {
+        if (StringUtils.hasText(properties.getDomain())) {
             String domain = properties.getDomain();
             if (!domain.endsWith("/")) {
                 domain += "/";

@@ -43,6 +43,7 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
     @Override
     public void initOssFactory() {
         log.info("开始初始化 OSS 客户端工厂...");
+        OssFactory.clear(); // 先清理旧缓存，确保配置更新生效
         List<SysOssConfigEntity> list = sysOssConfigManager.listEnabledConfig();
         for (SysOssConfigEntity config : list) {
             String configKey = config.getConfigKey();
@@ -102,13 +103,8 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
         
         sysOssConfigManager.saveOrUpdate(entity);
         
-        // 4. 刷新缓存客户端
-        // 如果是启用状态，则加载；否则尝试移除缓存
-        if (CommonStatus.isNormal(entity.getStatus())) {
-            OssFactory.init(toProperties(entity));
-        } else {
-            OssFactory.remove(entity.getConfigKey());
-        }
+        // 4. 刷新缓存：全量重载是最稳妥的方式，确保排他性启用状态和秘钥更新立即生效
+        initOssFactory();
     }
 
     @Override

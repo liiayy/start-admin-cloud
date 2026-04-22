@@ -70,5 +70,12 @@ public class OssFactory {
         CLIENT_CACHE.remove(configKey);
         log.info("移除 OSS 客户端成功: key={}", configKey);
     }
+    /**
+     * 清空所有客户端缓存
+     */
+    public static void clear() {
+        CLIENT_CACHE.clear();
+        log.info("已清空所有 OSS 客户端缓存");
+    }
 
 }

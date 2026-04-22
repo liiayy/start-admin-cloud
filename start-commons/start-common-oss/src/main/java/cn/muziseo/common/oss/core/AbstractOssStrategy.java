@@ -34,13 +34,20 @@ public abstract class AbstractOssStrategy implements OssClient {
      */
     protected String getPath(String suffix, String moduleName) {
         StringBuilder path = new StringBuilder();
-        // 前缀
+        // 前缀：确保不产生双斜杠
         if (StringUtils.hasText(properties.getPrefix())) {
-            path.append(properties.getPrefix()).append("/");
+            String prefix = properties.getPrefix();
+            path.append(prefix);
+            if (!prefix.endsWith("/")) {
+                path.append("/");
+            }
         }
         // 模块名
         if (StringUtils.hasText(moduleName)) {
-            path.append(moduleName).append("/");
+            path.append(moduleName);
+            if (!moduleName.endsWith("/")) {
+                path.append("/");
+            }
         }
         // 日期路径
         path.append(DateUtil.format(new Date(), "yyyy/MM/dd")).append("/");
@@ -55,7 +62,12 @@ public abstract class AbstractOssStrategy implements OssClient {
 
     @Override
     public UploadResult uploadSuffix(byte[] data, String suffix, String moduleName) {
+        return uploadSuffix(data, suffix, moduleName, null);
+    }
+
+    @Override
+    public UploadResult uploadSuffix(byte[] data, String suffix, String moduleName, String contentType) {
         String key = getPath(suffix, moduleName);
-        return upload(data, key, null);
+        return upload(data, key, contentType);
     }
 }

@@ -52,6 +52,17 @@ public interface OssClient {
      * @param data       数据
      * @param suffix     后缀 (如 .jpg)
      * @param moduleName 模块名 (用于路径分类)
+     * @param contentType MIME类型
+     * @return 上传结果
+     */
+    UploadResult uploadSuffix(byte[] data, String suffix, String moduleName, String contentType);
+
+    /**
+     * 根据后缀生成上传结果 (不带 contentType)
+     *
+     * @param data       数据
+     * @param suffix     后缀 (如 .jpg)
+     * @param moduleName 模块名 (用于路径分类)
      * @return 上传结果
      */
     UploadResult uploadSuffix(byte[] data, String suffix, String moduleName);

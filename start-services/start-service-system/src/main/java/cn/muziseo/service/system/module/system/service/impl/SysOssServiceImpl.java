@@ -3,6 +3,7 @@ package cn.muziseo.service.system.module.system.service.impl;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.oss.config.OssConfigProperties;
 import cn.muziseo.common.oss.core.OssClient;
 import cn.muziseo.common.oss.entity.UploadResult;
 import cn.muziseo.common.oss.factory.OssFactory;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -36,6 +36,9 @@ public class SysOssServiceImpl implements SysOssService {
     @Resource
     private SysOssConfigManager sysOssConfigManager;
 
+    @Resource
+    private OssConfigProperties ossConfigProperties;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SysOssEntity upload(MultipartFile file, String moduleName) {
@@ -43,12 +46,25 @@ public class SysOssServiceImpl implements SysOssService {
             throw new BusinessException(OssErrorCode.UPLOAD_FILE_EMPTY);
         }
 
-        // 校验模块名合法性 (仅允许字母数字，防止目录注入)
+        // 1. 安全校验：大小校验 (从配置获取)
+        if (file.getSize() > ossConfigProperties.getMaxSize()) {
+            double mbSize = (double) ossConfigProperties.getMaxSize() / (1024 * 1024);
+            throw new BusinessException("上传失败：文件大小超过 " + mbSize + "MB 限制");
+        }
+
+        // 2. 安全校验：模块名合法性
         if (moduleName != null && !moduleName.matches("^[a-zA-Z0-9_-]+$")) {
             throw new BusinessException(OssErrorCode.UPLOAD_MODULE_INVALID);
         }
 
-        // 1. 获取当前主存储配置 (第一个启用的)
+        // 3. 安全校验：后缀校验 (从配置获取)
+        String originalName = file.getOriginalFilename();
+        String suffix = FileUtil.extName(originalName).toLowerCase();
+        if (ossConfigProperties.getForbiddenSuffix().contains(suffix)) {
+            throw new BusinessException("上传失败：禁止上传该类型文件");
+        }
+
+        // 4. 获取当前主存储配置
         List<SysOssConfigEntity> configs = sysOssConfigManager.listEnabledConfig();
         if (configs.isEmpty()) {
             throw new BusinessException(OssErrorCode.OSS_CLIENT_NOT_FOUND);
@@ -56,15 +72,14 @@ public class SysOssServiceImpl implements SysOssService {
         SysOssConfigEntity config = configs.get(0);
 
         try {
-            // 2. 获取具体存储客户端
+            // 5. 获取具体存储客户端
             OssClient storage = OssFactory.instance(config.getConfigKey());
             
-            // 3. 执行物理上传
-            String originalName = file.getOriginalFilename();
-            String suffix = FileUtil.extName(originalName);
-            UploadResult uploadResult = storage.uploadSuffix(file.getBytes(), suffix, moduleName);
+            // 6. 执行物理上传 (带上 Content-Type，让云端正确识别文件类型)
+            byte[] data = file.getBytes();
+            UploadResult uploadResult = storage.uploadSuffix(data, suffix, moduleName, file.getContentType());
             
-            // 4. 保存元数据到数据库
+            // 7. 保存元数据到数据库
             SysOssEntity oss = new SysOssEntity();
             oss.setFileName(uploadResult.getFileName());
             oss.setOriginalName(originalName);
@@ -73,14 +88,13 @@ public class SysOssServiceImpl implements SysOssService {
             oss.setSize(file.getSize());
             oss.setService(config.getConfigKey());
             oss.setContentType(file.getContentType());
-            // 可选：计算 MD5
-            oss.setMd5(DigestUtil.md5Hex(file.getInputStream()));
+            oss.setMd5(DigestUtil.md5Hex(data));
             
             sysOssManager.save(oss);
             return oss;
-        } catch (IOException e) {
-            log.error("文件上传异常: {}", e.getMessage());
-            throw new RuntimeException("文件上传失败", e);
+        } catch (Exception e) {
+            log.error("文件上传异常: {}", e.getMessage(), e);
+            throw new BusinessException("文件上传失败: " + e.getMessage());
         }
     }
 

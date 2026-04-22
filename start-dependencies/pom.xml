@@ -37,6 +37,8 @@
         <sa-token.version>1.44.0</sa-token.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <forest.version>1.5.36</forest.version>
+        <aws-java-sdk.version>1.12.780</aws-java-sdk.version>
+        <commons-io.version>2.18.0</commons-io.version>
 
 
     </properties>
@@ -267,6 +269,18 @@
                 <groupId>com.dtflys.forest</groupId>
                 <artifactId>forest-spring-boot3-starter</artifactId>
                 <version>${forest.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-s3</artifactId>
+                <version>${aws-java-sdk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
             </dependency>
 
 

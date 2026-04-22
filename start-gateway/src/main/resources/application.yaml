@@ -69,6 +69,7 @@ gateway:
       - /system/config/value
       - /system/config/list-values
     white-prefixes:
+      - /api/system/resource/oss/download
       - /swagger-ui
       - /v3/api-docs
       - /actuator

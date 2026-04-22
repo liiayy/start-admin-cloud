@@ -28,6 +28,7 @@
         <module>start-common-env</module>
         <module>start-common-http</module>
         <module>start-common-log</module>
+        <module>start-common-oss</module>
     </modules>
 
     <properties>

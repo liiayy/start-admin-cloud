@@ -2,6 +2,7 @@ package cn.muziseo.service.system.module.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
+import cn.muziseo.common.core.enums.CommonStatus;
 import cn.muziseo.common.oss.entity.OssProperties;
 import cn.muziseo.common.oss.factory.OssFactory;
 import cn.muziseo.service.system.enums.OssErrorCode;
@@ -11,11 +12,16 @@ import cn.muziseo.service.system.module.system.service.SysOssConfigService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import cn.muziseo.common.oss.core.OssClient;
+import cn.muziseo.common.oss.entity.OssProperties;
+import cn.muziseo.common.oss.factory.OssFactory;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -49,7 +55,7 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
     @Override
     public void reloadClient(String configKey) {
         SysOssConfigEntity config = sysOssConfigManager.getByConfigKey(configKey);
-        if (config == null || config.getStatus() != 0) {
+        if (config == null || CommonStatus.isDisable(config.getStatus())) {
             OssFactory.remove(configKey);
         } else {
             OssFactory.init(toProperties(config));
@@ -67,15 +73,15 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
 
         // 2. 新增时默认为停用状态
         if (entity.getId() == null) {
-            entity.setStatus(1);
+            entity.setStatus(CommonStatus.DISABLE.getValue());
         }
 
         // 3. 状态切换逻辑
-        if (entity.getStatus() == 0) {
+        if (CommonStatus.isNormal(entity.getStatus())) {
             // 如果要启用当前配置，则将所有其他配置设为停用 (保持排他性)
             UpdateChain.of(SysOssConfigEntity.class)
-                    .set(SysOssConfigEntity::getStatus, 1)
-                    .where(SysOssConfigEntity::getStatus).eq(0)
+                    .set(SysOssConfigEntity::getStatus, CommonStatus.DISABLE.getValue())
+                    .where(SysOssConfigEntity::getStatus).eq(CommonStatus.NORMAL.getValue())
                     .and(SysOssConfigEntity::getId).ne(entity.getId())
                     .update();
         } else {
@@ -83,9 +89,9 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
             if (entity.getId() != null) {
                 SysOssConfigEntity old = sysOssConfigManager.getById(entity.getId());
                 // 如果原本是启用的，现在要改为停用
-                if (old != null && old.getStatus() == 0) {
+                if (old != null && CommonStatus.isNormal(old.getStatus())) {
                     long activeCount = sysOssConfigManager.count(
-                            QueryChain.of(SysOssConfigEntity.class).where(SysOssConfigEntity::getStatus).eq(0)
+                            QueryChain.of(SysOssConfigEntity.class).where(SysOssConfigEntity::getStatus).eq(CommonStatus.NORMAL.getValue())
                     );
                     if (activeCount <= 1) {
                         throw new BusinessException("系统中必须保留至少一个启用的存储配置");
@@ -98,7 +104,7 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
         
         // 4. 刷新缓存客户端
         // 如果是启用状态，则加载；否则尝试移除缓存
-        if (entity.getStatus() == 0) {
+        if (CommonStatus.isNormal(entity.getStatus())) {
             OssFactory.init(toProperties(entity));
         } else {
             OssFactory.remove(entity.getConfigKey());
@@ -123,6 +129,25 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
     @Override
     public List<SysOssConfigEntity> listAll() {
         return sysOssConfigManager.list();
+    }
+
+    @Override
+    public void testConfig(SysOssConfigEntity entity) {
+        OssProperties properties = toProperties(entity);
+        try {
+            // 1. 创建临时客户端
+            OssClient client = OssFactory.create(properties);
+            // 2. 尝试上传一个测试小文件
+            String testContent = "Test OSS Connection - " + System.currentTimeMillis();
+            byte[] bytes = testContent.getBytes(StandardCharsets.UTF_8);
+            String path = (properties.getPrefix() != null ? properties.getPrefix() : "") + "test_connection.txt";
+            
+            client.upload(bytes, path, "text/plain");
+            log.info("OSS 配置测试成功: service={}, endpoint={}", entity.getService(), entity.getEndpoint());
+        } catch (Exception e) {
+            log.error("OSS 配置测试失败: {}", e.getMessage(), e);
+            throw new BusinessException("连接测试失败: " + e.getMessage());
+        }
     }
 
     private OssProperties toProperties(SysOssConfigEntity entity) {

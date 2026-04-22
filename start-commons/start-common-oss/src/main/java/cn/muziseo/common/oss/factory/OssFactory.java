@@ -38,27 +38,27 @@ public class OssFactory {
         return client;
     }
 
+    public static OssClient init(OssProperties properties) {
+        OssClient client = create(properties);
+        CLIENT_CACHE.put(properties.getConfigKey(), client);
+        log.info("初始化 OSS 客户端成功: key={}", properties.getConfigKey());
+        return client;
+    }
+
     /**
-     * 根据配置对象动态生成或更新客户端
+     * 创建一个新的客户端 (不加入缓存)
      *
      * @param properties 配置
      * @return OSS 客户端
      */
-    public static OssClient init(OssProperties properties) {
-        OssClient client;
-        String configKey = properties.getConfigKey();
-        
+    public static OssClient create(OssProperties properties) {
         // 判断策略类型
         String service = properties.getService();
         if ("local".equalsIgnoreCase(service) || !StringUtils.hasText(properties.getEndpoint())) {
-            client = new LocalOssStrategy(properties);
+            return new LocalOssStrategy(properties);
         } else {
-            client = new S3OssStrategy(properties);
+            return new S3OssStrategy(properties);
         }
-        
-        CLIENT_CACHE.put(configKey, client);
-        log.info("初始化 OSS 客户端成功: key={}", configKey);
-        return client;
     }
 
     /**

@@ -27,6 +27,11 @@ import java.io.InputStream;
 @Slf4j
 public class S3OssStrategy extends AbstractOssStrategy {
 
+    static {
+        // 屏蔽 AWS SDK V1 的维护模式公告，保持日志整洁
+        System.setProperty("aws.java.v1.disableDeprecationAnnouncement", "true");
+    }
+
     private final AmazonS3 client;
 
     public S3OssStrategy(OssProperties properties) {
@@ -39,14 +44,24 @@ public class S3OssStrategy extends AbstractOssStrategy {
             AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard()
                     .withCredentials(new AWSStaticCredentialsProvider(credentials))
                     .withClientConfiguration(clientConfig)
-                    .withPathStyleAccessEnabled(true); // 兼容 MinIO
+                    .withPathStyleAccessEnabled(true); // 默认开启兼容 MinIO
 
-            if (properties.getEndpoint().contains("aliyuncs.com")) {
-                // 阿里云特殊处理，通常不需要强制 PathStyle
+            // 阿里云、腾讯云等厂商推荐使用虚拟托管风格 (Virtual Hosted Style)，需关闭路径风格
+            String endpoint = properties.getEndpoint();
+            String bucketName = properties.getBucketName();
+            String region = properties.getRegion();
+
+            // 自动修正 Endpoint：如果用户在 Endpoint 中包含了 BucketName，则剔除它
+            // 否则在 Virtual Hosted Style 开启时，SDK 会拼接成 bucket.bucket.cos... 导致 400 错误
+            if (endpoint.startsWith(bucketName + ".")) {
+                endpoint = endpoint.replace(bucketName + ".", "");
+            }
+
+            if (endpoint.contains("aliyuncs.com") || endpoint.contains("myqcloud.com")) {
                 builder.withPathStyleAccessEnabled(false);
             }
 
-            builder.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(properties.getEndpoint(), properties.getRegion()));
+            builder.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, region));
             this.client = builder.build();
         } catch (Exception e) {
             log.error("初始化 S3 存储客户端失败: {}", e.getMessage());
@@ -56,26 +71,40 @@ public class S3OssStrategy extends AbstractOssStrategy {
 
     @Override
     public UploadResult upload(byte[] data, String key, String contentType) {
-        return upload(new ByteArrayInputStream(data), key, contentType);
+        return upload(new ByteArrayInputStream(data), key, contentType, (long) data.length);
     }
 
     @Override
     public UploadResult upload(InputStream inputStream, String key, String contentType) {
+        return upload(inputStream, key, contentType, null);
+    }
+
+    /**
+     * 内部上传实现
+     */
+    private UploadResult upload(InputStream inputStream, String key, String contentType, Long length) {
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             if (contentType != null) {
-                metadata.setContentType(contentType);
+              m
+
+    etadata.setC
+    n
+        }
+        if (length != null) {
+            metadata.setContentLength(length);
             }
-            
-            PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), key, inputStream, metadata);
-            
+
+            PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), key, inputStream,
+                    metadata);
+
             // 如果是公共读桶，设置 ACL
             if (properties.getAccessPolicy() == AccessPolicyType.PUBLIC_READ) {
                 putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
             }
-            
+
             client.putObject(putObjectRequest);
-            
+
             return UploadResult.builder()
                     .url(getUrl(key))
                     .fileName(key)
@@ -107,14 +136,14 @@ public class S3OssStrategy extends AbstractOssStrategy {
             }
             return domain + key;
         }
-        
+
         // 否则使用 SDK 生成地址
         if (properties.getAccessPolicy() == AccessPolicyType.PRIVATE) {
             // 私有桶生成带签名的 URL (默认 1 小时)
-            return client.generatePresignedUrl(properties.getBucketName(), key, 
+            return client.generatePresignedUrl(properties.getBucketName(), key,
                     new java.util.Date(System.currentTimeMillis() + 3600 * 1000)).toString();
         }
-        
+
         return client.getUrl(properties.getBucketName(), key).toString();
     }
 }

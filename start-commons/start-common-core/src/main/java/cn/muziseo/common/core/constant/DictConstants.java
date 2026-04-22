@@ -28,8 +28,14 @@ public final class DictConstants {
     /** 用户性别 */
     public static final String SYS_USER_SEX = "sys_user_sex";
 
-    /** 系统通用状态（正常/停用） */
+    /** 系统状态（0正常 1停用） */
     public static final String SYS_STATUS = "sys_status";
+
+    /** 启用状态（0正常 1停用） */
+    public static final String SYS_ENABLE_STATUS = "sys_enable_status";
+
+    /** 成功/失败状态（0成功 1失败） */
+    public static final String SYS_COMMON_STATUS = "sys_common_status";
 
     /** 菜单显示状态（显示/隐藏） */
     public static final String SYS_SHOW_HIDE = "sys_show_hide";
@@ -39,4 +45,13 @@ public final class DictConstants {
 
     /** 菜单类型（目录/菜单/按钮） */
     public static final String SYS_MENU_TYPE = "sys_menu_type";
+
+    /** 操作类型 */
+    public static final String SYS_OPER_TYPE = "sys_oper_type";
+
+    /** OSS存储平台 */
+    public static final String SYS_OSS_SERVICE = "sys_oss_service";
+
+    /** OSS桶权限类型 */
+    public static final String SYS_OSS_ACCESS_POLICY = "sys_oss_access_policy";
 }

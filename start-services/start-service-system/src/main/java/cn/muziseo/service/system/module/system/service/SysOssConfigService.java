@@ -46,4 +46,9 @@ public interface SysOssConfigService {
      * 获取所有配置
      */
     List<SysOssConfigEntity> listAll();
+
+    /**
+     * 测试配置是否可用
+     */
+    void testConfig(SysOssConfigEntity entity);
 }

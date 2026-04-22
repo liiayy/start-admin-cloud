@@ -62,4 +62,12 @@ public class SysOssConfigController {
         sysOssConfigService.reloadClient(configKey);
         return ResponseDTO.success();
     }
+
+    @Operation(summary = "测试配置是否可用")
+    @PostMapping("/test")
+    @SaCheckPermission("system:oss:config:add")
+    public ResponseDTO<Void> test(@RequestBody SysOssConfigEntity entity) {
+        sysOssConfigService.testConfig(entity);
+        return ResponseDTO.success();
+    }
 }

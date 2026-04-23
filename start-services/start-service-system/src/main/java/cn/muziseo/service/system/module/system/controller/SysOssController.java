@@ -41,7 +41,7 @@ import cn.muziseo.service.system.module.system.service.SysOssConfigService;
 @Tag(name = "OSS资源管理")
 @RestController
 @Slf4j
-@RequestMapping("/resource/oss")
+@RequestMapping("/admin/system/oss")
 public class SysOssController {
 
     @Resource

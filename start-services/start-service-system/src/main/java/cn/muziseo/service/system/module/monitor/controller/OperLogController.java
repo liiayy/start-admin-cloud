@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "操作日志管理")
 @RestController
-@RequestMapping("/monitor/operlog")
+@RequestMapping("/admin/system/oper-log")
 @RequiredArgsConstructor
 public class OperLogController {
 

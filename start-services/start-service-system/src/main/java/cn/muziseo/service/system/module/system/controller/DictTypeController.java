@@ -25,7 +25,7 @@ import java.util.List;
 @Tag(name = "字典类型管理")
 @RestController
 @Slf4j
-@RequestMapping("/system/dict-type")
+@RequestMapping("/admin/system/dict-type")
 public class DictTypeController {
 
     @Resource

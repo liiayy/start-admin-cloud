@@ -3,6 +3,7 @@ package cn.muziseo.common.db.config;
 import cn.muziseo.common.core.factory.YmlPropertySourceFactory;
 import cn.muziseo.common.db.datascope.DataScopeDialect;
 import cn.muziseo.common.db.decipher.Decipher;
+import cn.muziseo.common.db.entity.BaseEntity;
 import cn.muziseo.common.db.listener.EntityInsertListener;
 import cn.muziseo.common.db.listener.EntityUpdateListener;
 import com.mybatisflex.core.FlexGlobalConfig;
@@ -110,9 +111,9 @@ public class MyBatisFlexConfig implements ConfigurationCustomizer, MyBatisFlexCu
         DialectFactory.registerDialect(DbType.POSTGRE_SQL, new DataScopeDialect());
 
         // 注册全局数据填充监听器
-        // 注册为全局监听器，在监听器内部判断类型
-        globalConfig.registerInsertListener(new EntityInsertListener());
-        globalConfig.registerUpdateListener(new EntityUpdateListener());
+        // 明确指定 BaseEntity.class，确保继承自该类的实体都能触发监听
+        globalConfig.registerInsertListener(new EntityInsertListener(), BaseEntity.class);
+        globalConfig.registerUpdateListener(new EntityUpdateListener(), BaseEntity.class);
 
         // 开启审计功能
         AuditManager.setAuditEnable(enableAudit);

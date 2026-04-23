@@ -64,8 +64,8 @@ public class LocalOssStrategy extends AbstractOssStrategy {
 
     @Override
     public String getUrl(String key) {
-        // 本地存储走网关代理：/api/system/resource/oss/download/**
-        return "/api/system/resource/oss/download/" + key;
+        // 本地存储走网关代理：/api/admin/system/oss/download/**
+        return "/api/admin/system/oss/download/" + key;
     }
 
     /**

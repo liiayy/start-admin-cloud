@@ -25,7 +25,7 @@ import java.util.List;
 @Tag(name = "菜单管理")
 @RestController
 @Slf4j
-@RequestMapping("/permission/menu")
+@RequestMapping("/admin/system/menu")
 public class MenuController {
 
     @Resource

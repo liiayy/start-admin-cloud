@@ -15,18 +15,25 @@ spring:
         webflux:
           routes:
             ## system-server 服务
-            - id: system-admin-api # 路由的编号
+            - id: system-admin-api
               uri: lb://system-service
-              predicates: # 断言，作为路由的匹配条件，对应 RouteDefinition 数组
-                - Path=/api/system/**
+              predicates:
+                - Path=/api/admin/system/**
               filters:
-                - StripPrefix=2  # 去掉前两级路径 /api/system/ 文档:https://spring-doc.muziseo.cn/spring-cloud/gateway/filters/strip-prefix.html
+                - StripPrefix=1
+            - id: system-app-api
+              uri: lb://system-service
+              predicates:
+                - Path=/api/app/system/**
+              filters:
+                - StripPrefix=1
+            ## demo-server 服务
             - id: demo-admin-api
               uri: lb://demo-service
               predicates:
-                - Path=/api/demo/**
+                - Path=/api/admin/demo/**
               filters:
-                - StripPrefix=2
+                - StripPrefix=1
 
 
 logging:
@@ -64,12 +71,12 @@ sa-token:
 gateway:
   auth:
     white-paths:
-      - /auth/login
-      - /auth/captcha
-      - /system/config/value
-      - /system/config/list-values
+      - /admin/system/auth/login
+      - /admin/system/auth/captcha
+      - /admin/system/config/value
+      - /admin/system/config/list-values
     white-prefixes:
-      - /api/system/resource/oss/download
+      - /api/admin/system/oss/download
       - /swagger-ui
       - /v3/api-docs
       - /actuator
@@ -87,6 +94,6 @@ springdoc:
     path: /swagger-ui.html
     urls:
       - name: system
-        url: /api/system/v3/api-docs
+        url: /api/admin/system/v3/api-docs
       - name: demo
-        url: /api/demo/v3/api-docs
+        url: /api/admin/demo/v3/api-docs

@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Tag(name = "字典数据管理")
 @RestController
 @Slf4j
-@RequestMapping("/system/dict-data")
+@RequestMapping("/admin/system/dict-data")
 public class DictController {
 
     @Resource

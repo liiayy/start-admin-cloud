@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "系统参数管理")
 @RestController
 @Slf4j
-@RequestMapping("/system/config")
+@RequestMapping("/admin/system/config")
 public class SystemConfigController {
 
     @Resource

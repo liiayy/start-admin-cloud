@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "登录日志管理")
 @RestController
-@RequestMapping("/monitor/loginlog")
+@RequestMapping("/admin/system/login-log")
 @RequiredArgsConstructor
 public class LoginLogController {
 

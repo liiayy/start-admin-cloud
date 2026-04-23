@@ -23,7 +23,7 @@ import java.util.List;
 @Tag(name = "OSS配置管理")
 @RestController
 @Slf4j
-@RequestMapping("/resource/oss/config")
+@RequestMapping("/admin/system/oss-config")
 public class SysOssConfigController {
 
     @Resource

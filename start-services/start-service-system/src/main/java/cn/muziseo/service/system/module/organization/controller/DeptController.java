@@ -25,7 +25,7 @@ import java.util.List;
 @RestController
 @Validated
 @Slf4j
-@RequestMapping("/organization/dept")
+@RequestMapping("/admin/system/dept")
 public class DeptController {
 
     @Resource

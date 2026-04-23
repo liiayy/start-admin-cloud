@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @Validated
 @Slf4j
-@RequestMapping("/organization/post")
+@RequestMapping("/admin/system/post")
 public class PostController {
 
     @Resource

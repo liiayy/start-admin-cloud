@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Tag(name = "验证码")
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/admin/system/auth")
 public class CaptchaController {
 
     private static final String CAPTCHA_CODE_KEY = "captcha_codes:";

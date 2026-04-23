@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @RestController
 @Validated
 @Slf4j
-@RequestMapping("/auth")
+@RequestMapping("/admin/system/auth")
 public class AuthController {
 
     @Resource

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "用户管理")
 @RestController
 @Slf4j
-@RequestMapping("/auth/user")
+@RequestMapping("/admin/system/user")
 public class UserController {
 
     @Resource

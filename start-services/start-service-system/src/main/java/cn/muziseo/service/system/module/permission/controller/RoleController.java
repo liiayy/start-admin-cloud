@@ -29,7 +29,7 @@ import java.util.List;
 @Tag(name = "角色管理")
 @RestController
 @Slf4j
-@RequestMapping("/permission/role")
+@RequestMapping("/admin/system/role")
 public class RoleController {
 
     @Resource

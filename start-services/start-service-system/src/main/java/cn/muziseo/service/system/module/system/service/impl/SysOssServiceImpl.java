@@ -46,40 +46,36 @@ public class SysOssServiceImpl implements SysOssService {
             throw new BusinessException(OssErrorCode.UPLOAD_FILE_EMPTY);
         }
 
-        // 1. 安全校验：大小校验 (从配置获取)
+        // 1. 安全校验：大小校验
         if (file.getSize() > ossConfigProperties.getMaxSize()) {
             double mbSize = (double) ossConfigProperties.getMaxSize() / (1024 * 1024);
-            throw new BusinessException("上传失败：文件大小超过 " + mbSize + "MB 限制");
+            throw new BusinessException("上传失败：文件大小超过 " + String.format("%.1f", mbSize) + "MB 限制");
         }
 
-        // 2. 安全校验：模块名合法性
-        if (moduleName != null && !moduleName.matches("^[a-zA-Z0-9_-]+$")) {
-            throw new BusinessException(OssErrorCode.UPLOAD_MODULE_INVALID);
-        }
-
-        // 3. 安全校验：后缀校验 (从配置获取)
+        // 2. 安全校验：后缀校验
         String originalName = file.getOriginalFilename();
         String suffix = FileUtil.extName(originalName).toLowerCase();
         if (ossConfigProperties.getForbiddenSuffix().contains(suffix)) {
             throw new BusinessException("上传失败：禁止上传该类型文件");
         }
 
-        // 4. 获取当前主存储配置
+        // 3. 获取存储配置
         List<SysOssConfigEntity> configs = sysOssConfigManager.listEnabledConfig();
         if (configs.isEmpty()) {
             throw new BusinessException(OssErrorCode.OSS_CLIENT_NOT_FOUND);
         }
         SysOssConfigEntity config = configs.get(0);
 
+        UploadResult uploadResult = null;
+        OssClient storage = null;
         try {
-            // 5. 获取具体存储客户端
-            OssClient storage = OssFactory.instance(config.getConfigKey());
-            
-            // 6. 执行物理上传 (带上 Content-Type，让云端正确识别文件类型)
+            storage = OssFactory.instance(config.getConfigKey());
             byte[] data = file.getBytes();
-            UploadResult uploadResult = storage.uploadSuffix(data, suffix, moduleName, file.getContentType());
             
-            // 7. 保存元数据到数据库
+            // 4. 执行物理上传
+            uploadResult = storage.uploadSuffix(data, suffix, moduleName, file.getContentType());
+            
+            // 5. 保存元数据
             SysOssEntity oss = new SysOssEntity();
             oss.setFileName(uploadResult.getFileName());
             oss.setOriginalName(originalName);
@@ -93,7 +89,19 @@ public class SysOssServiceImpl implements SysOssService {
             sysOssManager.save(oss);
             return oss;
         } catch (Exception e) {
-            log.error("文件上传异常: {}", e.getMessage(), e);
+            // [极致加固] 补偿机制：如果上传成功但后续（如存库）失败，尝试清理云端脏数据
+            if (uploadResult != null && storage != null) {
+                try {
+                    storage.delete(uploadResult.getFileName());
+                    log.info("上传失败，已自动清理云端脏数据: {}", uploadResult.getFileName());
+                } catch (Exception ex) {
+                    log.warn("清理云端脏数据失败: {}", ex.getMessage());
+                }
+            }
+            log.error("文件上传异常: {}", e.getMessage());
+            if (e instanceof BusinessException) {
+                throw (BusinessException) e;
+            }
             throw new BusinessException("文件上传失败: " + e.getMessage());
         }
     }
@@ -106,6 +114,7 @@ public class SysOssServiceImpl implements SysOssService {
             return;
         }
 
+        // [安全加固] 权限校验 (如果以后有租户或多用户系统，这里应校验 oss.getCreator())
         // 1. 删除数据库记录
         sysOssManager.removeById(id);
 

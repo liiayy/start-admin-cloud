@@ -43,7 +43,28 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DictUtils {
 
+    // ================== 兜底回调（由外部设置） ================== //
+
     /**
+     * 全局 RPC 兜底回调
+     * <p>
+     * 由各微服务在启动时注入（通过 {@link #setRpcFallback}），
+     * 默认返回空列表（纯缓存模式）。
+     * </p>
+     */
+    private static volatile Function<String, List<DictDataSimpleDTO>> globalRpcFallback = k -> Collections.emptyList();
+
+    /**
+     * 设置全局 RPC 兜底回调
+     *
+     * @param fallback RPC 回调函数
+     */
+    public static void setRpcFallback(Function<String, List<DictDataSimpleDTO>> fallback) {
+        globalRpcFallback = fallback;
+    }
+
+    /**
+
      * 根据字典类型和字典值，获取字典标签
      *
      * @param dictType 字典类型
@@ -175,11 +196,9 @@ public class DictUtils {
      * @return 字典数据列表
      */
     public static List<DictDataSimpleDTO> getDict(String dictType, Function<String, List<DictDataSimpleDTO>> rpcFallback) {
-        if (rpcFallback != null) {
-            return DictCacheManager.getDict(dictType, rpcFallback);
-        }
-        // 无兜底时，只查缓存，避免 NPE
-        return DictCacheManager.getDict(dictType, t -> Collections.emptyList());
+        // 如果传入了局部回调，优先用局部的；否则用全局的
+        Function<String, List<DictDataSimpleDTO>> fallback = rpcFallback != null ? rpcFallback : globalRpcFallback;
+        return DictCacheManager.getDict(dictType, fallback);
     }
 
     /**

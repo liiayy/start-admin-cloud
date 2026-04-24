@@ -14,7 +14,6 @@ import cn.muziseo.service.system.module.auth.controller.request.*;
 import cn.muziseo.service.system.module.auth.controller.vo.UserVO;
 import cn.muziseo.service.system.module.auth.manager.UserManager;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
-import cn.muziseo.common.excel.core.ExcelResult;
 import cn.muziseo.service.system.module.auth.controller.vo.UserImportVO;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.auth.repository.entity.UserRoleEntity;
@@ -30,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -81,33 +81,22 @@ public class UserServiceImpl implements UserService {
             return new PageResponse<>(List.of(), 0);
         }
 
-        // 1. 批量获取部门名称 (O(1) 替代 O(N))
-        List<Long> deptIds = records.stream()
-                .map(UserEntity::getDeptId)
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toList());
-        Map<Long, String> deptMap = deptManager.listByIds(deptIds).stream()
-                .collect(Collectors.toMap(DeptEntity::getId, DeptEntity::getName));
-
-        // 2. 批量获取用户角色 (O(1) 替代 O(N))
-        List<Long> userIds = records.stream()
-                .map(UserEntity::getId)
-                .collect(Collectors.toList());
-        Map<Long, List<Long>> userRoleMap = userRoleManager.listByUserIds(userIds).stream()
-                .collect(Collectors.groupingBy(
-                        UserRoleEntity::getUserId,
-                        Collectors.mapping(UserRoleEntity::getRoleId, Collectors.toList())
-                ));
-
-        List<UserVO> voList = records.stream()
-                .map(entity -> toUserVO(entity, deptMap, userRoleMap))
-                .collect(Collectors.toList());
+        List<UserVO> voList = buildUserVOList(records);
 
         PageResponse<UserVO> response = new PageResponse<>();
         response.setList(voList);
         response.setTotal(page.getTotalRow());
         return response;
+    }
+
+    @Override
+    @DataScope
+    public List<UserVO> listUser(UserPageRequest request) {
+        List<UserEntity> records = userManager.listUser(request);
+        if (records.isEmpty()) {
+            return List.of();
+        }
+        return buildUserVOList(records);
     }
 
     @Override
@@ -252,73 +241,94 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ExcelResult<Void> importUsers(List<UserImportVO> list, boolean updateSupport) {
+    public String importUsers(List<UserImportVO> list, boolean updateSupport) {
         if (list == null || list.isEmpty()) {
             throw new BusinessException("导入用户数据不能为空！");
         }
 
-        ExcelResult<Void> result = new ExcelResult<>();
-        
-        // 1. 预取部门数据 (优化1: 批量查询替代循环内单条查询; 优化2: 忽略大小写和前后空格)
+        List<String> errorList = new ArrayList<>();
+
+        // 预取部门数据
         Map<String, Long> deptMap = deptManager.listAll().stream()
                 .collect(Collectors.toMap(
-                    d -> d.getName().trim().toLowerCase(), 
-                    DeptEntity::getId, 
+                    d -> d.getName().trim().toLowerCase(),
+                    DeptEntity::getId,
                     (v1, v2) -> v1
                 ));
 
         String initPassword = ConfigUtils.getString("sys.user.initPassword", "123456");
+        int successCount = 0;
 
         for (int i = 0; i < list.size(); i++) {
             UserImportVO user = list.get(i);
             try {
-                // 验证是否存在用户
-                UserEntity u = userManager.getByUsername(user.getUsername());
-                if (u == null) {
-                    u = BeanUtil.copyProperties(user, UserEntity.class);
-                    u.setPassword(PasswordUtils.encode(initPassword));
-                    // 解析部门
-                    if (StringUtils.isNotBlank(user.getDeptName())) {
-                        Long deptId = deptMap.get(user.getDeptName().trim().toLowerCase());
-                        if (deptId != null) {
-                            u.setDeptId(deptId);
-                        }
-                    }
-                    userManager.save(u);
+                UserEntity existing = userManager.getByUsername(user.getUsername());
+                if (existing == null) {
+                    UserEntity entity = BeanUtil.copyProperties(user, UserEntity.class);
+                    entity.setPassword(PasswordUtils.encode(initPassword));
+                    resolveDept(entity, user.getDeptName(), deptMap);
+                    userManager.save(entity);
+                    successCount++;
                 } else if (updateSupport) {
-                    Long userId = u.getId();
-                    u = BeanUtil.copyProperties(user, UserEntity.class);
-                    u.setId(userId);
-                    // 解析部门
-                    if (StringUtils.isNotBlank(user.getDeptName())) {
-                        Long deptId = deptMap.get(user.getDeptName().trim().toLowerCase());
-                        if (deptId != null) {
-                            u.setDeptId(deptId);
-                        }
-                    }
-                    userManager.updateById(u);
+                    BeanUtil.copyProperties(user, existing);
+                    resolveDept(existing, user.getDeptName(), deptMap);
+                    userManager.updateById(existing);
+                    successCount++;
                 } else {
-                    result.getErrorList().add("第 " + (i + 2) + " 行：账号 " + user.getUsername() + " 已存在");
+                    errorList.add("第 " + (i + 2) + " 行：账号 " + user.getUsername() + " 已存在");
                 }
             } catch (Exception e) {
-                result.getErrorList().add("第 " + (i + 2) + " 行：账号 " + user.getUsername() + " 导入异常：" + e.getMessage());
+                errorList.add("第 " + (i + 2) + " 行：账号 " + user.getUsername() + " 导入异常：" + e.getMessage());
             }
         }
 
-        if (!result.getErrorList().isEmpty()) {
-            // 优化5: 结构化错误反馈。抛出异常以回滚事务
-            StringBuilder sb = new StringBuilder("导入失败！检测到 " + result.getErrorList().size() + " 处错误，已全部回滚：");
-            for (String error : result.getErrorList()) {
+        if (!errorList.isEmpty()) {
+            StringBuilder sb = new StringBuilder("导入失败！检测到 " + errorList.size() + " 处错误，已全部回滚：");
+            for (String error : errorList) {
                 sb.append("<br/>").append(error);
             }
             throw new BusinessException(sb.toString());
         }
 
-        return result;
+        return "导入成功，共导入 " + successCount + " 条数据";
+    }
+
+    private void resolveDept(UserEntity entity, String deptName, Map<String, Long> deptMap) {
+        if (StringUtils.isNotBlank(deptName)) {
+            Long deptId = deptMap.get(deptName.trim().toLowerCase());
+            if (deptId != null) {
+                entity.setDeptId(deptId);
+            }
+        }
     }
 
     private UserVO toUserVO(UserEntity entity) {
         return toUserVO(entity, null, null);
+    }
+
+    private List<UserVO> buildUserVOList(List<UserEntity> records) {
+        // 1. 批量获取部门名称
+        List<Long> deptIds = records.stream()
+                .map(UserEntity::getDeptId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<Long, String> deptMap = deptManager.listByIds(deptIds).stream()
+                .collect(Collectors.toMap(DeptEntity::getId, DeptEntity::getName));
+
+        // 2. 批量获取用户角色
+        List<Long> userIds = records.stream()
+                .map(UserEntity::getId)
+                .collect(Collectors.toList());
+        Map<Long, List<Long>> userRoleMap = userRoleManager.listByUserIds(userIds).stream()
+                .collect(Collectors.groupingBy(
+                        UserRoleEntity::getUserId,
+                        Collectors.mapping(UserRoleEntity::getRoleId, Collectors.toList())
+                ));
+
+        return records.stream()
+                .map(entity -> toUserVO(entity, deptMap, userRoleMap))
+                .collect(Collectors.toList());
     }
 
     /**

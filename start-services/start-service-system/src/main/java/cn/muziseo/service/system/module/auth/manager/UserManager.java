@@ -110,13 +110,22 @@ public class UserManager extends BaseServiceImpl<UserMapper, UserEntity> {
      * 分页查询用户
      */
     public Page<UserEntity> pageUser(UserPageRequest request) {
-        QueryWrapper wrapper = QueryWrapper.create()
+        return page(new Page<>(request.getPageNum(), request.getPageSize()), buildQueryWrapper(request));
+    }
+
+    /**
+     * 列表查询用户（不分页，用于导出等场景）
+     */
+    public java.util.List<UserEntity> listUser(UserPageRequest request) {
+        return list(buildQueryWrapper(request));
+    }
+
+    private QueryWrapper buildQueryWrapper(UserPageRequest request) {
+        return QueryWrapper.create()
                 .where(UserEntity::getUsername).like(request.getUsername(), request.getUsername() != null)
                 .and(UserEntity::getMobile).like(request.getMobile(), request.getMobile() != null)
                 .and(UserEntity::getStatus).eq(request.getStatus(), request.getStatus() != null)
                 .and(UserEntity::getDeptId).eq(request.getDeptId(), request.getDeptId() != null)
                 .orderBy(UserEntity::getId, false);
-
-        return page(new Page<>(request.getPageNum(), request.getPageSize()), wrapper);
     }
 }

@@ -39,6 +39,7 @@
         <forest.version>1.5.36</forest.version>
         <aws-java-sdk.version>1.12.780</aws-java-sdk.version>
         <commons-io.version>2.18.0</commons-io.version>
+        <fastexcel.version>1.3.0</fastexcel.version>
 
 
     </properties>
@@ -281,6 +282,12 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.idev.excel</groupId>
+                <artifactId>fastexcel</artifactId>
+                <version>${fastexcel.version}</version>
             </dependency>
 
 

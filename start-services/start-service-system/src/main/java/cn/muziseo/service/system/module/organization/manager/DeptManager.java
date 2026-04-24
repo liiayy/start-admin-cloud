@@ -61,6 +61,10 @@ public class DeptManager extends BaseServiceImpl<DeptMapper, DeptEntity> {
         return exists(qw);
     }
 
+    public DeptEntity getByName(String name) {
+        return getOne(QueryWrapper.create().where(DeptEntity::getName).eq(name));
+    }
+
     /**
      * 统计子部门数量
      *

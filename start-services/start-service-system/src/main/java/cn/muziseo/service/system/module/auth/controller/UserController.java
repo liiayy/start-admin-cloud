@@ -8,12 +8,17 @@ import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.auth.controller.request.*;
 import cn.muziseo.service.system.module.auth.controller.vo.UserDetailVO;
+import cn.muziseo.service.system.module.auth.controller.vo.UserExportVO;
+import cn.muziseo.service.system.module.auth.controller.vo.UserImportVO;
 import cn.muziseo.service.system.module.auth.controller.vo.UserVO;
+import cn.muziseo.common.excel.core.ExcelResult;
 import cn.muziseo.service.system.module.auth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +41,32 @@ public class UserController {
     @SaCheckPermission("system:user:query")
     public ResponseDTO<PageResponse<UserVO>> page(UserPageRequest request) {
         return ResponseDTO.success(userService.pageUser(request));
+    }
+
+    @Operation(summary = "导出用户")
+    @PostMapping("/export")
+    @SaCheckPermission("system:user:export")
+    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
+    public void export(UserPageRequest request, HttpServletResponse response) {
+        PageResponse<UserVO> pageResponse = userService.pageUser(request);
+        List<UserExportVO> list = cn.hutool.core.convert.Convert.toList(UserExportVO.class, pageResponse.getList());
+        cn.muziseo.common.excel.utils.ExcelUtil.exportExcel(list, "用户数据", UserExportVO.class, response);
+    }
+
+    @Operation(summary = "导入用户")
+    @PostMapping("/import")
+    @SaCheckPermission("system:user:import")
+    @Log(title = "用户管理", businessType = BusinessType.IMPORT)
+    public ResponseDTO<ExcelResult<Void>> importExcel(@RequestPart("file") org.springframework.web.multipart.MultipartFile file, boolean updateSupport) throws Exception {
+        List<UserImportVO> userList = cn.muziseo.common.excel.utils.ExcelUtil.importExcel(file.getInputStream(), UserImportVO.class);
+        return ResponseDTO.success(userService.importUsers(userList, updateSupport));
+    }
+
+    @Operation(summary = "下载导入模板")
+    @PostMapping("/import-template")
+    @SaCheckPermission("system:user:import")
+    public void importTemplate(HttpServletResponse response) {
+        cn.muziseo.common.excel.utils.ExcelUtil.exportExcel(List.of(), "用户导入模板", UserImportVO.class, response);
     }
 
     @Operation(summary = "获取用户详情")

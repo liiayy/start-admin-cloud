@@ -29,6 +29,7 @@
         <module>start-common-http</module>
         <module>start-common-log</module>
         <module>start-common-oss</module>
+        <module>start-common-excel</module>
     </modules>
 
     <properties>

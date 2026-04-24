@@ -1,5 +1,8 @@
 package cn.muziseo.service.system.module.auth.service.impl;
 
+import cn.muziseo.common.core.utils.string.StringUtils;
+import cn.muziseo.common.cache.config.ConfigUtils;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.core.util.UserSecurityUtils;
@@ -11,6 +14,8 @@ import cn.muziseo.service.system.module.auth.controller.request.*;
 import cn.muziseo.service.system.module.auth.controller.vo.UserVO;
 import cn.muziseo.service.system.module.auth.manager.UserManager;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
+import cn.muziseo.common.excel.core.ExcelResult;
+import cn.muziseo.service.system.module.auth.controller.vo.UserImportVO;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.auth.repository.entity.UserRoleEntity;
 import cn.muziseo.common.cache.datascope.DataScopeCacheManager;
@@ -243,6 +248,73 @@ public class UserServiceImpl implements UserService {
         DataScopeCacheManager.evictCache(request.getUserId());
         
         log.info("分配用户角色: userId={}, roleIds={}", request.getUserId(), request.getRoleIds());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ExcelResult<Void> importUsers(List<UserImportVO> list, boolean updateSupport) {
+        if (list == null || list.isEmpty()) {
+            throw new BusinessException("导入用户数据不能为空！");
+        }
+
+        ExcelResult<Void> result = new ExcelResult<>();
+        
+        // 1. 预取部门数据 (优化1: 批量查询替代循环内单条查询; 优化2: 忽略大小写和前后空格)
+        Map<String, Long> deptMap = deptManager.listAll().stream()
+                .collect(Collectors.toMap(
+                    d -> d.getName().trim().toLowerCase(), 
+                    DeptEntity::getId, 
+                    (v1, v2) -> v1
+                ));
+
+        String initPassword = ConfigUtils.getString("sys.user.initPassword", "123456");
+
+        for (int i = 0; i < list.size(); i++) {
+            UserImportVO user = list.get(i);
+            try {
+                // 验证是否存在用户
+                UserEntity u = userManager.getByUsername(user.getUsername());
+                if (u == null) {
+                    u = BeanUtil.copyProperties(user, UserEntity.class);
+                    u.setPassword(PasswordUtils.encode(initPassword));
+                    // 解析部门
+                    if (StringUtils.isNotBlank(user.getDeptName())) {
+                        Long deptId = deptMap.get(user.getDeptName().trim().toLowerCase());
+                        if (deptId != null) {
+                            u.setDeptId(deptId);
+                        }
+                    }
+                    userManager.save(u);
+                } else if (updateSupport) {
+                    Long userId = u.getId();
+                    u = BeanUtil.copyProperties(user, UserEntity.class);
+                    u.setId(userId);
+                    // 解析部门
+                    if (StringUtils.isNotBlank(user.getDeptName())) {
+                        Long deptId = deptMap.get(user.getDeptName().trim().toLowerCase());
+                        if (deptId != null) {
+                            u.setDeptId(deptId);
+                        }
+                    }
+                    userManager.updateById(u);
+                } else {
+                    result.getErrorList().add("第 " + (i + 2) + " 行：账号 " + user.getUsername() + " 已存在");
+                }
+            } catch (Exception e) {
+                result.getErrorList().add("第 " + (i + 2) + " 行：账号 " + user.getUsername() + " 导入异常：" + e.getMessage());
+            }
+        }
+
+        if (!result.getErrorList().isEmpty()) {
+            // 优化5: 结构化错误反馈。抛出异常以回滚事务
+            StringBuilder sb = new StringBuilder("导入失败！检测到 " + result.getErrorList().size() + " 处错误，已全部回滚：");
+            for (String error : result.getErrorList()) {
+                sb.append("<br/>").append(error);
+            }
+            throw new BusinessException(sb.toString());
+        }
+
+        return result;
     }
 
     private UserVO toUserVO(UserEntity entity) {

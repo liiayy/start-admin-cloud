@@ -285,7 +285,7 @@ public class UserServiceImpl implements UserService {
         if (!errorList.isEmpty()) {
             StringBuilder sb = new StringBuilder("导入失败！检测到 " + errorList.size() + " 处错误，已全部回滚：");
             for (String error : errorList) {
-                sb.append("<br/>").append(error);
+                sb.append(error);
             }
             throw new BusinessException(sb.toString());
         }

@@ -1,13 +1,12 @@
-# 内置配置 不允许修改 如需修改请在 nacos 上写相同配置覆盖
-# Sa-Token配置
 sa-token:
-  # 允许动态设置 token 有效期
-  dynamic-active-timeout: true
-  # 允许从 请求参数 读取 token
+  token-name: Authorization    # 统一名称
+  token-prefix: Bearer         # 统一前缀
+  jwt-secret-key: abcdefghijklmnopqrstuvwxyz   # 统一秘钥（非常关键！）
+  is-concurrent: true          # 是否允许并发登录
+  is-share: false              # 是否共用 Token
+  timeout: 2592000             # Token 有效期
+  active-timeout: -1           # 活跃有效期
+  dynamic-active-timeout: true # 是否开启动态有效期
   is-read-body: true
-  # 允许从 header 读取 token
   is-read-header: true
-  # 关闭 cookie 鉴权 从根源杜绝 csrf 漏洞风险
   is-read-cookie: false
-  # token前缀
-  token-prefix: Bearer

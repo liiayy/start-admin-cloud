@@ -71,10 +71,10 @@ sa-token:
 gateway:
   auth:
     white-paths:
-      - /admin/system/auth/login
-      - /admin/system/auth/captcha
-      - /admin/system/config/value
-      - /admin/system/config/list-values
+      - /api/admin/system/auth/login
+      - /api/admin/system/auth/captcha
+      - /api/admin/system/config/value
+      - /api/admin/system/config/list-values
     white-prefixes:
       - /api/admin/system/oss/download
       - /swagger-ui

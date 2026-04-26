@@ -72,47 +72,22 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
     /**
      * 判断是否为白名单路径
-     * <p>
-     * 路由路径格式：/api/{service}/{actual-path}
-     * 需要匹配去掉路由前缀后的实际路径
      */
     private boolean isWhitePath(String path) {
-        // 前缀匹配：文档、监控等全局路径
+        // 1. 前缀匹配
         for (String prefix : authWhiteProperties.getWhitePrefixes()) {
             if (path.startsWith(prefix)) {
                 return true;
             }
         }
 
-        // 精确匹配：业务白名单 /api/system/auth/login → 提取 /auth/login
-        String actualPath = extractActualPath(path);
-        if (actualPath != null) {
-            for (String white : authWhiteProperties.getWhitePaths()) {
-                if (actualPath.equals(white) || actualPath.startsWith(white + "/")) {
-                    return true;
-                }
+        // 2. 精确匹配
+        for (String white : authWhiteProperties.getWhitePaths()) {
+            if (path.equals(white)) {
+                return true;
             }
         }
         return false;
-    }
-
-    /**
-     * 从网关路径中提取实际业务路径
-     * <p>
-     * /api/system/auth/login → /auth/login
-     * /api/demo/auth/login   → /auth/login
-     */
-    private String extractActualPath(String path) {
-        // 去掉 /api 前缀
-        if (!path.startsWith("/api/")) {
-            return path;
-        }
-        String rest = path.substring(5); // "system/auth/login"
-        int slashIndex = rest.indexOf('/');
-        if (slashIndex < 0) {
-            return null;
-        }
-        return rest.substring(slashIndex); // "/auth/login"
     }
 
     /**

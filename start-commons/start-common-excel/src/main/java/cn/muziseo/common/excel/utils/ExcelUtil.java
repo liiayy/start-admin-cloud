@@ -20,6 +20,14 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import cn.idev.excel.write.metadata.style.WriteCellStyle;
+import cn.idev.excel.write.metadata.style.WriteFont;
+import cn.idev.excel.write.style.HorizontalCellStyleStrategy;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+
 /**
  * Excel 工具类
  *
@@ -28,6 +36,42 @@ import java.util.List;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExcelUtil {
+
+    /**
+     * 获取默认样式策略
+     */
+    public static HorizontalCellStyleStrategy getDefaultStyleStrategy() {
+        // 表头策略
+        WriteCellStyle headWriteCellStyle = new WriteCellStyle();
+        // 背景色：浅灰色 (GREY_25_PERCENT)
+        headWriteCellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        headWriteCellStyle.setFillPatternType(FillPatternType.SOLID_FOREGROUND);
+        // 字体
+        WriteFont headWriteFont = new WriteFont();
+        headWriteFont.setFontName("微软雅黑");
+        headWriteFont.setFontHeightInPoints((short) 12);
+        headWriteFont.setBold(true);
+        headWriteCellStyle.setWriteFont(headWriteFont);
+        // 居中
+        headWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        headWriteCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        // 内容策略
+        WriteCellStyle contentWriteCellStyle = new WriteCellStyle();
+        WriteFont contentWriteFont = new WriteFont();
+        contentWriteFont.setFontName("微软雅黑");
+        contentWriteFont.setFontHeightInPoints((short) 11);
+        contentWriteCellStyle.setWriteFont(contentWriteFont);
+        // 居中 & 边框
+        contentWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        contentWriteCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        contentWriteCellStyle.setBorderLeft(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+        contentWriteCellStyle.setBorderRight(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+        contentWriteCellStyle.setBorderTop(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+        contentWriteCellStyle.setBorderBottom(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+
+        return new HorizontalCellStyleStrategy(headWriteCellStyle, contentWriteCellStyle);
+    }
 
     /**
      * 导出 Excel
@@ -46,6 +90,7 @@ public class ExcelUtil {
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + filename + ".xlsx");
             FastExcel.write(response.getOutputStream(), clazz)
                 .autoCloseStream(false)
+                .registerWriteHandler(getDefaultStyleStrategy())
                 .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
                 .registerWriteHandler(new DataWriteHandler(clazz))
                 .registerWriteHandler(new CellMergeStrategy(list, clazz))

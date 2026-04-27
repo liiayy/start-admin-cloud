@@ -35,18 +35,22 @@ spring:
 
 seata:
   application-name: ${spring.application.name}
+  # 事务分组名称
   tx-service-group: my_test_tx_group
-  data-source-proxy-mode: XA
+  # 代理模式：AT (推荐，需 undo_log 表) / XA (强一致性)
+  data-source-proxy-mode: AT
   registry:
     type: nacos
     nacos:
       server-addr: 192.168.100.20:8848
       group: DEFAULT_GROUP
+      # 对应 Seata Server 在 Nacos 注册的服务名
       application: seata-server
   config:
     type: nacos
     nacos:
       server-addr: 192.168.100.20:8848
+      # 注意：此处通常为 Seata Server 自身的配置命名空间
       namespace: seata-server
       group: DEFAULT_GROUP
       data-id: seataServer.properties
@@ -74,7 +78,7 @@ spring:
 seata:
   application-name: ${spring.application.name}
   tx-service-group: my_test_tx_group
-  data-source-proxy-mode: XA
+  data-source-proxy-mode: AT
   registry:
     type: nacos
     nacos:

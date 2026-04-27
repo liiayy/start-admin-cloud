@@ -65,24 +65,19 @@ public abstract class AbstractOssStrategy implements OssClient {
  
     /**
      * 路径清洗：防止路径穿越 (Path Traversal)
-     * 过滤掉 .. 和 多余的斜杠
+     * 使用规范化工具替代简单的字符串替换
      */
     private String cleanPath(String path) {
-        if (!StringUtils.hasText(path)) {
+        if (!org.springframework.util.StringUtils.hasText(path)) {
             return "";
         }
-        // 1. 替换反斜杠
-        String cleanPath = path.replace("\\", "/");
-        // 2. 移除所有的 .. 字符
-        cleanPath = cleanPath.replace("../", "").replace("./", "");
-        // 3. 移除开头和结尾的斜杠
-        while (cleanPath.startsWith("/")) {
-            cleanPath = cleanPath.substring(1);
+        // 使用 Hutool 的规范化工具，自动处理 .. 和 ./ 以及多余的斜杠
+        String normalizedPath = cn.hutool.core.io.FileUtil.normalize(path);
+        // 确保不以斜杠开头，由 getPath 统一处理拼接
+        while (normalizedPath.startsWith("/") || normalizedPath.startsWith("\\")) {
+            normalizedPath = normalizedPath.substring(1);
         }
-        while (cleanPath.endsWith("/")) {
-            cleanPath = cleanPath.substring(0, cleanPath.length() - 1);
-        }
-        return cleanPath;
+        return normalizedPath;
     }
 
     @Override

@@ -75,9 +75,18 @@ public class SysOssServiceImpl implements SysOssService {
             // 【极致加固】安全校验：基于魔数（Magic Number）验证真实文件类型
             // 防止恶意用户通过修改后缀（如 .php -> .jpg）绕过校验
             String realType = cn.hutool.core.io.FileTypeUtil.getType(new java.io.ByteArrayInputStream(data));
+            
+            // 1. 拦截已知危险类型
             if (StrUtil.isNotBlank(realType) && ossConfigProperties.getForbiddenSuffix().contains(realType.toLowerCase())) {
                 log.warn("[安全拦截] 检测到文件后缀与实际内容不符的风险上传: filename={}, realType={}", originalName, realType);
                 throw new BusinessException("上传失败：文件内容与后缀不符，疑似非法文件");
+            }
+            
+            // 2. 深度加固：如果后缀是图片，但魔数识别不是图片（且非空），则拦截
+            List<String> imageSuffixes = List.of("jpg", "jpeg", "png", "gif", "bmp", "webp");
+            if (imageSuffixes.contains(suffix) && StrUtil.isNotBlank(realType) && !imageSuffixes.contains(realType.toLowerCase())) {
+                log.warn("[安全拦截] 检测到图片伪装风险: filename={}, realType={}", originalName, realType);
+                throw new BusinessException("上传失败：图片格式非法或已被篡改");
             }
 
             storage = OssFactory.instance(config.getConfigKey());

@@ -79,23 +79,20 @@ public class LocalOssStrategy extends AbstractOssStrategy {
     }
 
     /**
-     * 获取本地绝对路径（加固版：增加边界校验）
+     * 获取本地绝对路径（加固版：使用 Hutool 规范化校验）
      */
     private String getLocalPath(String key) {
-        // endpoint 作为本地存储的根目录
         String baseDir = properties.getEndpoint();
         File baseDirFile = new File(baseDir);
-        String absoluteBaseDir = baseDirFile.getAbsolutePath();
-        
         File file = new File(baseDirFile, key);
-        String absoluteFilePath = file.getAbsolutePath();
         
-        // 【核心加固】检查最终生成的路径是否还在基准目录下，防止通过 ../ 穿越
-        if (!absoluteFilePath.startsWith(absoluteBaseDir)) {
+        // 【核心加固】检查最终生成的路径是否还在基准目录下
+        // FileUtil.isSub 内部会进行路径规范化处理，防止通过 .. 绕过
+        if (!FileUtil.isSub(baseDirFile, file)) {
             log.error("[安全拦截] 检测到非法的路径访问尝试: key={}", key);
             throw new RuntimeException("非法的存储路径");
         }
         
-        return absoluteFilePath;
+        return file.getAbsolutePath();
     }
 }

@@ -163,6 +163,34 @@ public class SysOssController {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
+ 
+            // 【极致加固】私有读取权限校验
+            if (cn.muziseo.common.oss.enums.AccessPolicyType.PRIVATE.equals(config.getAccessPolicy())) {
+                String expires = request.getParameter("expires");
+                String token = request.getParameter("token");
+                
+                if (expires == null || token == null) {
+                    log.warn("私有文件访问缺少令牌: key={}", key);
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    return;
+                }
+                
+                // 1. 校验是否过期
+                if (Long.parseLong(expires) < System.currentTimeMillis() / 1000) {
+                    log.warn("私有文件访问令牌已过期: key={}", key);
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    return;
+                }
+                
+                // 2. 校验签名是否正确
+                String secret = cn.hutool.core.util.StrUtil.blankToDefault(config.getSecretKey(), "start-admin-default-secret");
+                String serverToken = cn.hutool.crypto.SecureUtil.hmacMd5(secret).digestHex(key + expires);
+                if (!serverToken.equals(token)) {
+                    log.warn("私有文件访问令牌错误: key={}", key);
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    return;
+                }
+            }
 
             // 默认设置响应头
             String contentType = Files.probeContentType(file.toPath());

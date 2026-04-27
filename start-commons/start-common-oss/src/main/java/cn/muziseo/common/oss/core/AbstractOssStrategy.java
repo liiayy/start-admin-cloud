@@ -42,11 +42,14 @@ public abstract class AbstractOssStrategy implements OssClient {
                 path.append("/");
             }
         }
-        // 模块名
+        // 模块名：强制路径清洗，防止路径穿越
         if (StringUtils.hasText(moduleName)) {
-            path.append(moduleName);
-            if (!moduleName.endsWith("/")) {
-                path.append("/");
+            String cleanModuleName = cleanPath(moduleName);
+            if (StringUtils.hasText(cleanModuleName)) {
+                path.append(cleanModuleName);
+                if (!cleanModuleName.endsWith("/")) {
+                    path.append("/");
+                }
             }
         }
         // 日期路径
@@ -58,6 +61,28 @@ public abstract class AbstractOssStrategy implements OssClient {
             path.append(suffix.startsWith(".") ? suffix : "." + suffix);
         }
         return path.toString();
+    }
+ 
+    /**
+     * 路径清洗：防止路径穿越 (Path Traversal)
+     * 过滤掉 .. 和 多余的斜杠
+     */
+    private String cleanPath(String path) {
+        if (!StringUtils.hasText(path)) {
+            return "";
+        }
+        // 1. 替换反斜杠
+        String cleanPath = path.replace("\\", "/");
+        // 2. 移除所有的 .. 字符
+        cleanPath = cleanPath.replace("../", "").replace("./", "");
+        // 3. 移除开头和结尾的斜杠
+        while (cleanPath.startsWith("/")) {
+            cleanPath = cleanPath.substring(1);
+        }
+        while (cleanPath.endsWith("/")) {
+            cleanPath = cleanPath.substring(0, cleanPath.length() - 1);
+        }
+        return cleanPath;
     }
 
     @Override

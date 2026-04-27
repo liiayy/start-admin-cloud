@@ -1,6 +1,7 @@
 package cn.muziseo.service.system.module.system.service.impl;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.oss.config.OssConfigProperties;
@@ -69,8 +70,17 @@ public class SysOssServiceImpl implements SysOssService {
         UploadResult uploadResult = null;
         OssClient storage = null;
         try {
-            storage = OssFactory.instance(config.getConfigKey());
             byte[] data = file.getBytes();
+            
+            // 【极致加固】安全校验：基于魔数（Magic Number）验证真实文件类型
+            // 防止恶意用户通过修改后缀（如 .php -> .jpg）绕过校验
+            String realType = cn.hutool.core.io.FileTypeUtil.getType(new java.io.ByteArrayInputStream(data));
+            if (StrUtil.isNotBlank(realType) && ossConfigProperties.getForbiddenSuffix().contains(realType.toLowerCase())) {
+                log.warn("[安全拦截] 检测到文件后缀与实际内容不符的风险上传: filename={}, realType={}", originalName, realType);
+                throw new BusinessException("上传失败：文件内容与后缀不符，疑似非法文件");
+            }
+
+            storage = OssFactory.instance(config.getConfigKey());
             
             // 4. 执行物理上传
             uploadResult = storage.uploadSuffix(data, suffix, moduleName, file.getContentType());

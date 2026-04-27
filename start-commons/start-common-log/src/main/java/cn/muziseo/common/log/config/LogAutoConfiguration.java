@@ -4,6 +4,7 @@ import cn.muziseo.common.log.aspect.LogAspect;
 import cn.muziseo.common.log.listener.RemoteLogEventListener;
 import cn.muziseo.common.log.utils.IpLocationUtils;
 import cn.muziseo.service.system.module.monitor.api.OperLogApi;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -28,8 +29,8 @@ public class LogAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public LogAspect logAspect(IpLocationUtils ipLocationUtils) {
-        return new LogAspect(ipLocationUtils);
+    public LogAspect logAspect(IpLocationUtils ipLocationUtils, ApplicationEventPublisher eventPublisher) {
+        return new LogAspect(ipLocationUtils, eventPublisher);
     }
 
     /**

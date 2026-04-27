@@ -35,9 +35,9 @@ public class LogDemoController {
     @Log(title = "日志演示-数据脱敏", businessType = BusinessType.OTHER)
     @Operation(summary = "数据脱敏演示")
     @PostMapping("/mask")
-    public ResponseDTO<Map<String, Object>> mask(@RequestBody Map<String, Object> params) {
-        // params 中若包含 password 等关键词，由于我们在 LogAspect 中配置了脱敏逻辑，
-        // 日志中存储的参数将会显示为 ******
+    public ResponseDTO<LogDemoDTO> mask(@RequestBody LogDemoDTO params) {
+        // params 中标记了 @Sensitive 的字段，由于我们在 LogAspect 中配置了脱敏逻辑，
+        // 日志中存储的参数将会自动进行掩码处理
         return ResponseDTO.success(params);
     }
 

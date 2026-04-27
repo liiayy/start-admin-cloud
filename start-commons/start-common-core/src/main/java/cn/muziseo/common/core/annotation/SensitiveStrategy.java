@@ -20,7 +20,7 @@ public enum SensitiveStrategy {
     /**
      * 姓名（只显示第一个汉字）
      */
-    CHINESE_NAME(s -> DesensitizedUtil.chineseName(s)),
+    CHINESE_NAME(DesensitizedUtil::chineseName),
  
     /**
      * 身份证号
@@ -30,12 +30,12 @@ public enum SensitiveStrategy {
     /**
      * 固定电话
      */
-    FIXED_PHONE(s -> DesensitizedUtil.fixedPhone(s)),
+    FIXED_PHONE(DesensitizedUtil::fixedPhone),
  
     /**
      * 手机号
      */
-    MOBILE(s -> DesensitizedUtil.mobilePhone(s)),
+    MOBILE(DesensitizedUtil::mobilePhone),
  
     /**
      * 地址
@@ -45,12 +45,12 @@ public enum SensitiveStrategy {
     /**
      * 电子邮件
      */
-    EMAIL(s -> DesensitizedUtil.email(s)),
+    EMAIL(DesensitizedUtil::email),
  
     /**
      * 银行卡
      */
-    BANK_CARD(s -> DesensitizedUtil.bankCard(s)),
+    BANK_CARD(DesensitizedUtil::bankCard),
  
     /**
      * 密码（全部显示为*）

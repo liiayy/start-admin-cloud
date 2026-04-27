@@ -21,3 +21,8 @@ spring:
     sentinel:
       transport:
         dashboard: 192.168.100.20:8858
+ 
+start:
+  log:
+    remote:
+      enabled: true

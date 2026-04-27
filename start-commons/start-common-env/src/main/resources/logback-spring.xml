@@ -15,9 +15,9 @@
 
     <!-- 日志格式 -->
     <property name="NORMAL_LOG_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}.%method@%line - %msg%n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] [%thread] %-5level %logger{50}.%method@%line - %msg%n"/>
     <property name="CONSOLE_LOG_PATTERN"
-              value="%boldMagenta([%d{yyyy-MM-dd HH:mm:ss.SSS}]) %red([%thread]) %boldMagenta(%-5level) %blue(%logger{20}.%method@%line) %msg%n"/>
+              value="%boldMagenta([%d{yyyy-MM-dd HH:mm:ss.SSS}]) %cyan([%X{traceId}]) %red([%thread]) %boldMagenta(%-5level) %blue(%logger{20}.%method@%line) %msg%n"/>
 
     <!-- ==========================控制台输出========================== -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -108,7 +108,7 @@
     <!-- 生产环境和预发布环境：只打印WARN及以上级别的日志到控制台，其他日志输出到文件 -->
     <springProfile name="pre,prod">
         <property name="PROD_PATTERN"
-                  value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{20}.%method@%line - %msg%n"/>
+                  value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%X{traceId}] [%thread] %-5level %logger{20}.%method@%line - %msg%n"/>
 
         <appender name="PROD_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">

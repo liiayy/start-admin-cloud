@@ -2,7 +2,9 @@ package cn.muziseo.common.satoken.core.feign;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.muziseo.common.core.constant.TraceConstants;
 import feign.RequestInterceptor;
+import org.slf4j.MDC;
 import feign.RequestTemplate;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,12 @@ public class FeignAuthInterceptor implements RequestInterceptor {
         Object loginId = StpUtil.getLoginIdDefaultNull();
         if (loginId != null) {
             template.header(HEADER_USER_ID, loginId.toString());
+        }
+ 
+        // 【新增】透传 TraceId，实现全链路追踪
+        String traceId = MDC.get(TraceConstants.TRACE_ID);
+        if (StrUtil.isNotBlank(traceId)) {
+            template.header(TraceConstants.TRACE_ID_HEADER, traceId);
         }
     }
 

@@ -3,8 +3,8 @@ package cn.muziseo.common.satoken.core.handler;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
-import cn.hutool.http.HttpStatus;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.core.exception.errorCode.CommonErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,7 +21,7 @@ public class SaTokenExceptionHandler {
     public ResponseDTO<Void> handleNotPermissionException(NotPermissionException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',权限码校验失败'{}'", requestURI, e.getMessage());
-        return ResponseDTO.fail(HttpStatus.HTTP_FORBIDDEN, "没有访问权限，请联系管理员授权");
+        return ResponseDTO.fail(CommonErrorCode.PERMISSION_DENIED);
     }
 
     /**
@@ -31,7 +31,7 @@ public class SaTokenExceptionHandler {
     public ResponseDTO<Void> handleNotRoleException(NotRoleException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',角色权限校验失败'{}'", requestURI, e.getMessage());
-        return ResponseDTO.fail(HttpStatus.HTTP_FORBIDDEN, "没有访问权限，请联系管理员授权");
+        return ResponseDTO.fail(CommonErrorCode.PERMISSION_DENIED);
     }
 
     /**
@@ -41,6 +41,6 @@ public class SaTokenExceptionHandler {
     public ResponseDTO<Void> handleNotLoginException(NotLoginException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI, e.getMessage());
-        return ResponseDTO.fail(HttpStatus.HTTP_UNAUTHORIZED, "认证失败，无法访问系统资源");
+        return ResponseDTO.fail(CommonErrorCode.UNAUTHORIZED);
     }
 }

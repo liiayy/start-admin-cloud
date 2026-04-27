@@ -20,6 +20,7 @@ public enum CommonErrorCode implements IErrorCode {
     OPERATION_NOT_ALLOWED(20004, "操作不允许"),
     PERMISSION_DENIED(20005, "权限不足"),
     OPERATION_TOO_FREQUENT(20006, "操作过于频繁，请稍后再试"),
+    UNAUTHORIZED(20007, "未登录或登录已过期"),
     ;
 
     private final int code;

@@ -52,8 +52,8 @@ sa-token:
   is-concurrent: true
   # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
   is-share: false
-  # jwt秘钥
-  jwt-secret-key: abcdefghijklmnopqrstuvwxyz
+  # jwt秘钥 (建议从 Nacos 或 环境变量读取)
+  jwt-secret-key: ${sa-token.jwt-secret-key:start-admin-cloud-default-secret-key-32bits}
   # 关闭无状态模式下不支持的活跃度校验
   dynamic-active-timeout: false
   active-timeout: -1
@@ -80,7 +80,7 @@ gateway:
       - /swagger-ui
       - /v3/api-docs
       - /actuator
-  allowed-origins: "http://localhost:9000,http://localhost:5173,http://127.0.0.1:3000"
+  allowed-origins: ${gateway.allowed-origins:*}
   allowed-methods: "*"
   allowed-headers: "*"
   exposed-headers: "Authorization, Content-Disposition, X-Request-ID"

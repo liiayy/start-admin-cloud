@@ -1,6 +1,7 @@
 package cn.muziseo.common.core.domain.dto;
 
 import cn.muziseo.common.core.constant.HttpStatus;
+import cn.muziseo.common.core.exception.errorCode.IErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -101,6 +102,20 @@ public class ResponseDTO<T> implements Serializable {
      */
     public static <T> ResponseDTO<T> fail(String message, T data) {
         return of(HttpStatus.INTERNAL_SERVER_ERROR, message, data);
+    }
+
+    /**
+     * 构建带错误码枚举的失败响应
+     */
+    public static <T> ResponseDTO<T> fail(IErrorCode errorCode) {
+        return of(errorCode.getCode(), errorCode.getMessage(), null);
+    }
+
+    /**
+     * 构建带错误码枚举 + 自定义消息的失败响应
+     */
+    public static <T> ResponseDTO<T> fail(IErrorCode errorCode, String message) {
+        return of(errorCode.getCode(), message, null);
     }
 
     /* ------------------------- 核心构建方法 ------------------------- */

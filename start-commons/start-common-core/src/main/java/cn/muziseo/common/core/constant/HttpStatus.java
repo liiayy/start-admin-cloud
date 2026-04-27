@@ -65,18 +65,6 @@ public final class HttpStatus {
     public static final int GATEWAY_TIMEOUT = 504;
     public static final int HTTP_VERSION_NOT_SUPPORTED = 505;
 
-    // ================== 业务扩展状态码 ================== //
-    /**
-     * 业务逻辑失败 (原SUCCESS)
-     */
-    public static final int BUSINESS_FAIL = 600;
-
-    /**
-     * 参数校验失败 (原BAD_REQUEST)
-     */
-    public static final int VALIDATION_FAILED = 601;
-
-
     // ================== 实用方法 ================== //
 
     /**

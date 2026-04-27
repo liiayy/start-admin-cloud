@@ -1,9 +1,11 @@
 package cn.muziseo.gateway.filter;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.core.exception.errorCode.CommonErrorCode;
+import cn.muziseo.common.core.exception.errorCode.IErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.gateway.config.AuthWhiteProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,11 +57,11 @@ public class AuthFilter implements GlobalFilter, Ordered {
             loginId = StpUtil.getLoginIdDefaultNull();
         } catch (Exception e) {
             log.error("Token 解析异常: path={}", path, e);
-            return writeError(exchange, HttpStatus.UNAUTHORIZED.value(), "无效的认证凭证: " + e.getMessage());
+            return writeError(exchange, CommonErrorCode.UNAUTHORIZED, "无效的认证凭证: " + e.getMessage());
         }
 
         if (loginId == null) {
-            return writeError(exchange, HttpStatus.UNAUTHORIZED.value(), "未登录或登录已过期");
+            return writeError(exchange, CommonErrorCode.UNAUTHORIZED);
         }
 
         // 3. 将 userId 透传给下游服务
@@ -93,12 +95,19 @@ public class AuthFilter implements GlobalFilter, Ordered {
     /**
      * 返回错误响应
      */
-    private Mono<Void> writeError(ServerWebExchange exchange, int code, String message) {
+    private Mono<Void> writeError(ServerWebExchange exchange, IErrorCode errorCode) {
+        return writeError(exchange, errorCode, errorCode.getMessage());
+    }
+
+    /**
+     * 返回错误响应
+     */
+    private Mono<Void> writeError(ServerWebExchange exchange, IErrorCode errorCode, String message) {
         ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.OK);
+        response.setStatusCode(org.springframework.http.HttpStatus.OK);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        ResponseDTO<?> result = ResponseDTO.fail(code, message);
+        ResponseDTO<?> result = ResponseDTO.fail(errorCode, message);
 
         return response.writeWith(Mono.fromSupplier(() -> {
             DataBufferFactory bufferFactory = response.bufferFactory();

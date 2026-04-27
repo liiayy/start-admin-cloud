@@ -3,6 +3,8 @@ package cn.muziseo.gateway.exception;
 import cn.hutool.core.util.StrUtil;
 import cn.muziseo.common.core.constant.HttpStatus;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.core.exception.errorCode.CommonErrorCode;
+import cn.muziseo.common.core.exception.errorCode.SystemErrorCode;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeException;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowException;
@@ -62,26 +64,26 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
      */
     private ResponseDTO<?> handleBlockException(Throwable ex) {
         if (ex instanceof FlowException) {
-            return ResponseDTO.fail(HttpStatus.TOO_MANY_REQUESTS, "请求过于频繁，请稍后再试");
+            return ResponseDTO.fail(CommonErrorCode.OPERATION_TOO_FREQUENT);
         } else if (ex instanceof DegradeException) {
-            return ResponseDTO.fail(HttpStatus.TOO_MANY_REQUESTS, "服务已降级，请稍候重试");
+            return ResponseDTO.fail(CommonErrorCode.OPERATION_TOO_FREQUENT, "服务已降级，请稍候重试");
         } else if (ex instanceof ParamFlowException) {
-            return ResponseDTO.fail(HttpStatus.TOO_MANY_REQUESTS, "热点参数限流");
+            return ResponseDTO.fail(CommonErrorCode.OPERATION_TOO_FREQUENT, "热点参数限流");
         }
-        return ResponseDTO.fail(HttpStatus.TOO_MANY_REQUESTS, "系统忙，请稍后再试");
+        return ResponseDTO.fail(CommonErrorCode.OPERATION_TOO_FREQUENT);
     }
 
     private ResponseDTO<?> handleInternalException(ServerWebExchange exchange, Throwable ex) {
         ServerHttpRequest request = exchange.getRequest();
         log.error("[网关系统异常] 路径: {}, 信息: ", request.getURI().getPath(), ex);
-
+ 
         // 识别服务不可用的常见情况
         String msg = ex.getMessage();
         if (msg != null && msg.contains("Unable to find instance for")) {
-            return ResponseDTO.fail(HttpStatus.NOT_FOUND, "服务暂时不可用，请稍后再试");
+            return ResponseDTO.fail(SystemErrorCode.INTERNAL_ERROR, "服务暂时不可用，请稍后再试");
         }
-
-        return ResponseDTO.fail(HttpStatus.INTERNAL_SERVER_ERROR, "网关内部错误");
+ 
+        return ResponseDTO.fail(SystemErrorCode.INTERNAL_ERROR);
     }
 
     private Mono<Void> writeJSON(ServerWebExchange exchange, ResponseDTO<?> responseDTO) {

@@ -22,7 +22,9 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ValidatorUtils {
 
-    private static final Validator VALIDATOR = SpringUtils.getBean(Validator.class);
+    private static Validator validator() {
+        return SpringUtils.getBean(Validator.class);
+    }
 
     /* ------------------------- 基础校验方法 ------------------------- */
 
@@ -50,7 +52,7 @@ public class ValidatorUtils {
             throw new ConstraintViolationException("校验对象不能为null", Collections.emptySet());
         }
 
-        Set<ConstraintViolation<T>> violations = VALIDATOR.validate(object, groups);
+        Set<ConstraintViolation<T>> violations = validator().validate(object, groups);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException("参数校验失败", violations);
         }
@@ -85,7 +87,7 @@ public class ValidatorUtils {
             throw new ConstraintViolationException("属性名不能为空", Collections.emptySet());
         }
 
-        Set<ConstraintViolation<T>> violations = VALIDATOR.validateProperty(object, propertyName, groups);
+        Set<ConstraintViolation<T>> violations = validator().validateProperty(object, propertyName, groups);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException("属性 '" + propertyName + "' 校验失败", violations);
         }
@@ -109,7 +111,7 @@ public class ValidatorUtils {
             throw new ConstraintViolationException("属性名不能为空", Collections.emptySet());
         }
 
-        Set<ConstraintViolation<T>> violations = VALIDATOR.validateValue(beanType, propertyName, value, groups);
+        Set<ConstraintViolation<T>> violations = validator().validateValue(beanType, propertyName, value, groups);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException("属性值 '" + propertyName + "' 校验失败", violations);
         }
@@ -133,7 +135,7 @@ public class ValidatorUtils {
         Set<ConstraintViolation<?>> allViolations = new HashSet<>();
         for (T object : objects) {
             if (object != null) {
-                Set<ConstraintViolation<T>> violations = VALIDATOR.validate(object, groups);
+                Set<ConstraintViolation<T>> violations = validator().validate(object, groups);
                 allViolations.addAll(violations);
             }
         }
@@ -161,7 +163,7 @@ public class ValidatorUtils {
         int index = 0;
         for (T object : objects) {
             if (object != null) {
-                Set<ConstraintViolation<T>> violations = VALIDATOR.validate(object, groups);
+                Set<ConstraintViolation<T>> violations = validator().validate(object, groups);
                 if (!violations.isEmpty()) {
                     List<String> errorMessages = violations.stream()
                             .map(ConstraintViolation::getMessage)
@@ -189,7 +191,7 @@ public class ValidatorUtils {
         if (object == null) {
             return false;
         }
-        Set<ConstraintViolation<T>> violations = VALIDATOR.validate(object, groups);
+        Set<ConstraintViolation<T>> violations = validator().validate(object, groups);
         return violations.isEmpty();
     }
 
@@ -206,7 +208,7 @@ public class ValidatorUtils {
         if (object == null || propertyName == null || propertyName.trim().isEmpty()) {
             return false;
         }
-        Set<ConstraintViolation<T>> violations = VALIDATOR.validateProperty(object, propertyName, groups);
+        Set<ConstraintViolation<T>> violations = validator().validateProperty(object, propertyName, groups);
         return violations.isEmpty();
     }
 
@@ -225,7 +227,7 @@ public class ValidatorUtils {
             return Collections.singletonList("校验对象不能为null");
         }
 
-        Set<ConstraintViolation<T>> violations = VALIDATOR.validate(object, groups);
+        Set<ConstraintViolation<T>> violations = validator().validate(object, groups);
         return violations.stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
@@ -244,7 +246,7 @@ public class ValidatorUtils {
             return Collections.singletonList(new ViolationDetail(null, "object", "校验对象不能为null", null));
         }
 
-        Set<ConstraintViolation<T>> violations = VALIDATOR.validate(object, groups);
+        Set<ConstraintViolation<T>> violations = validator().validate(object, groups);
         return violations.stream()
                 .map(violation -> new ViolationDetail(
                         violation.getRootBeanClass(),
@@ -275,7 +277,7 @@ public class ValidatorUtils {
         }
 
         for (Class<?> group : groups) {
-            Set<ConstraintViolation<T>> violations = VALIDATOR.validate(object, group);
+            Set<ConstraintViolation<T>> violations = validator().validate(object, group);
             if (!violations.isEmpty()) {
                 throw new ConstraintViolationException("分组 [" + group.getSimpleName() + "] 校验失败", violations);
             }
@@ -299,7 +301,7 @@ public class ValidatorUtils {
             return false;
         }
 
-        Set<ConstraintViolation<T>> violations = VALIDATOR.validate(object, groups);
+        Set<ConstraintViolation<T>> violations = validator().validate(object, groups);
         if (!violations.isEmpty()) {
             log.warn("{}: 校验失败 - {}", message,
                     violations.stream()
@@ -331,7 +333,7 @@ public class ValidatorUtils {
             return false;
         }
 
-        Set<ConstraintViolation<T>> violations = VALIDATOR.validateProperty(object, propertyName, groups);
+        Set<ConstraintViolation<T>> violations = validator().validateProperty(object, propertyName, groups);
         if (!violations.isEmpty()) {
             log.warn("{}: 属性 '{}' 校验失败 - {}", message, propertyName,
                     violations.stream()

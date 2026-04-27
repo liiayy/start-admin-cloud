@@ -15,13 +15,15 @@ import java.util.Collection;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RedissonUtils {
 
-    private static final RedissonClient CLIENT = SpringUtils.getBean(RedissonClient.class);
+    private static RedissonClient client() {
+        return SpringUtils.getBean(RedissonClient.class);
+    }
 
     /**
      * 获取客户端实例
      */
     public static RedissonClient getClient() {
-        return CLIENT;
+        return client();
     }
 
     /**
@@ -30,7 +32,7 @@ public class RedissonUtils {
      * @param lockKey 锁键
      */
     public static RLock getLock(String lockKey) {
-        return CLIENT.getLock(lockKey);
+        return client().getLock(lockKey);
     }
 
     /**
@@ -39,7 +41,7 @@ public class RedissonUtils {
      * @param lockKey 锁键
      */
     public static RLock getFairLock(String lockKey) {
-        return CLIENT.getFairLock(lockKey);
+        return client().getFairLock(lockKey);
     }
 
     /**
@@ -48,7 +50,7 @@ public class RedissonUtils {
      * @param lockKey 锁键
      */
     public static RReadWriteLock getReadWriteLock(String lockKey) {
-        return CLIENT.getReadWriteLock(lockKey);
+        return client().getReadWriteLock(lockKey);
     }
 
     /**
@@ -57,7 +59,7 @@ public class RedissonUtils {
      * @param lockKey 锁键
      */
     public static RLock getReadLock(String lockKey) {
-        return CLIENT.getReadWriteLock(lockKey).readLock();
+        return client().getReadWriteLock(lockKey).readLock();
     }
 
     /**
@@ -66,7 +68,7 @@ public class RedissonUtils {
      * @param lockKey 锁键
      */
     public static RLock getWriteLock(String lockKey) {
-        return CLIENT.getReadWriteLock(lockKey).writeLock();
+        return client().getReadWriteLock(lockKey).writeLock();
     }
 
     /**
@@ -75,7 +77,7 @@ public class RedissonUtils {
      * @param lockKey 锁键
      */
     public static RSemaphore getSemaphore(String lockKey) {
-        return CLIENT.getSemaphore(lockKey);
+        return client().getSemaphore(lockKey);
     }
 
     /**
@@ -84,7 +86,7 @@ public class RedissonUtils {
      * @param lockKey 锁键
      */
     public static RCountDownLatch getCountDownLatch(String lockKey) {
-        return CLIENT.getCountDownLatch(lockKey);
+        return client().getCountDownLatch(lockKey);
     }
 
     /**
@@ -93,7 +95,7 @@ public class RedissonUtils {
      * @param key 键
      */
     public static boolean deleteObject(String key) {
-        return CLIENT.getBucket(key).delete();
+        return client().getBucket(key).delete();
     }
 
     /**
@@ -102,7 +104,7 @@ public class RedissonUtils {
      * @param collection 多个对象
      */
     public static void deleteObject(Collection<?> collection) {
-        RBatch batch = CLIENT.createBatch();
+        RBatch batch = client().createBatch();
         collection.forEach(t -> batch.getBucket(t.toString()).deleteAsync());
         batch.execute();
     }

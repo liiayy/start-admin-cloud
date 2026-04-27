@@ -1,5 +1,6 @@
 package cn.muziseo.common.core.exception;
 
+import cn.muziseo.common.core.exception.errorCode.IErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,6 +36,36 @@ public class ServiceException extends RuntimeException {
      * 错误提示
      */
     private String message = "系统异常,请联系管理员";
+
+    /**
+     * 原始错误码枚举
+     */
+    private IErrorCode errorCode;
+
+    /**
+     * 通过错误码枚举构造
+     *
+     * @param errorCode 错误码枚举
+     */
+    public ServiceException(IErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.code = errorCode.getCode();
+        this.message = errorCode.getMessage();
+        this.errorCode = errorCode;
+    }
+
+    /**
+     * 通过错误码枚举 + 原始异常构造
+     *
+     * @param errorCode 错误码枚举
+     * @param cause     原始异常
+     */
+    public ServiceException(IErrorCode errorCode, Throwable cause) {
+        super(errorCode.getMessage(), cause);
+        this.code = errorCode.getCode();
+        this.message = errorCode.getMessage();
+        this.errorCode = errorCode;
+    }
 
     /**
      * 构造方法 - 仅包含错误信息

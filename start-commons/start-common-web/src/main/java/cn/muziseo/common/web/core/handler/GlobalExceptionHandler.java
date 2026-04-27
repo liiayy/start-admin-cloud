@@ -5,6 +5,8 @@ import cn.muziseo.common.core.constant.HttpStatus;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.core.exception.ServiceException;
+import cn.muziseo.common.core.exception.errorCode.CommonErrorCode;
+import cn.muziseo.common.core.exception.errorCode.SystemErrorCode;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -49,7 +51,9 @@ public class GlobalExceptionHandler {
         // 记录警告日志，避免暴露敏感信息
         log.warn("[业务异常] 错误码: {}, 错误信息: {}", ex.getCode(), ex.getMessage());
         // 返回统一的错误响应
-        return ResponseDTO.fail(ex.getCode(), ex.getMessage());
+        return ex.getErrorCode() != null
+                ? ResponseDTO.fail(ex.getErrorCode(), ex.getMessage())
+                : ResponseDTO.fail(ex.getCode(), ex.getMessage());
     }
 
     /**
@@ -63,7 +67,9 @@ public class GlobalExceptionHandler {
         // 记录错误日志，包含完整堆栈信息
         log.error("[系统异常] 错误码: {}, 错误信息: {}", ex.getCode(), ex.getMessage(), ex);
         // 返回统一的错误响应
-        return ResponseDTO.fail(ex.getCode(), ex.getMessage());
+        return ex.getErrorCode() != null
+                ? ResponseDTO.fail(ex.getErrorCode(), ex.getMessage())
+                : ResponseDTO.fail(ex.getCode(), ex.getMessage());
     }
 
     /**
@@ -75,7 +81,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = MissingServletRequestParameterException.class)
     public ResponseDTO<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
         log.warn("[请求参数缺失]", ex);
-        return ResponseDTO.fail(HttpStatus.BAD_REQUEST, String.format("请求参数缺失:%s", ex.getParameterName()));
+        return ResponseDTO.fail(CommonErrorCode.PARAM_VALIDATION_FAILED, String.format("请求参数缺失:%s", ex.getParameterName()));
     }
 
     /**
@@ -110,7 +116,7 @@ public class GlobalExceptionHandler {
                             .findFirst()
                             .orElse("参数格式错误"); // 最终兜底，防止 getDefaultMessage 返回 null
                 });
-        return ResponseDTO.fail(HttpStatus.BAD_REQUEST, String.format("参数校验失败: %s", errorMessage));
+        return ResponseDTO.fail(CommonErrorCode.PARAM_VALIDATION_FAILED, String.format("参数校验失败: %s", errorMessage));
     }
 
     /**
@@ -138,7 +144,7 @@ public class GlobalExceptionHandler {
             }
         }
 
-        return ResponseDTO.fail(HttpStatus.BAD_REQUEST, String.format("请求参数不正确: %s", errorMessage));
+        return ResponseDTO.fail(CommonErrorCode.PARAM_VALIDATION_FAILED, String.format("请求参数不正确: %s", errorMessage));
     }
 
     /**
@@ -155,20 +161,20 @@ public class GlobalExceptionHandler {
 
         // 1. 处理 JSON 格式转换错误 (类型不匹配)
         if (cause instanceof InvalidFormatException ife) {
-            return ResponseDTO.fail(HttpStatus.BAD_REQUEST, String.format("参数类型错误: 期望类型与输入值 [%s] 不匹配", ife.getValue()));
+            return ResponseDTO.fail(CommonErrorCode.PARAM_VALIDATION_FAILED, String.format("参数类型错误: 期望类型与输入值 [%s] 不匹配", ife.getValue()));
         }
 
         // 2. 处理 Body 为空
         if (ex.getMessage() != null && ex.getMessage().contains("Required request body is missing")) {
-            return ResponseDTO.fail(HttpStatus.BAD_REQUEST, "请求体 (Body) 不能为空");
+            return ResponseDTO.fail(CommonErrorCode.PARAM_VALIDATION_FAILED, "请求体 (Body) 不能为空");
         }
 
         // 3. 处理 JSON 语法错误 (比如少了引号)
         if (cause instanceof com.fasterxml.jackson.core.JsonParseException) {
-            return ResponseDTO.fail(HttpStatus.BAD_REQUEST, "JSON 格式语法错误，请检查括号或逗号");
+            return ResponseDTO.fail(CommonErrorCode.PARAM_VALIDATION_FAILED, "JSON 格式语法错误，请检查括号或逗号");
         }
 
-        return ResponseDTO.fail(HttpStatus.BAD_REQUEST, "请求参数格式无法解析");
+        return ResponseDTO.fail(CommonErrorCode.PARAM_VALIDATION_FAILED, "请求参数格式无法解析");
     }
 
     /**
@@ -181,7 +187,7 @@ public class GlobalExceptionHandler {
     public ResponseDTO<?> handleConstraintViolationException(ConstraintViolationException ex) {
         log.warn("[参数校验异常]", ex);
         ConstraintViolation<?> constraintViolation = ex.getConstraintViolations().iterator().next();
-        return ResponseDTO.fail(HttpStatus.BAD_REQUEST, String.format("请求参数不正确:%s", constraintViolation.getMessage()));
+        return ResponseDTO.fail(CommonErrorCode.PARAM_VALIDATION_FAILED, String.format("请求参数不正确:%s", constraintViolation.getMessage()));
     }
 
     /**
@@ -192,7 +198,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseDTO<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
-        return ResponseDTO.fail(HttpStatus.BAD_REQUEST, "上传文件过大，请调整后重试");
+        return ResponseDTO.fail(CommonErrorCode.PARAM_VALIDATION_FAILED, "上传文件过大，请调整后重试");
     }
 
     /**
@@ -244,7 +250,7 @@ public class GlobalExceptionHandler {
     public ResponseDTO<?> handleDefaultException(HttpServletRequest req, Exception ex) {
         log.error("[系统异常] 请求地址: {}, 异常原因: ", req.getRequestURI(), ex);
         // 在生产环境下，不建议直接把 ex.getMessage() 返回给前端，防止泄露堆栈或数据库结构
-        return ResponseDTO.fail(HttpStatus.INTERNAL_SERVER_ERROR, "服务器繁忙，请稍后再试");
+        return ResponseDTO.fail(SystemErrorCode.INTERNAL_ERROR);
     }
 
 

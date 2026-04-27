@@ -469,21 +469,21 @@ public class ServletUtils extends JakartaServletUtil {
             return StringUtils.EMPTY;
         }
 
-        // 检查各种代理头部
+        // 检查各种代理头部 (安全加固：优先使用网关重写的头部)
         String[] headerNames = {
+                HEADER_X_REAL_IP,       // 优先使用 X-Real-IP，通常由 Nginx/Gateway 重写
                 HEADER_X_FORWARDED_FOR,
                 HEADER_PROXY_CLIENT_IP,
                 HEADER_WL_PROXY_CLIENT_IP,
                 HEADER_HTTP_CLIENT_IP,
-                HEADER_HTTP_X_FORWARDED_FOR,
-                HEADER_X_REAL_IP
+                HEADER_HTTP_X_FORWARDED_FOR
         };
 
         for (String header : headerNames) {
             String ip = request.getHeader(header);
-            if (StringUtils.isNotEmpty(ip) && !"unknown".equalsIgnoreCase(ip)) {
-                // 对于 X-Forwarded-For，取第一个 IP
-                if (HEADER_X_FORWARDED_FOR.equals(header)) {
+            if (StringUtils.isNotEmpty(ip) && !StrUtil.equalsIgnoreCase("unknown", ip)) {
+                // 对于 X-Forwarded-For，取第一个 IP（最接近真实客户端的 IP）
+                if (HEADER_X_FORWARDED_FOR.equalsIgnoreCase(header)) {
                     int index = ip.indexOf(',');
                     return (index != -1) ? ip.substring(0, index).trim() : ip;
                 }

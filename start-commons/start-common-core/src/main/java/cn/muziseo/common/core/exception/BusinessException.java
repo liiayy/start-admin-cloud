@@ -1,6 +1,7 @@
 package cn.muziseo.common.core.exception;
 
 import cn.muziseo.common.core.exception.errorCode.IErrorCode;
+import cn.muziseo.common.core.exception.errorCode.SystemErrorCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,6 +32,11 @@ public class BusinessException extends RuntimeException {
     private String message;
 
     /**
+     * 原始错误码枚举
+     */
+    private IErrorCode errorCode;
+
+    /**
      * 通过错误码枚举构造（推荐）
      *
      * @param errorCode 错误码枚举
@@ -39,6 +45,7 @@ public class BusinessException extends RuntimeException {
         super(errorCode.getMessage());
         this.code = errorCode.getCode();
         this.message = errorCode.getMessage();
+        this.errorCode = errorCode;
     }
 
     /**
@@ -51,6 +58,7 @@ public class BusinessException extends RuntimeException {
         super(message);
         this.code = errorCode.getCode();
         this.message = message;
+        this.errorCode = errorCode;
     }
 
     /**
@@ -72,7 +80,7 @@ public class BusinessException extends RuntimeException {
      */
     public BusinessException(String message) {
         super(message);
-        this.code = 600;
+        this.code = SystemErrorCode.INTERNAL_ERROR.getCode();
         this.message = message;
     }
 

@@ -32,14 +32,9 @@ import java.util.List;
 @Slf4j
 public class JsonUtils {
 
-    /**
-     * Jackson ObjectMapper 实例
-     * <p>
-     * 从 Spring 容器中获取，支持自定义配置
-     * </p>
-     */
-    @Getter
-    private static final ObjectMapper objectMapper = SpringUtils.getBean(ObjectMapper.class);
+    public static ObjectMapper objectMapper() {
+        return SpringUtils.getBean(ObjectMapper.class);
+    }
 
     /**
      * 将对象序列化为 JSON 字符串
@@ -49,7 +44,7 @@ public class JsonUtils {
      */
     @SneakyThrows
     public static String toJsonString(Object object) {
-        return objectMapper.writeValueAsString(object);
+        return objectMapper().writeValueAsString(object);
     }
 
     /**
@@ -60,7 +55,7 @@ public class JsonUtils {
      */
     @SneakyThrows
     public static byte[] toJsonByte(Object object) {
-        return objectMapper.writeValueAsBytes(object);
+        return objectMapper().writeValueAsBytes(object);
     }
 
     /**
@@ -71,7 +66,7 @@ public class JsonUtils {
      */
     @SneakyThrows
     public static String toJsonPrettyString(Object object) {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+        return objectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
     }
 
     /**
@@ -86,7 +81,7 @@ public class JsonUtils {
             return null;
         }
         try {
-            return objectMapper.readValue(text, clazz);
+            return objectMapper().readValue(text, clazz);
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
@@ -106,9 +101,9 @@ public class JsonUtils {
             return null;
         }
         try {
-            JsonNode treeNode = objectMapper.readTree(text);
+            JsonNode treeNode = objectMapper().readTree(text);
             JsonNode pathNode = treeNode.path(path);
-            return objectMapper.readValue(pathNode.toString(), clazz);
+            return objectMapper().readValue(pathNode.toString(), clazz);
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
@@ -127,7 +122,7 @@ public class JsonUtils {
             return null;
         }
         try {
-            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructType(type));
+            return objectMapper().readValue(text, objectMapper().getTypeFactory().constructType(type));
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
@@ -146,7 +141,7 @@ public class JsonUtils {
             return null;
         }
         try {
-            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructType(type));
+            return objectMapper().readValue(text, objectMapper().getTypeFactory().constructType(type));
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
@@ -181,7 +176,7 @@ public class JsonUtils {
             return null;
         }
         try {
-            return objectMapper.readValue(bytes, clazz);
+            return objectMapper().readValue(bytes, clazz);
         } catch (IOException e) {
             log.error("json parse err,json:{}", bytes, e);
             throw new RuntimeException(e);
@@ -197,7 +192,7 @@ public class JsonUtils {
      */
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
         try {
-            return objectMapper.readValue(text, typeReference);
+            return objectMapper().readValue(text, typeReference);
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
@@ -213,7 +208,7 @@ public class JsonUtils {
      */
     public static <T> T parseObjectQuietly(String text, TypeReference<T> typeReference) {
         try {
-            return objectMapper.readValue(text, typeReference);
+            return objectMapper().readValue(text, typeReference);
         } catch (IOException e) {
             return null;
         }
@@ -231,7 +226,7 @@ public class JsonUtils {
             return new ArrayList<>();
         }
         try {
-            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+            return objectMapper().readValue(text, objectMapper().getTypeFactory().constructCollectionType(List.class, clazz));
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
@@ -251,9 +246,9 @@ public class JsonUtils {
             return null;
         }
         try {
-            JsonNode treeNode = objectMapper.readTree(text);
+            JsonNode treeNode = objectMapper().readTree(text);
             JsonNode pathNode = treeNode.path(path);
-            return objectMapper.readValue(pathNode.toString(), objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+            return objectMapper().readValue(pathNode.toString(), objectMapper().getTypeFactory().constructCollectionType(List.class, clazz));
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
@@ -268,7 +263,7 @@ public class JsonUtils {
      */
     public static JsonNode parseTree(String text) {
         try {
-            return objectMapper.readTree(text);
+            return objectMapper().readTree(text);
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
@@ -283,7 +278,7 @@ public class JsonUtils {
      */
     public static JsonNode parseTree(byte[] text) {
         try {
-            return objectMapper.readTree(text);
+            return objectMapper().readTree(text);
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);

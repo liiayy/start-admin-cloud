@@ -55,6 +55,19 @@ public class ServiceException extends RuntimeException {
     }
 
     /**
+     * 通过错误码枚举 + 自定义错误消息构造
+     *
+     * @param errorCode 错误码枚举
+     * @param message   自定义错误消息
+     */
+    public ServiceException(IErrorCode errorCode, String message) {
+        super(message);
+        this.code = errorCode.getCode();
+        this.message = message;
+        this.errorCode = errorCode;
+    }
+ 
+    /**
      * 通过错误码枚举 + 原始异常构造
      *
      * @param errorCode 错误码枚举

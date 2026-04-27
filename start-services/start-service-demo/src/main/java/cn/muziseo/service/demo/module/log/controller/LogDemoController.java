@@ -1,5 +1,6 @@
 package cn.muziseo.service.demo.module.log.controller;
 
+import cn.muziseo.common.core.annotation.Idempotent;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
@@ -33,7 +34,8 @@ public class LogDemoController {
     }
 
     @Log(title = "日志演示-数据脱敏", businessType = BusinessType.OTHER)
-    @Operation(summary = "数据脱敏演示")
+    @Operation(summary = "数据脱敏演示（附加幂等校验）")
+    @Idempotent(key = "#params.username", message = "正在处理该用户的数据，请勿重复操作")
     @PostMapping("/mask")
     public ResponseDTO<LogDemoDTO> mask(@RequestBody LogDemoDTO params) {
         // params 中标记了 @Sensitive 的字段，由于我们在 LogAspect 中配置了脱敏逻辑，

@@ -57,4 +57,14 @@ public class LogDemoController {
         data.put("result", "这段文本会被完整保存在日志表的 json_result 字段中");
         return ResponseDTO.success(data);
     }
+ 
+    @Operation(summary = "字典翻译演示")
+    @GetMapping("/dict")
+    public ResponseDTO<java.util.List<DictDemoVO>> dict() {
+        java.util.List<DictDemoVO> list = new java.util.ArrayList<>();
+        list.add(new DictDemoVO("张三", "1", null, "0", null));
+        list.add(new DictDemoVO("李四", "2", null, "1", null));
+        // 返回时，DictTranslationAdvice 会自动填充 sexLabel 和 statusName
+        return ResponseDTO.success(list);
+    }
 }

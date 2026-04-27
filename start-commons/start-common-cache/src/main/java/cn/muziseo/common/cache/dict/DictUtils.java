@@ -213,6 +213,17 @@ public class DictUtils {
     }
 
     /**
+     * 获取指定字典类型的映射表 (Value -> Label)
+     *
+     * @param dictType 字典类型
+     * @return Value -> Label 的 Map
+     */
+    public static java.util.Map<String, String> getDictMap(String dictType) {
+        return getDict(dictType, null).stream()
+                .collect(Collectors.toMap(DictDataSimpleDTO::getValue, DictDataSimpleDTO::getLabel, (k1, k2) -> k1));
+    }
+ 
+    /**
      * 整数值获取颜色（便捷重载）
      */
     public static String getColorType(String dictType, Integer value) {

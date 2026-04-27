@@ -18,5 +18,9 @@ spring:
 
 server:
   port: 58082
+ 
+springdoc:
+  api-docs:
+    path: /admin/demo/v3/api-docs
 
 

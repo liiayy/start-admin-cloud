@@ -5,3 +5,4 @@ cn.muziseo.common.web.xss.config.StartXssAutoConfiguration
 cn.muziseo.common.web.core.dict.DictTranslationAdvice
 cn.muziseo.common.web.core.config.AsyncConfig
 cn.muziseo.common.web.core.idempotent.IdempotentAutoConfiguration
+cn.muziseo.common.web.core.config.SwaggerConfig

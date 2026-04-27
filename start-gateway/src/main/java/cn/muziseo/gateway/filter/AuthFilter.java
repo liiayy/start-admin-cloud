@@ -89,6 +89,14 @@ public class AuthFilter implements GlobalFilter, Ordered {
                 return true;
             }
         }
+ 
+        // 3. 后缀匹配
+        for (String suffix : authWhiteProperties.getWhiteSuffixes()) {
+            if (path.endsWith(suffix)) {
+                return true;
+            }
+        }
+ 
         return false;
     }
 

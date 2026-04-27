@@ -43,3 +43,7 @@ start:
       - exe
       - bat
       - jspx
+ 
+springdoc:
+  api-docs:
+    path: /admin/system/v3/api-docs

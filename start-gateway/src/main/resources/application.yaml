@@ -80,6 +80,8 @@ gateway:
       - /swagger-ui
       - /v3/api-docs
       - /actuator
+    white-suffixes:
+      - /v3/api-docs
   allowed-origins: ${gateway.allowed-origins:*}
   allowed-methods: "*"
   allowed-headers: "*"
@@ -92,8 +94,7 @@ springdoc:
     enabled: true
   swagger-ui:
     path: /swagger-ui.html
+    # 至少保留一个 URL 占位符，触发 SwaggerUiConfigParameters Bean 的创建
     urls:
-      - name: system
-        url: /api/admin/system/v3/api-docs
-      - name: demo
-        url: /api/admin/demo/v3/api-docs
+      - name: gateway
+        url: /v3/api-docs

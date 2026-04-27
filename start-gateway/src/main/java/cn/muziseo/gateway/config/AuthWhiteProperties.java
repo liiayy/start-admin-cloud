@@ -30,4 +30,11 @@ public class AuthWhiteProperties {
      * 直接匹配网关看到的完整路径前缀，如 /swagger-ui、/actuator
      */
     private List<String> whitePrefixes = new ArrayList<>();
+ 
+    /**
+     * 后缀匹配的全局路径白名单
+     * <p>
+     * 匹配如 /v3/api-docs 的路径后缀
+     */
+    private List<String> whiteSuffixes = new ArrayList<>();
 }

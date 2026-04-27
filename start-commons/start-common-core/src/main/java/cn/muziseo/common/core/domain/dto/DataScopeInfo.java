@@ -31,4 +31,9 @@ public class DataScopeInfo implements Serializable {
      */
     private List<Long> deptIds;
 
+    /**
+     * 允许访问的用户 ID 列表（用于“仅本人可见”等场景）
+     */
+    private List<Long> userIds;
+
 }

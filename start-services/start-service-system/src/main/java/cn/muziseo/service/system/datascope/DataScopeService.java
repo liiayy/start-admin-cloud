@@ -91,6 +91,10 @@ public class DataScopeService {
                     info.setFilter(true);
                     info.setDeptIds(deptManager.getDeptAndChildIds(user.getDeptId()));
                     break;
+                case 5: // 仅本人
+                    info.setFilter(true);
+                    info.setUserIds(List.of(userId));
+                    break;
                 default:
                     info.setFilter(false);
                     break;

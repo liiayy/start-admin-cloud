@@ -1,5 +1,6 @@
 package cn.muziseo.service.system.module.auth.repository.entity;
 
+import cn.muziseo.common.db.annotation.DataColumn;
 import cn.muziseo.common.db.entity.BaseEntity;
 import cn.muziseo.common.db.handler.BigIntArrayTypeHandler;
 import com.mybatisflex.annotation.Column;
@@ -34,6 +35,7 @@ public class UserEntity extends BaseEntity {
      * 用户ID
      */
     @Id
+    @DataColumn(DataColumn.DataType.USER)
     private Long id;
 
     /**
@@ -59,6 +61,7 @@ public class UserEntity extends BaseEntity {
     /**
      * 部门ID
      */
+    @DataColumn(DataColumn.DataType.DEPT)
     private Long deptId;
 
     /**

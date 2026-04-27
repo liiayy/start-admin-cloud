@@ -45,8 +45,8 @@ public class DataScopeAspect {
             
             DataScopeContext.set(info);
 
-            log.debug("数据权限过滤: userId={}, filter={}, deptIds={}",
-                    userId, info.isFilter(), info.getDeptIds());
+            log.debug("数据权限过滤: userId={}, filter={}, deptIds={}, userIds={}",
+                    userId, info.isFilter(), info.getDeptIds(), info.getUserIds());
         }
         catch (Exception e) {
             log.warn("数据权限解析异常: {}", e.getMessage());

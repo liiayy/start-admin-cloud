@@ -1,2 +1,3 @@
 cn.muziseo.common.db.config.DruidConfig
 cn.muziseo.common.db.config.MyBatisFlexConfig
+cn.muziseo.common.db.datascope.DataScopeAutoRegister

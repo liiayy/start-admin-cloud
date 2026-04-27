@@ -1,5 +1,6 @@
 package cn.muziseo.service.system.module.organization.repository.entity;
 
+import cn.muziseo.common.db.annotation.DataColumn;
 import cn.muziseo.common.db.entity.BaseEntity;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
@@ -34,6 +35,7 @@ public class PostEntity extends BaseEntity {
     /**
      * 所属部门ID
      */
+    @DataColumn(DataColumn.DataType.DEPT)
     private Long deptId;
 
     /**

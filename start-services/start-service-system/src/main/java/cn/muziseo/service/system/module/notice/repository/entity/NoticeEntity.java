@@ -45,4 +45,24 @@ public class NoticeEntity extends BaseEntity {
      * 公告状态 (0正常 1关闭)
      */
     private Integer status;
+
+    /**
+     * 发布范围 (0全部 1指定)
+     */
+    private Integer targetType;
+
+    /**
+     * 指定的部门ID (逗号分隔)
+     */
+    private String targetDepts;
+
+    /**
+     * 指定的角色ID (逗号分隔)
+     */
+    private String targetRoles;
+
+    /**
+     * 指定的岗位ID (逗号分隔)
+     */
+    private String targetPosts;
 }

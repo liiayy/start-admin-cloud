@@ -1,5 +1,6 @@
 package cn.muziseo.common.websocket.holder;
 
+import cn.muziseo.common.cache.utils.RedisUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,11 @@ public class WebSocketSessionHolder {
             = new ConcurrentHashMap<>();
 
     /**
+     * Redis 在线状态 Hash 键名
+     */
+    public static final String ONLINE_USERS_KEY = "ws:cluster:online_users";
+
+    /**
      * 注册会话
      *
      * @param userId    用户 ID
@@ -53,7 +59,18 @@ public class WebSocketSessionHolder {
             }
         }
 
-        userSessions.put(sessionId, session);
+        WebSocketSession oldSession = userSessions.put(sessionId, session);
+
+        // 分布式集群状态同步：若为新会话，递增该用户的全局连接引用计数
+        if (oldSession == null) {
+            try {
+                org.redisson.api.RMap<String, Integer> rMap = RedisUtils.getClient().getMap(ONLINE_USERS_KEY);
+                rMap.addAndGet(userId.toString(), 1);
+            } catch (Exception e) {
+                log.error("[WebSocket] 同步 Redis 在线状态异常 (Incr): userId={}, error={}", userId, e.getMessage());
+            }
+        }
+
         log.info("[WebSocket] 用户连接建立: userId={}, sessionId={}, 当前连接数={}",
                 userId, sessionId, userSessions.size());
     }
@@ -70,7 +87,20 @@ public class WebSocketSessionHolder {
             return;
         }
 
-        userSessions.remove(sessionId);
+        WebSocketSession removedSession = userSessions.remove(sessionId);
+
+        // 分布式集群状态同步：仅当该会话确实存在并被移除时，才扣减引用计数
+        if (removedSession != null) {
+            try {
+                org.redisson.api.RMap<String, Integer> rMap = RedisUtils.getClient().getMap(ONLINE_USERS_KEY);
+                long remaining = rMap.addAndGet(userId.toString(), -1);
+                if (remaining <= 0) {
+                    rMap.remove(userId.toString());
+                }
+            } catch (Exception e) {
+                log.error("[WebSocket] 同步 Redis 在线状态异常 (Decr): userId={}, error={}", userId, e.getMessage());
+            }
+        }
 
         // 如果该用户已无连接，清理映射
         if (userSessions.isEmpty()) {

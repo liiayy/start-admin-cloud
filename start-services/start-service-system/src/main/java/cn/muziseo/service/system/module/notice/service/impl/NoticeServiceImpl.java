@@ -17,6 +17,8 @@ import cn.muziseo.service.system.module.notice.repository.entity.NoticeUserEntit
 import cn.muziseo.service.system.module.notice.service.NoticeService;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.row.Db;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,26 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Resource
     private NoticeUserManager noticeUserManager;
+
+    @Resource
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
+    @Resource
+    private cn.muziseo.service.system.module.notice.service.WebSocketSendService webSocketSendService;
+
+    @PostConstruct
+    public void migrateNoticeTargetColumns() {
+        log.info("[NoticeMigration] 开始检查 system_notice 灰度覆盖属性...");
+        try {
+            Db.updateBySql("ALTER TABLE system_notice ADD COLUMN IF NOT EXISTS target_type smallint DEFAULT 0");
+            Db.updateBySql("ALTER TABLE system_notice ADD COLUMN IF NOT EXISTS target_depts text");
+            Db.updateBySql("ALTER TABLE system_notice ADD COLUMN IF NOT EXISTS target_roles text");
+            Db.updateBySql("ALTER TABLE system_notice ADD COLUMN IF NOT EXISTS target_posts text");
+            log.info("[NoticeMigration] system_notice 灰度覆盖属性检查及升级成功！");
+        } catch (Exception e) {
+            log.warn("[NoticeMigration] system_notice 表属性扩展异常: {}", e.getMessage());
+        }
+    }
 
     @Override
     public PageResponse<NoticeVO> pageNotice(NoticePageRequest request) {
@@ -114,9 +136,37 @@ public class NoticeServiceImpl implements NoticeService {
                 .build()
         );
 
-        // 利用工具类广播给所有在线用户
-        WebSocketUtils.publishMessage(WebSocketMessageDTO.broadcast(payload));
-        log.info("触发公告全局广播推送: id={}, title={}", id, notice.getTitle());
+        // 灰度发布范围鉴别
+        if (notice.getTargetType() != null && notice.getTargetType() == 1) {
+            List<Long> deptIds = new ArrayList<>();
+            if (cn.hutool.core.util.StrUtil.isNotBlank(notice.getTargetDepts())) {
+                for (String idStr : notice.getTargetDepts().split(",")) {
+                    try { deptIds.add(Long.parseLong(idStr)); } catch (Exception ignored) {}
+                }
+            }
+
+            List<Long> roleIds = new ArrayList<>();
+            if (cn.hutool.core.util.StrUtil.isNotBlank(notice.getTargetRoles())) {
+                for (String idStr : notice.getTargetRoles().split(",")) {
+                    try { roleIds.add(Long.parseLong(idStr)); } catch (Exception ignored) {}
+                }
+            }
+
+            List<Long> postIds = new ArrayList<>();
+            if (cn.hutool.core.util.StrUtil.isNotBlank(notice.getTargetPosts())) {
+                for (String idStr : notice.getTargetPosts().split(",")) {
+                    try { postIds.add(Long.parseLong(idStr)); } catch (Exception ignored) {}
+                }
+            }
+
+            webSocketSendService.sendToScope(deptIds, roleIds, postIds, payload);
+            log.info("触发公告指定范围路由推送: id={}, targetDepts={}, targetRoles={}, targetPosts={}", 
+                id, notice.getTargetDepts(), notice.getTargetRoles(), notice.getTargetPosts());
+        } else {
+            // 默认全局广播给所有在线用户
+            WebSocketUtils.publishMessage(WebSocketMessageDTO.broadcast(payload));
+            log.info("触发公告全局广播推送: id={}, title={}", id, notice.getTitle());
+        }
     }
 
     @Override
@@ -131,9 +181,65 @@ public class NoticeServiceImpl implements NoticeService {
             return new ArrayList<>();
         }
 
-        // 2. 依次校验映射状态
+        // 提取当前用户的身份标签
+        Long userDeptId = null;
+        String userPostIds = null;
+        try {
+            List<Long> deptIds = jdbcTemplate.queryForList("SELECT dept_id FROM system_user WHERE id = ?", Long.class, userId);
+            userDeptId = deptIds != null && !deptIds.isEmpty() ? deptIds.get(0) : null;
+
+            List<String> posts = jdbcTemplate.queryForList("SELECT post_ids FROM system_user WHERE id = ?", String.class, userId);
+            userPostIds = posts != null && !posts.isEmpty() ? posts.get(0) : null;
+        } catch (Exception ignored) {}
+
+        List<Long> userRoleIds = new ArrayList<>();
+        try {
+            List<Long> rIds = jdbcTemplate.queryForList("SELECT role_id FROM system_user_role WHERE user_id = ?", Long.class, userId);
+            if (rIds != null) userRoleIds.addAll(rIds);
+        } catch (Exception ignored) {}
+
+        // 2. 依次校验映射状态与灰度覆盖范围
         List<NoticeVO> unreadList = new ArrayList<>();
         for (NoticeEntity notice : publishedNotices) {
+            if (notice.getTargetType() != null && notice.getTargetType() == 1) {
+                boolean matched = false;
+
+                // 部门匹配
+                if (userDeptId != null && cn.hutool.core.util.StrUtil.isNotBlank(notice.getTargetDepts())) {
+                    String[] targetDepts = notice.getTargetDepts().split(",");
+                    if (java.util.Arrays.asList(targetDepts).contains(userDeptId.toString())) {
+                        matched = true;
+                    }
+                }
+
+                // 角色匹配
+                if (!matched && !userRoleIds.isEmpty() && cn.hutool.core.util.StrUtil.isNotBlank(notice.getTargetRoles())) {
+                    String[] targetRoles = notice.getTargetRoles().split(",");
+                    for (String roleIdStr : targetRoles) {
+                        if (userRoleIds.contains(Long.parseLong(roleIdStr))) {
+                            matched = true;
+                            break;
+                        }
+                    }
+                }
+
+                // 岗位匹配
+                if (!matched && cn.hutool.core.util.StrUtil.isNotBlank(userPostIds) && cn.hutool.core.util.StrUtil.isNotBlank(notice.getTargetPosts())) {
+                    String[] targetPosts = notice.getTargetPosts().split(",");
+                    for (String postIdStr : targetPosts) {
+                        if (userPostIds.contains(postIdStr)) {
+                            matched = true;
+                            break;
+                        }
+                    }
+                }
+
+                // 如果不符合当前用户身份灰度范围，直接跳过
+                if (!matched) {
+                    continue;
+                }
+            }
+
             NoticeUserEntity mapping = noticeUserManager.getByNoticeAndUser(notice.getId(), userId);
             if (mapping == null || !Boolean.TRUE.equals(mapping.getIsRead())) {
                 NoticeVO vo = toNoticeVO(notice);

@@ -4,6 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.exception.ApiDisabledException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.json.JSONUtil;
+import cn.muziseo.common.cache.utils.RedisUtils;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.websocket.dto.WebSocketMessageDTO;
 import cn.muziseo.common.websocket.holder.WebSocketSessionHolder;
@@ -79,29 +80,49 @@ public class WebSocketOnlineController {
     @GetMapping("/online")
     @SaCheckPermission("monitor:websocket:query")
     public ResponseDTO<WebSocketOnlineVO> getOnlineStats() {
-        int[] stats = WebSocketSessionHolder.getConnectionStats();
-        Set<Long> onlineUserIds = WebSocketSessionHolder.getAllOnlineUserIds();
-        
+        // 分布式集群状态拉取
+        org.redisson.api.RMap<String, Integer> rMap = RedisUtils.getClient().getMap(WebSocketSessionHolder.ONLINE_USERS_KEY);
+        Set<String> keys = rMap.keySet();
+        Set<Long> onlineUserIds = new java.util.HashSet<>();
+        int totalSessionCount = 0;
+
+        if (keys != null) {
+            for (String key : keys) {
+                try {
+                    Long userId = Long.parseLong(key);
+                    onlineUserIds.add(userId);
+
+                    Integer val = rMap.get(key);
+                    if (val != null) {
+                        totalSessionCount += val;
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+
         List<OnlineUserDetailVO> details = new ArrayList<>();
         for (Long userId : onlineUserIds) {
             try {
                 UserEntity user = userService.getUserById(userId);
                 if (user != null) {
+                    Integer userSessionCount = rMap.get(userId.toString());
+                    int finalCount = userSessionCount != null ? userSessionCount : 0;
+
                     details.add(OnlineUserDetailVO.builder()
                             .userId(user.getId())
                             .username(user.getUsername())
                             .nickname(user.getNickname())
                             .loginIp(user.getLoginIp())
                             .loginDate(user.getLoginDate())
-                            .sessionCount(WebSocketSessionHolder.getUserSessions(userId).size())
+                            .sessionCount(finalCount)
                             .build());
                 }
             } catch (Exception ignored) {}
         }
 
         WebSocketOnlineVO vo = WebSocketOnlineVO.builder()
-                .userCount(stats[0])
-                .sessionCount(stats[1])
+                .userCount(onlineUserIds.size())
+                .sessionCount(totalSessionCount)
                 .onlineUserIds(onlineUserIds)
                 .userDetails(details)
                 .build();

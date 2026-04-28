@@ -43,4 +43,16 @@ public class NoticeVO {
 
     @Schema(description = "是否已读 (状态补偿)")
     private Boolean isRead;
+
+    @Schema(description = "发布范围 (0全部 1指定)")
+    private Integer targetType;
+
+    @Schema(description = "指定的部门ID (逗号分隔)")
+    private String targetDepts;
+
+    @Schema(description = "指定的角色ID (逗号分隔)")
+    private String targetRoles;
+
+    @Schema(description = "指定的岗位ID (逗号分隔)")
+    private String targetPosts;
 }

@@ -12,12 +12,12 @@ import cn.muziseo.service.system.module.notice.controller.request.NoticeUpdateRe
 import cn.muziseo.service.system.module.notice.controller.vo.NoticeVO;
 import cn.muziseo.service.system.module.notice.manager.NoticeManager;
 import cn.muziseo.service.system.module.notice.manager.NoticeUserManager;
+import cn.muziseo.service.system.enums.NoticeErrorCode;
 import cn.muziseo.service.system.module.notice.repository.entity.NoticeEntity;
 import cn.muziseo.service.system.module.notice.repository.entity.NoticeUserEntity;
 import cn.muziseo.service.system.module.notice.service.NoticeService;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
-import com.mybatisflex.core.row.Db;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -52,19 +52,6 @@ public class NoticeServiceImpl implements NoticeService {
     @Resource
     private cn.muziseo.service.system.module.notice.service.WebSocketSendService webSocketSendService;
 
-    @PostConstruct
-    public void migrateNoticeTargetColumns() {
-        log.info("[NoticeMigration] 开始检查 system_notice 灰度覆盖属性...");
-        try {
-            Db.updateBySql("ALTER TABLE system_notice ADD COLUMN IF NOT EXISTS target_type smallint DEFAULT 0");
-            Db.updateBySql("ALTER TABLE system_notice ADD COLUMN IF NOT EXISTS target_depts text");
-            Db.updateBySql("ALTER TABLE system_notice ADD COLUMN IF NOT EXISTS target_roles text");
-            Db.updateBySql("ALTER TABLE system_notice ADD COLUMN IF NOT EXISTS target_posts text");
-            log.info("[NoticeMigration] system_notice 灰度覆盖属性检查及升级成功！");
-        } catch (Exception e) {
-            log.warn("[NoticeMigration] system_notice 表属性扩展异常: {}", e.getMessage());
-        }
-    }
 
     @Override
     public PageResponse<NoticeVO> pageNotice(NoticePageRequest request) {
@@ -85,7 +72,7 @@ public class NoticeServiceImpl implements NoticeService {
     public NoticeVO getNotice(Long id) {
         NoticeEntity entity = noticeManager.getById(id);
         if (entity == null) {
-            throw new BusinessException("公告通知不存在");
+            throw new BusinessException(NoticeErrorCode.NOTICE_NOT_EXISTS);
         }
         return toNoticeVO(entity);
     }
@@ -106,7 +93,7 @@ public class NoticeServiceImpl implements NoticeService {
     public void updateNotice(NoticeUpdateRequest request) {
         NoticeEntity existing = noticeManager.getById(request.getId());
         if (existing == null) {
-            throw new BusinessException("公告通知不存在");
+            throw new BusinessException(NoticeErrorCode.NOTICE_NOT_EXISTS);
         }
         NoticeEntity entity = BeanUtil.copyProperties(request, NoticeEntity.class);
         noticeManager.updateById(entity);
@@ -124,10 +111,10 @@ public class NoticeServiceImpl implements NoticeService {
     public void publishNotice(Long id) {
         NoticeEntity notice = noticeManager.getById(id);
         if (notice == null) {
-            throw new BusinessException("公告通知不存在");
+            throw new BusinessException(NoticeErrorCode.NOTICE_NOT_EXISTS);
         }
         if (notice.getStatus() != 0) {
-            throw new BusinessException("仅正常状态下的公告支持发布");
+            throw new BusinessException(NoticeErrorCode.NOTICE_STATUS_ERROR);
         }
 
         // 构造前端适配的消息载荷

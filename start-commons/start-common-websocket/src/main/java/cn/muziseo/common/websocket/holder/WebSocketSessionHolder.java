@@ -33,9 +33,26 @@ public class WebSocketSessionHolder {
             = new ConcurrentHashMap<>();
 
     /**
-     * Redis 在线状态 Hash 键名
+     * 集群节点独立唯一标识（重启时自动隔离死连接）
      */
-    public static final String ONLINE_USERS_KEY = "ws:cluster:online_users";
+    public static final String NODE_ID = java.util.UUID.randomUUID().toString();
+
+    /**
+     * Redis 在线状态 Hash 键名前缀
+     */
+    public static final String ONLINE_USERS_PREFIX = "ws:cluster:node:";
+
+    static {
+        java.util.concurrent.Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            try {
+                String key = ONLINE_USERS_PREFIX + NODE_ID + ":sessions";
+                org.redisson.api.RMap<String, Integer> nodeMap = RedisUtils.getClient().getMap(key);
+                if (!nodeMap.isEmpty()) {
+                    nodeMap.expire(java.time.Duration.ofSeconds(60));
+                }
+            } catch (Exception ignored) {}
+        }, 20, 20, java.util.concurrent.TimeUnit.SECONDS);
+    }
 
     /**
      * 注册会话
@@ -61,11 +78,13 @@ public class WebSocketSessionHolder {
 
         WebSocketSession oldSession = userSessions.put(sessionId, session);
 
-        // 分布式集群状态同步：若为新会话，递增该用户的全局连接引用计数
+        // 分布式集群状态同步：若为新会话，递增本节点的全局连接引用计数
         if (oldSession == null) {
             try {
-                org.redisson.api.RMap<String, Integer> rMap = RedisUtils.getClient().getMap(ONLINE_USERS_KEY);
-                rMap.addAndGet(userId.toString(), 1);
+                String key = ONLINE_USERS_PREFIX + NODE_ID + ":sessions";
+                org.redisson.api.RMap<String, Integer> nodeMap = RedisUtils.getClient().getMap(key);
+                nodeMap.addAndGet(userId.toString(), 1);
+                nodeMap.expire(java.time.Duration.ofSeconds(60));
             } catch (Exception e) {
                 log.error("[WebSocket] 同步 Redis 在线状态异常 (Incr): userId={}, error={}", userId, e.getMessage());
             }
@@ -92,10 +111,11 @@ public class WebSocketSessionHolder {
         // 分布式集群状态同步：仅当该会话确实存在并被移除时，才扣减引用计数
         if (removedSession != null) {
             try {
-                org.redisson.api.RMap<String, Integer> rMap = RedisUtils.getClient().getMap(ONLINE_USERS_KEY);
-                long remaining = rMap.addAndGet(userId.toString(), -1);
+                String key = ONLINE_USERS_PREFIX + NODE_ID + ":sessions";
+                org.redisson.api.RMap<String, Integer> nodeMap = RedisUtils.getClient().getMap(key);
+                long remaining = nodeMap.addAndGet(userId.toString(), -1);
                 if (remaining <= 0) {
-                    rMap.remove(userId.toString());
+                    nodeMap.remove(userId.toString());
                 }
             } catch (Exception e) {
                 log.error("[WebSocket] 同步 Redis 在线状态异常 (Decr): userId={}, error={}", userId, e.getMessage());

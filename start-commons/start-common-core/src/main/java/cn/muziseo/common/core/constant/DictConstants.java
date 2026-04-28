@@ -54,4 +54,13 @@ public final class DictConstants {
 
     /** OSS桶权限类型 */
     public static final String SYS_OSS_ACCESS_POLICY = "sys_oss_access_policy";
+
+    /** 通知公告类型 */
+    public static final String SYS_NOTICE_TYPE = "sys_notice_type";
+
+    /** 通知公告状态 */
+    public static final String SYS_NOTICE_STATUS = "sys_notice_status";
+
+    /** 通知公告发布对象 */
+    public static final String SYS_NOTICE_TARGET_TYPE = "sys_notice_target_type";
 }

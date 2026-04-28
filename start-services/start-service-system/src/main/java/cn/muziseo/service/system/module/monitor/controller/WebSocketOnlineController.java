@@ -80,34 +80,34 @@ public class WebSocketOnlineController {
     @GetMapping("/online")
     @SaCheckPermission("monitor:websocket:query")
     public ResponseDTO<WebSocketOnlineVO> getOnlineStats() {
-        // 分布式集群状态拉取
-        org.redisson.api.RMap<String, Integer> rMap = RedisUtils.getClient().getMap(WebSocketSessionHolder.ONLINE_USERS_KEY);
-        Set<String> keys = rMap.keySet();
-        Set<Long> onlineUserIds = new java.util.HashSet<>();
+        // 1. 查找所有活跃节点的前缀键
+        Iterable<String> nodeKeys = RedisUtils.getClient().getKeys().getKeysByPattern("ws:cluster:node:*:sessions");
+        Map<Long, Integer> aggregatedCounts = new java.util.HashMap<>();
         int totalSessionCount = 0;
 
-        if (keys != null) {
-            for (String key : keys) {
+        if (nodeKeys != null) {
+            for (String key : nodeKeys) {
                 try {
-                    Long userId = Long.parseLong(key);
-                    onlineUserIds.add(userId);
-
-                    Integer val = rMap.get(key);
-                    if (val != null) {
-                        totalSessionCount += val;
+                    org.redisson.api.RMap<String, Integer> nodeMap = RedisUtils.getClient().getMap(key);
+                    for (Map.Entry<String, Integer> entry : nodeMap.entrySet()) {
+                        Long userId = Long.parseLong(entry.getKey());
+                        Integer val = entry.getValue();
+                        if (val != null && val > 0) {
+                            aggregatedCounts.merge(userId, val, Integer::sum);
+                            totalSessionCount += val;
+                        }
                     }
                 } catch (Exception ignored) {}
             }
         }
 
         List<OnlineUserDetailVO> details = new ArrayList<>();
-        for (Long userId : onlineUserIds) {
+        for (Map.Entry<Long, Integer> entry : aggregatedCounts.entrySet()) {
+            Long userId = entry.getKey();
+            int finalCount = entry.getValue();
             try {
                 UserEntity user = userService.getUserById(userId);
                 if (user != null) {
-                    Integer userSessionCount = rMap.get(userId.toString());
-                    int finalCount = userSessionCount != null ? userSessionCount : 0;
-
                     details.add(OnlineUserDetailVO.builder()
                             .userId(user.getId())
                             .username(user.getUsername())
@@ -121,9 +121,9 @@ public class WebSocketOnlineController {
         }
 
         WebSocketOnlineVO vo = WebSocketOnlineVO.builder()
-                .userCount(onlineUserIds.size())
+                .userCount(aggregatedCounts.size())
                 .sessionCount(totalSessionCount)
-                .onlineUserIds(onlineUserIds)
+                .onlineUserIds(aggregatedCounts.keySet())
                 .userDetails(details)
                 .build();
 

@@ -77,37 +77,9 @@ public class WebSocketUtils {
      * @param dto 消息传输对象
      */
     public static void publishMessage(WebSocketMessageDTO dto) {
-        // 广播模式
-        if (Boolean.TRUE.equals(dto.getBroadcast())) {
-            // 本地广播
-            WebSocketSessionHolder.getAllOnlineUserIds().forEach(userId ->
-                    sendMessage(userId, dto.getMessage()));
-
-            // 同时通过 Redis 分发到其他实例
-            RedisUtils.publish(WS_TOPIC, dto);
-            log.debug("[WebSocket] 广播消息已发布到 Redis 主题");
-            return;
-        }
-
-        // 定向模式
-        List<Long> unsentUserIds = new ArrayList<>();
-
-        for (Long userId : dto.getUserIds()) {
-            if (WebSocketSessionHolder.isUserOnline(userId)) {
-                // 本地在线，直接发送
-                sendMessage(userId, dto.getMessage());
-            } else {
-                // 本地不在线，标记待分发
-                unsentUserIds.add(userId);
-            }
-        }
-
-        // 将本地未送达的用户通过 Redis 分发到其他实例
-        if (CollUtil.isNotEmpty(unsentUserIds)) {
-            WebSocketMessageDTO redisMessage = WebSocketMessageDTO.of(unsentUserIds, dto.getMessage());
-            RedisUtils.publish(WS_TOPIC, redisMessage);
-            log.debug("[WebSocket] 跨实例分发: 目标用户={}", unsentUserIds);
-        }
+        // 统一通过 Redis Pub/Sub 进行集群分发，由各节点的订阅监听器安全落地发送，杜绝重复
+        RedisUtils.publish(WS_TOPIC, dto);
+        log.debug("[WebSocket] 消息已分发至 Redis 主题: broadcast={}", dto.getBroadcast());
     }
 
     /**

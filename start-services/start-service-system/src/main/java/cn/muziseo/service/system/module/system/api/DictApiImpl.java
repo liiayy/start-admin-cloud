@@ -1,6 +1,7 @@
-package cn.muziseo.service.system.module.dict.api;
+package cn.muziseo.service.system.module.system.api;
 
 import cn.muziseo.common.core.domain.dto.DictDataSimpleDTO;
+import cn.muziseo.service.system.module.dict.api.DictApi;
 import cn.muziseo.service.system.module.system.service.DictService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.RestController;

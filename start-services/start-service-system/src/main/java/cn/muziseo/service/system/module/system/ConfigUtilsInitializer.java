@@ -1,4 +1,4 @@
-package cn.muziseo.service.system.module.config;
+package cn.muziseo.service.system.module.system;
 
 import cn.muziseo.common.cache.config.ConfigUtils;
 import cn.muziseo.common.cache.dict.DictUtils;
@@ -9,8 +9,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 /**
  * 系统参数与字典工具类初始化器

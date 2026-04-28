@@ -1,5 +1,6 @@
-package cn.muziseo.service.system.module.config.api;
+package cn.muziseo.service.system.module.system.api;
 
+import cn.muziseo.service.system.module.config.api.ConfigApi;
 import cn.muziseo.service.system.module.system.service.SystemConfigService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.RestController;

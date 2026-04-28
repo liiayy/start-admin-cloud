@@ -295,6 +295,12 @@
                 <version>${fastexcel.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>cn.muziseo</groupId>
+                <artifactId>start-common-websocket</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
 
         </dependencies>
 

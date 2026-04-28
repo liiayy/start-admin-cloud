@@ -44,6 +44,14 @@ start:
       - bat
       - jspx
  
+# ===================================================================
+# WebSocket 实时通讯配置
+# ===================================================================
+websocket:
+  enabled: true
+  path: /admin/system/websocket
+  allowed-origins: "*"
+
 springdoc:
   api-docs:
     path: /admin/system/v3/api-docs

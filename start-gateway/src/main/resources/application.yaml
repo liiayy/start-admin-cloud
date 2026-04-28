@@ -14,6 +14,13 @@ spring:
       server:
         webflux:
           routes:
+            ## WebSocket 路由（必须在 HTTP 路由之前）
+            - id: system-websocket
+              uri: lb:ws://system-service
+              predicates:
+                - Path=/api/admin/system/websocket/**
+              filters:
+                - StripPrefix=1
             ## system-server 服务
             - id: system-admin-api
               uri: lb://system-service
@@ -77,6 +84,7 @@ gateway:
       - /api/admin/system/config/list-values
     white-prefixes:
       - /api/admin/system/oss/download
+      - /api/admin/system/websocket
       - /swagger-ui
       - /v3/api-docs
       - /actuator

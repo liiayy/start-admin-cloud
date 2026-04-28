@@ -30,6 +30,7 @@
         <module>start-common-log</module>
         <module>start-common-oss</module>
         <module>start-common-excel</module>
+        <module>start-common-websocket</module>
     </modules>
 
     <properties>

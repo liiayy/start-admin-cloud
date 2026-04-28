@@ -13,6 +13,8 @@ import cn.muziseo.service.system.module.permission.repository.mapper.MenuMapper;
 import com.mybatisflex.core.query.QueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import cn.muziseo.common.log.annotation.Log;
+import cn.muziseo.common.log.enums.BusinessType;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +52,7 @@ public class SysNoticeController {
 
     @Operation(summary = "新增公告")
     @PostMapping
+    @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @SaCheckPermission("system:notice:add")
     public ResponseDTO<Void> createNotice(@RequestBody NoticeAddRequest request) {
         noticeService.createNotice(request);
@@ -58,6 +61,7 @@ public class SysNoticeController {
 
     @Operation(summary = "更新公告")
     @PutMapping
+    @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @SaCheckPermission("system:notice:update")
     public ResponseDTO<Void> updateNotice(@RequestBody NoticeUpdateRequest request) {
         noticeService.updateNotice(request);
@@ -66,6 +70,7 @@ public class SysNoticeController {
 
     @Operation(summary = "删除公告")
     @DeleteMapping("/{id}")
+    @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @SaCheckPermission("system:notice:delete")
     public ResponseDTO<Void> deleteNotice(@PathVariable Long id) {
         noticeService.deleteNotice(id);
@@ -74,6 +79,7 @@ public class SysNoticeController {
 
     @Operation(summary = "推送发布公告")
     @PostMapping("/publish/{id}")
+    @Log(title = "通知公告", businessType = BusinessType.OTHER)
     @SaCheckPermission("system:notice:publish")
     public ResponseDTO<Void> publishNotice(@PathVariable Long id) {
         noticeService.publishNotice(id);

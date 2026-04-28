@@ -9,6 +9,8 @@ import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.websocket.dto.WebSocketMessageDTO;
 import cn.muziseo.common.websocket.holder.WebSocketSessionHolder;
 import cn.muziseo.common.websocket.utils.WebSocketUtils;
+import cn.muziseo.common.log.annotation.Log;
+import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.auth.service.UserService;
 import cn.muziseo.service.system.module.permission.repository.entity.MenuEntity;
@@ -39,41 +41,10 @@ import java.util.HashMap;
 public class WebSocketOnlineController {
 
     private final UserService userService;
-    private final MenuMapper menuMapper;
 
-    @PostConstruct
-    public void initMenu() {
-        try {
-            QueryWrapper qw = QueryWrapper.create()
-                    .eq("name", "在线用户")
-                    .eq("deleted", false);
-            long count = menuMapper.selectCountByQuery(qw);
-            if (count == 0) {
-                MenuEntity menu = MenuEntity.builder()
-                        .name("在线用户")
-                        .permission("monitor:websocket:query")
-                        .type(2)
-                        .sort(100)
-                        .parentId(100L)
-                        .path("online")
-                        .icon("i-ri:user-received-2-line")
-                        .component("system/online/index")
-                        .componentName("SystemOnline")
-                        .status(0)
-                        .visible(true)
-                        .keepAlive(true)
-                        .alwaysShow(false)
-                        .build();
-                menuMapper.insert(menu);
-            }
-        } catch (Exception e) {
-            // 忽略异常
-        }
-    }
 
-    public WebSocketOnlineController(UserService userService, MenuMapper menuMapper) {
+    public WebSocketOnlineController(UserService userService) {
         this.userService = userService;
-        this.menuMapper = menuMapper;
     }
 
     @Operation(summary = "获取在线连接统计与用户列表")
@@ -132,6 +103,7 @@ public class WebSocketOnlineController {
 
     @Operation(summary = "强制用户下线")
     @DeleteMapping("/online/{userId}")
+    @Log(title = "在线用户", businessType = BusinessType.FORCE)
     @SaCheckPermission("monitor:websocket:kickout")
     public ResponseDTO<Void> forceLogout(@PathVariable Long userId) {
         // 1. 发送 WebSocket 强制下线消息给该用户

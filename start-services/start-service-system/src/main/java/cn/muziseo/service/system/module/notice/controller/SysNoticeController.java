@@ -32,38 +32,7 @@ public class SysNoticeController {
     @Resource
     private NoticeService noticeService;
 
-    @Resource
-    private MenuMapper menuMapper;
 
-    @PostConstruct
-    public void initMenu() {
-        try {
-            QueryWrapper qw = QueryWrapper.create()
-                    .eq("name", "通知公告")
-                    .eq("deleted", false);
-            long count = menuMapper.selectCountByQuery(qw);
-            if (count == 0) {
-                MenuEntity menu = MenuEntity.builder()
-                        .name("通知公告")
-                        .permission("system:notice:query")
-                        .type(2)
-                        .sort(150)
-                        .parentId(100L)
-                        .path("notice")
-                        .icon("i-ri:notification-badge-line")
-                        .component("system/notice/index")
-                        .componentName("SystemNotice")
-                        .status(0)
-                        .visible(true)
-                        .keepAlive(true)
-                        .alwaysShow(false)
-                        .build();
-                menuMapper.insert(menu);
-            }
-        } catch (Exception e) {
-            // 忽略异常
-        }
-    }
 
     @Operation(summary = "分页获取公告列表")
     @PostMapping("/page")

@@ -2,19 +2,20 @@ package cn.muziseo.service.system.module.notice.service.impl;
 
 import cn.muziseo.common.websocket.dto.WebSocketMessageDTO;
 import cn.muziseo.common.websocket.utils.WebSocketUtils;
+import cn.muziseo.service.system.module.auth.manager.UserManager;
+import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.notice.service.WebSocketSendService;
+import com.mybatisflex.core.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
- * WebSocket 多维路由灰度分发服务实现
+ * WebSocket 多维路由灰度分发服务实现 (聚合 SQL 优化版本)
  * 
  * @author 木子软件
  */
@@ -23,49 +24,49 @@ import java.util.Set;
 public class WebSocketSendServiceImpl implements WebSocketSendService {
 
     @Resource
-    private JdbcTemplate jdbcTemplate;
+    private UserManager userManager;
 
     @Override
     public void sendToScope(List<Long> deptIds, List<Long> roleIds, List<Long> postIds, String payload) {
-        Set<Long> targetUserIds = new HashSet<>();
+        QueryWrapper qw = QueryWrapper.create().where(UserEntity::getDeleted).eq(false);
+        
+        List<String> orConditions = new ArrayList<>();
 
-        // 1. 部门筛选
+        // 1. 部门灰度范围
         if (deptIds != null && !deptIds.isEmpty()) {
-            for (Long dId : deptIds) {
-                try {
-                    List<Long> uIds = jdbcTemplate.queryForList("SELECT id FROM system_user WHERE dept_id = ? AND deleted = false", Long.class, dId);
-                    if (uIds != null) targetUserIds.addAll(uIds);
-                } catch (Exception ignored) {}
-            }
+            orConditions.add("dept_id IN (" + cn.hutool.core.util.StrUtil.join(",", deptIds) + ")");
         }
 
-        // 2. 角色筛选
+        // 2. 角色灰度范围
         if (roleIds != null && !roleIds.isEmpty()) {
-            for (Long rId : roleIds) {
-                try {
-                    List<Long> uIds = jdbcTemplate.queryForList("SELECT user_id FROM system_user_role WHERE role_id = ?", Long.class, rId);
-                    if (uIds != null) targetUserIds.addAll(uIds);
-                } catch (Exception ignored) {}
-            }
+            orConditions.add("id IN (SELECT user_id FROM system_user_role WHERE role_id IN (" + cn.hutool.core.util.StrUtil.join(",", roleIds) + "))");
         }
 
-        // 3. 岗位筛选
+        // 3. 岗位灰度范围 (适配 PostgreSQL 数组交集运算符 &&)
         if (postIds != null && !postIds.isEmpty()) {
-            for (Long pId : postIds) {
-                try {
-                    List<Long> uIds = jdbcTemplate.queryForList("SELECT id FROM system_user WHERE post_ids LIKE ? AND deleted = false", Long.class, "%" + pId + "%");
-                    if (uIds != null) targetUserIds.addAll(uIds);
-                } catch (Exception ignored) {}
-            }
+            orConditions.add("post_ids && ARRAY[" + cn.hutool.core.util.StrUtil.join(",", postIds) + "]::bigint[]");
         }
 
-        if (!targetUserIds.isEmpty()) {
-            WebSocketUtils.publishMessage(WebSocketMessageDTO.of(new ArrayList<>(targetUserIds), payload));
-            log.info("[WebSocketSend] 触发定向灰度发布成功: usersCount={}, targetScopes(depts={}, roles={}, posts={})", 
-                targetUserIds.size(), deptIds, roleIds, postIds);
-        } else {
-            log.warn("[WebSocketSend] 未匹配到任何范围内的有效接收用户: targetScopes(depts={}, roles={}, posts={})",
-                deptIds, roleIds, postIds);
+        if (orConditions.isEmpty()) {
+            log.warn("[WebSocketSend] 未匹配到任何定向条件，取消此次推送");
+            return;
         }
+
+        // 聚合 OR 语句
+        String aggregatedOrSql = "(" + cn.hutool.core.util.StrUtil.join(" OR ", orConditions) + ")";
+        qw.and(aggregatedOrSql);
+
+        List<UserEntity> users = userManager.list(qw);
+        if (users == null || users.isEmpty()) {
+            log.warn("[WebSocketSend] 未匹配到满足条件的灰度有效用户范围");
+            return;
+        }
+
+        List<Long> targetUserIds = users.stream()
+            .map(UserEntity::getId)
+            .collect(Collectors.toList());
+
+        WebSocketUtils.publishMessage(WebSocketMessageDTO.of(targetUserIds, payload));
+        log.info("[WebSocketSend] 定向推送成功: 发送用户数={}, 发送载荷={}", targetUserIds.size(), payload);
     }
 }

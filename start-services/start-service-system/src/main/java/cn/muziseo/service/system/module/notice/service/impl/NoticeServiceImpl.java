@@ -44,7 +44,10 @@ public class NoticeServiceImpl implements NoticeService {
     private NoticeUserManager noticeUserManager;
 
     @Resource
-    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+    private cn.muziseo.service.system.module.auth.manager.UserManager userManager;
+
+    @Resource
+    private cn.muziseo.service.system.module.auth.manager.UserRoleManager userRoleManager;
 
     @Resource
     private cn.muziseo.service.system.module.notice.service.WebSocketSendService webSocketSendService;
@@ -183,19 +186,26 @@ public class NoticeServiceImpl implements NoticeService {
 
         // 提取当前用户的身份标签
         Long userDeptId = null;
-        String userPostIds = null;
+        List<Long> userPostIds = new ArrayList<>();
         try {
-            List<Long> deptIds = jdbcTemplate.queryForList("SELECT dept_id FROM system_user WHERE id = ?", Long.class, userId);
-            userDeptId = deptIds != null && !deptIds.isEmpty() ? deptIds.get(0) : null;
-
-            List<String> posts = jdbcTemplate.queryForList("SELECT post_ids FROM system_user WHERE id = ?", String.class, userId);
-            userPostIds = posts != null && !posts.isEmpty() ? posts.get(0) : null;
+            cn.muziseo.service.system.module.auth.repository.entity.UserEntity user = userManager.getById(userId);
+            if (user != null) {
+                userDeptId = user.getDeptId();
+                if (user.getPostIds() != null) {
+                    userPostIds.addAll(user.getPostIds());
+                }
+            }
         } catch (Exception ignored) {}
 
         List<Long> userRoleIds = new ArrayList<>();
         try {
-            List<Long> rIds = jdbcTemplate.queryForList("SELECT role_id FROM system_user_role WHERE user_id = ?", Long.class, userId);
-            if (rIds != null) userRoleIds.addAll(rIds);
+            List<cn.muziseo.service.system.module.auth.repository.entity.UserRoleEntity> relations = userRoleManager.list(
+                com.mybatisflex.core.query.QueryWrapper.create()
+                    .where(cn.muziseo.service.system.module.auth.repository.entity.UserRoleEntity::getUserId).eq(userId)
+            );
+            if (relations != null) {
+                relations.forEach(r -> userRoleIds.add(r.getRoleId()));
+            }
         } catch (Exception ignored) {}
 
         // 2. 依次校验映射状态与灰度覆盖范围
@@ -224,10 +234,10 @@ public class NoticeServiceImpl implements NoticeService {
                 }
 
                 // 岗位匹配
-                if (!matched && cn.hutool.core.util.StrUtil.isNotBlank(userPostIds) && cn.hutool.core.util.StrUtil.isNotBlank(notice.getTargetPosts())) {
+                if (!matched && !userPostIds.isEmpty() && cn.hutool.core.util.StrUtil.isNotBlank(notice.getTargetPosts())) {
                     String[] targetPosts = notice.getTargetPosts().split(",");
                     for (String postIdStr : targetPosts) {
-                        if (userPostIds.contains(postIdStr)) {
+                        if (userPostIds.contains(Long.parseLong(postIdStr))) {
                             matched = true;
                             break;
                         }

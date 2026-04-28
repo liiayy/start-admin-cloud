@@ -14,6 +14,7 @@ import cn.muziseo.service.system.module.organization.manager.PostManager;
 import cn.muziseo.service.system.module.organization.repository.entity.DeptEntity;
 import cn.muziseo.service.system.module.organization.repository.entity.PostEntity;
 import cn.muziseo.service.system.module.organization.service.PostService;
+import cn.muziseo.service.system.module.organization.convert.PostConverter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,10 +41,22 @@ public class PostServiceImpl implements PostService {
     @Resource
     private UserManager userManager;
 
+    @Resource
+    private PostConverter postConverter;
+
     @Override
     public List<PostVO> list() {
         return postManager.listAll().stream()
-                .map(this::toPostVO)
+                .map(post -> {
+                    PostVO vo = postConverter.toVO(post);
+                    if (post.getDeptId() != null) {
+                        DeptEntity dept = deptManager.getById(post.getDeptId());
+                        if (dept != null) {
+                            vo.setDeptName(dept.getName());
+                        }
+                    }
+                    return vo;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -58,7 +71,16 @@ public class PostServiceImpl implements PostService {
 
         var page = postManager.pagePost(request, deptIds);
         List<PostVO> voList = page.getRecords().stream()
-                .map(this::toPostVO)
+                .map(post -> {
+                    PostVO vo = postConverter.toVO(post);
+                    if (post.getDeptId() != null) {
+                        DeptEntity dept = deptManager.getById(post.getDeptId());
+                        if (dept != null) {
+                            vo.setDeptName(dept.getName());
+                        }
+                    }
+                    return vo;
+                })
                 .collect(Collectors.toList());
 
         PageResponse<PostVO> response = new PageResponse<>();
@@ -73,7 +95,14 @@ public class PostServiceImpl implements PostService {
         if (post == null) {
             throw new BusinessException(PostErrorCode.POST_NOT_EXISTS);
         }
-        return toPostVO(post);
+        PostVO vo = postConverter.toVO(post);
+        if (post.getDeptId() != null) {
+            DeptEntity dept = deptManager.getById(post.getDeptId());
+            if (dept != null) {
+                vo.setDeptName(dept.getName());
+            }
+        }
+        return vo;
     }
 
     @Override
@@ -84,7 +113,7 @@ public class PostServiceImpl implements PostService {
             throw new BusinessException(PostErrorCode.POST_CODE_EXISTS);
         }
 
-        PostEntity entity = BeanUtil.copyProperties(request, PostEntity.class);
+        PostEntity entity = postConverter.toEntity(request);
         if (entity.getStatus() == null) {
             entity.setStatus(0);
         }
@@ -105,7 +134,7 @@ public class PostServiceImpl implements PostService {
             throw new BusinessException(PostErrorCode.POST_CODE_EXISTS);
         }
 
-        PostEntity entity = BeanUtil.copyProperties(request, PostEntity.class);
+        PostEntity entity = postConverter.toEntity(request);
         entity.setId(id);
         postManager.updateById(entity);
         log.info("更新岗位成功: id={}", id);
@@ -140,29 +169,5 @@ public class PostServiceImpl implements PostService {
         entity.setStatus(status);
         postManager.updateById(entity);
         log.info("更新岗位状态: id={}, status={}", id, status);
-    }
-
-    /**
-     * Entity → PostVO
-     */
-    private PostVO toPostVO(PostEntity entity) {
-        String deptName = null;
-        if (entity.getDeptId() != null) {
-            DeptEntity dept = deptManager.getById(entity.getDeptId());
-            if (dept != null) {
-                deptName = dept.getName();
-            }
-        }
-        return PostVO.builder()
-                .id(entity.getId())
-                .deptId(entity.getDeptId())
-                .deptName(deptName)
-                .code(entity.getCode())
-                .name(entity.getName())
-                .sort(entity.getSort())
-                .status(entity.getStatus())
-                .remark(entity.getRemark())
-                .createTime(entity.getCreateTime())
-                .build();
     }
 }

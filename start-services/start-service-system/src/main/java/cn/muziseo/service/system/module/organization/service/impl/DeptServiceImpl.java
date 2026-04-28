@@ -11,6 +11,7 @@ import cn.muziseo.service.system.module.organization.manager.DeptManager;
 import cn.muziseo.service.system.module.organization.manager.PostManager;
 import cn.muziseo.service.system.module.organization.repository.entity.DeptEntity;
 import cn.muziseo.service.system.module.organization.service.DeptService;
+import cn.muziseo.service.system.module.organization.convert.DeptConverter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,10 +39,13 @@ public class DeptServiceImpl implements DeptService {
     @Resource
     private PostManager postManager;
 
+    @Resource
+    private DeptConverter deptConverter;
+
     @Override
     public List<DeptVO> list() {
         return deptManager.listAll().stream()
-                .map(this::toDeptVO)
+                .map(deptConverter::toVO)
                 .collect(Collectors.toList());
     }
 
@@ -57,7 +61,7 @@ public class DeptServiceImpl implements DeptService {
         if (dept == null) {
             throw new BusinessException(DeptErrorCode.DEPT_NOT_EXISTS);
         }
-        return toDeptVO(dept);
+        return deptConverter.toVO(dept);
     }
 
     @Override
@@ -74,7 +78,7 @@ public class DeptServiceImpl implements DeptService {
             throw new BusinessException(DeptErrorCode.DEPT_NOT_EXISTS, "父部门不存在");
         }
 
-        DeptEntity entity = BeanUtil.copyProperties(request, DeptEntity.class);
+        DeptEntity entity = deptConverter.toEntity(request);
         if (entity.getParentId() == null) {
             entity.setParentId(0L);
         }
@@ -107,7 +111,7 @@ public class DeptServiceImpl implements DeptService {
             throw new BusinessException(DeptErrorCode.DEPT_NOT_EXISTS, "父部门不存在");
         }
 
-        DeptEntity entity = BeanUtil.copyProperties(request, DeptEntity.class);
+        DeptEntity entity = deptConverter.toEntity(request);
         entity.setId(id);
         deptManager.updateById(entity);
         log.info("更新部门成功: id={}", id);
@@ -155,24 +159,6 @@ public class DeptServiceImpl implements DeptService {
     }
 
     /**
-     * Entity → DeptVO
-     */
-    private DeptVO toDeptVO(DeptEntity entity) {
-        return DeptVO.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .parentId(entity.getParentId())
-                .sort(entity.getSort())
-                .leaderUserId(entity.getLeaderUserId())
-                .phone(entity.getPhone())
-                .email(entity.getEmail())
-                .status(entity.getStatus())
-                .remark(entity.getRemark())
-                .createTime(entity.getCreateTime())
-                .build();
-    }
-
-    /**
      * 构建部门树 (O(N) 优化版)
      */
     private List<DeptTreeVO> buildTree(List<DeptEntity> allDepts, Long rootId) {
@@ -182,18 +168,7 @@ public class DeptServiceImpl implements DeptService {
 
         // 按父 ID 分组转换为 VO
         Map<Long, List<DeptTreeVO>> parentMap = allDepts.stream()
-                .map(d -> DeptTreeVO.builder()
-                        .id(d.getId())
-                        .name(d.getName())
-                        .parentId(d.getParentId())
-                        .sort(d.getSort())
-                        .leaderUserId(d.getLeaderUserId())
-                        .phone(d.getPhone())
-                        .email(d.getEmail())
-                        .status(d.getStatus())
-                        .remark(d.getRemark())
-                        .createTime(d.getCreateTime())
-                        .build())
+                .map(deptConverter::toTreeVO)
                 .collect(Collectors.groupingBy(DeptTreeVO::getParentId));
 
         // 构建嵌套结构

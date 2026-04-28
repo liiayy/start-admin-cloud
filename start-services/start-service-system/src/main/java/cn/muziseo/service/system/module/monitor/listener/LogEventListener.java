@@ -5,6 +5,7 @@ import cn.muziseo.common.core.event.LoginLogEvent;
 import cn.muziseo.common.core.event.OperLogEvent;
 import cn.muziseo.service.system.module.monitor.repository.entity.LoginLogEntity;
 import cn.muziseo.service.system.module.monitor.repository.entity.OperLogEntity;
+import cn.muziseo.service.system.module.monitor.convert.LogConverter;
 import cn.muziseo.service.system.module.monitor.repository.mapper.LoginLogMapper;
 import cn.muziseo.service.system.module.monitor.repository.mapper.OperLogMapper;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class LogEventListener {
 
     private final OperLogMapper operLogMapper;
     private final LoginLogMapper loginLogMapper;
+    private final LogConverter logConverter;
 
     /**
      * 保存操作日志
@@ -33,7 +35,7 @@ public class LogEventListener {
         log.info("收到操作日志事件：{}", event.getTitle());
         try {
             OperLogEntity entity = new OperLogEntity();
-            BeanUtil.copyProperties(event, entity);
+            logConverter.copyToEntity(event, entity);
             // FIXME: id 这里需要全局唯一ID生成器，如果数据库没有自动递增
             // 由于项目配置可能使用了分布式ID，这里我们暂且让数据库处理或后续接入Snowflake
             operLogMapper.insert(entity);
@@ -51,7 +53,7 @@ public class LogEventListener {
         log.info("收到登录日志事件：{}", event.getUsername());
         try {
             LoginLogEntity entity = new LoginLogEntity();
-            BeanUtil.copyProperties(event, entity);
+            logConverter.copyToEntity(event, entity);
             loginLogMapper.insert(entity);
         } catch (Exception e) {
             log.error("保存登录日志失败: {}", e.getMessage(), e);

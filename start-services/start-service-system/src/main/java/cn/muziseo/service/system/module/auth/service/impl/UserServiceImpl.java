@@ -24,6 +24,7 @@ import cn.muziseo.service.system.module.organization.manager.DeptManager;
 import cn.muziseo.service.system.module.organization.repository.entity.DeptEntity;
 import cn.muziseo.service.system.module.permission.service.MenuService;
 import cn.muziseo.service.system.module.permission.service.RoleService;
+import cn.muziseo.service.system.module.auth.convert.UserConverter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private SaSessionRefreshService saSessionRefreshService;
+
+    @Resource
+    private UserConverter userConverter;
 
     @Override
     public UserEntity getByUsername(String username) {
@@ -122,7 +126,7 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(UserErrorCode.EMAIL_EXISTS);
         }
 
-        UserEntity entity = BeanUtil.copyProperties(request, UserEntity.class);
+        UserEntity entity = userConverter.toEntity(request);
         entity.setPassword(PasswordUtils.encode(request.getPassword()));
         if (entity.getStatus() == null) {
             entity.setStatus(0);
@@ -264,13 +268,13 @@ public class UserServiceImpl implements UserService {
             try {
                 UserEntity existing = userManager.getByUsername(user.getUsername());
                 if (existing == null) {
-                    UserEntity entity = BeanUtil.copyProperties(user, UserEntity.class);
+                    UserEntity entity = userConverter.toEntity(user);
                     entity.setPassword(PasswordUtils.encode(initPassword));
                     resolveDept(entity, user.getDeptName(), deptMap);
                     userManager.save(entity);
                     successCount++;
                 } else if (updateSupport) {
-                    BeanUtil.copyProperties(user, existing);
+                    userConverter.copyToEntity(user, existing);
                     resolveDept(existing, user.getDeptName(), deptMap);
                     userManager.updateById(existing);
                     successCount++;

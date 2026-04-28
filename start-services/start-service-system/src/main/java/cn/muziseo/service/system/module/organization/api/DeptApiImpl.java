@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.service.system.module.organization.api.dto.DeptRemoteDTO;
 import cn.muziseo.service.system.module.organization.manager.DeptManager;
 import cn.muziseo.service.system.module.organization.repository.entity.DeptEntity;
+import cn.muziseo.service.system.module.organization.convert.DeptConverter;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,10 +22,13 @@ public class DeptApiImpl implements DeptApi {
     @Resource
     private DeptManager deptManager;
 
+    @Resource
+    private DeptConverter deptConverter;
+
     @Override
     public DeptRemoteDTO getDeptById(Long id) {
         DeptEntity dept = deptManager.getById(id);
-        return dept != null ? BeanUtil.copyProperties(dept, DeptRemoteDTO.class) : null;
+        return dept != null ? deptConverter.toRemoteDTO(dept) : null;
     }
 
     @Override
@@ -34,7 +38,7 @@ public class DeptApiImpl implements DeptApi {
         }
         List<DeptEntity> depts = deptManager.listByIds(ids);
         return depts.stream()
-                .map(dept -> BeanUtil.copyProperties(dept, DeptRemoteDTO.class))
+                .map(deptConverter::toRemoteDTO)
                 .collect(Collectors.toList());
     }
 }

@@ -17,6 +17,10 @@ import cn.muziseo.service.system.module.notice.repository.entity.NoticeEntity;
 import cn.muziseo.service.system.module.notice.repository.entity.NoticeUserEntity;
 import cn.muziseo.service.system.module.notice.service.NoticeService;
 import com.mybatisflex.core.paginate.Page;
+import cn.muziseo.service.system.module.auth.manager.UserManager;
+import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
+import cn.muziseo.service.system.module.notice.service.WebSocketSendService;
+import cn.muziseo.service.system.module.notice.convert.NoticeConverter;
 import com.mybatisflex.core.query.QueryWrapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -44,13 +48,16 @@ public class NoticeServiceImpl implements NoticeService {
     private NoticeUserManager noticeUserManager;
 
     @Resource
-    private cn.muziseo.service.system.module.auth.manager.UserManager userManager;
+    private UserManager userManager;
 
     @Resource
-    private cn.muziseo.service.system.module.auth.manager.UserRoleManager userRoleManager;
+    private UserRoleManager userRoleManager;
 
     @Resource
-    private cn.muziseo.service.system.module.notice.service.WebSocketSendService webSocketSendService;
+    private WebSocketSendService webSocketSendService;
+
+    @Resource
+    private NoticeConverter noticeConverter;
 
 
     @Override
@@ -80,7 +87,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createNotice(NoticeAddRequest request) {
-        NoticeEntity entity = BeanUtil.copyProperties(request, NoticeEntity.class);
+        NoticeEntity entity = noticeConverter.toEntity(request);
         if (entity.getStatus() == null) {
             entity.setStatus(0); // 默认正常发布
         }
@@ -95,7 +102,7 @@ public class NoticeServiceImpl implements NoticeService {
         if (existing == null) {
             throw new BusinessException(NoticeErrorCode.NOTICE_NOT_EXISTS);
         }
-        NoticeEntity entity = BeanUtil.copyProperties(request, NoticeEntity.class);
+        NoticeEntity entity = noticeConverter.toEntity(request);
         noticeManager.updateById(entity);
         log.info("更新公告成功: id={}", request.getId());
     }
@@ -257,7 +264,7 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     private NoticeVO toNoticeVO(NoticeEntity entity) {
-        NoticeVO vo = BeanUtil.copyProperties(entity, NoticeVO.class);
+        NoticeVO vo = noticeConverter.toVO(entity);
         // 判定当前用户读取状态
         try {
             Long userId = StpUtil.getLoginIdAsLong();

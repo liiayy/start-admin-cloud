@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.domain.dto.DataScopeInfo;
 import cn.muziseo.service.system.datascope.DataScopeService;
 import cn.muziseo.service.system.module.auth.api.dto.DataScopeRemoteDTO;
+import cn.muziseo.service.system.module.auth.convert.UserConverter;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,9 +19,12 @@ public class PermissionApiImpl implements PermissionApi {
     @Resource
     private DataScopeService dataScopeService;
 
+    @Resource
+    private UserConverter userConverter;
+
     @Override
     public DataScopeRemoteDTO getDataScope(Long userId) {
         DataScopeInfo info = dataScopeService.getDataScopeInfo(userId);
-        return BeanUtil.copyProperties(info, DataScopeRemoteDTO.class);
+        return userConverter.toRemoteDTO(info);
     }
 }

@@ -16,6 +16,7 @@ import cn.muziseo.service.system.module.permission.manager.RoleMenuManager;
 import cn.muziseo.service.system.module.permission.repository.entity.RoleEntity;
 import cn.muziseo.service.system.module.permission.repository.entity.RoleMenuEntity;
 import cn.muziseo.service.system.module.permission.service.RoleService;
+import cn.muziseo.service.system.module.permission.convert.RoleConverter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,9 @@ public class RoleServiceImpl implements RoleService {
     @Resource
     private SaSessionRefreshService saSessionRefreshService;
 
+    @Resource
+    private RoleConverter roleConverter;
+
     @Override
     public List<RoleEntity> getRolesByUserId(Long userId) {
         List<Long> roleIds = userRoleManager.getRoleIdsByUserId(userId);
@@ -58,7 +62,7 @@ public class RoleServiceImpl implements RoleService {
     public PageResponse<RoleVO> pageRole(RolePageRequest request) {
         var page = roleManager.pageRole(request);
         List<RoleVO> voList = page.getRecords().stream()
-                .map(this::toRoleVO)
+                .map(roleConverter::toVO)
                 .collect(Collectors.toList());
 
         PageResponse<RoleVO> response = new PageResponse<>();
@@ -73,7 +77,7 @@ public class RoleServiceImpl implements RoleService {
         if (entity == null) {
             throw new BusinessException(RoleErrorCode.ROLE_NOT_EXISTS);
         }
-        return toRoleVO(entity);
+        return roleConverter.toVO(entity);
     }
 
     @Override
@@ -84,7 +88,7 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessException(RoleErrorCode.ROLE_CODE_EXISTS);
         }
 
-        RoleEntity entity = BeanUtil.copyProperties(request, RoleEntity.class);
+        RoleEntity entity = roleConverter.toEntity(request);
         if (entity.getStatus() == null) {
             entity.setStatus(0);
         }
@@ -105,7 +109,7 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessException(RoleErrorCode.ROLE_CODE_EXISTS);
         }
 
-        RoleEntity entity = BeanUtil.copyProperties(request, RoleEntity.class);
+        RoleEntity entity = roleConverter.toEntity(request);
         roleManager.updateById(entity);
 
         // 刷新拥有该角色的用户 Session 和 数据权限缓存
@@ -194,20 +198,5 @@ public class RoleServiceImpl implements RoleService {
             saSessionRefreshService.refreshUserSessions(userIds);
             userIds.forEach(DataScopeCacheManager::evictCache);
         }
-    }
-
-    private RoleVO toRoleVO(RoleEntity entity) {
-        return RoleVO.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .code(entity.getCode())
-                .sort(entity.getSort())
-                .status(entity.getStatus())
-                .dataScope(entity.getDataScope())
-                .dataScopeDeptIds(entity.getDataScopeDeptIds())
-                .type(entity.getType())
-                .remark(entity.getRemark())
-                .createTime(entity.getCreateTime())
-                .build();
     }
 }

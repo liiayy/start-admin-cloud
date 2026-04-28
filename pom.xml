@@ -27,6 +27,7 @@
         <spring-boot.version>3.5.9</spring-boot.version>
         <lombok.version>1.18.40</lombok.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
 
 
         <!-- 插件版本 -->
@@ -155,6 +156,11 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok-mapstruct-binding</artifactId> <!-- 让Lombok和MapStruct协同工作 -->
                             <version>${mapstruct-plus.lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.6.3</version>
                         </path>
                     </annotationProcessorPaths>
                     <!-- 编译器参数：保留方法参数名信息，这对Spring MVC等框架非常重要 -->

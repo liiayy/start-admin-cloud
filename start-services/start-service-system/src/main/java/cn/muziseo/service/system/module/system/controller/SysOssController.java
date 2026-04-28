@@ -7,6 +7,7 @@ import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.service.system.module.system.controller.vo.SysOssVO;
+import cn.muziseo.service.system.module.system.convert.SysOssConverter;
 import cn.muziseo.service.system.module.system.repository.entity.SysOssEntity;
 import cn.muziseo.service.system.module.system.service.SysOssService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +54,9 @@ public class SysOssController {
     @Resource
     private SysOssConfigService sysOssConfigService;
 
+    @Resource
+    private SysOssConverter sysOssConverter;
+
     @Operation(summary = "上传文件")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SaCheckPermission("system:oss:upload")
@@ -64,16 +68,7 @@ public class SysOssController {
         log.info("开始上传文件: originalName={}, module={}", file.getOriginalFilename(), moduleName);
         SysOssEntity oss = sysOssService.upload(file, moduleName);
         
-        SysOssVO vo = SysOssVO.builder()
-                .id(oss.getId())
-                .fileName(oss.getFileName())
-                .originalName(oss.getOriginalName())
-                .fileSuffix(oss.getFileSuffix())
-                .url(oss.getUrl())
-                .size(oss.getSize())
-                .contentType(oss.getContentType())
-                .createTime(oss.getCreateTime())
-                .build();
+        SysOssVO vo = sysOssConverter.toVO(oss);
         
         return ResponseDTO.success(vo);
     }
@@ -112,17 +107,9 @@ public class SysOssController {
         voPage.setPageSize(page.getPageSize());
         voPage.setTotalRow(page.getTotalRow());
         
-        voPage.setRecords(page.getRecords().stream().map(oss -> SysOssVO.builder()
-                .id(oss.getId())
-                .fileName(oss.getFileName())
-                .originalName(oss.getOriginalName())
-                .fileSuffix(oss.getFileSuffix())
-                .url(oss.getUrl())
-                .size(oss.getSize())
-                .service(oss.getService())
-                .contentType(oss.getContentType())
-                .createTime(oss.getCreateTime())
-                .build()).collect(Collectors.toList()));
+        voPage.setRecords(page.getRecords().stream()
+                .map(sysOssConverter::toVO)
+                .collect(Collectors.toList()));
 
         return ResponseDTO.success(voPage);
     }

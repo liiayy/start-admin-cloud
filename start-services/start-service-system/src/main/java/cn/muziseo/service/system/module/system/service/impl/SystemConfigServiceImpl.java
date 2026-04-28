@@ -8,6 +8,7 @@ import cn.muziseo.service.system.enums.SystemErrorCode;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigAddRequest;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigPageRequest;
 import cn.muziseo.service.system.module.system.controller.vo.SystemConfigVO;
+import cn.muziseo.service.system.module.system.convert.SystemConfigConverter;
 import cn.muziseo.service.system.module.system.manager.SystemConfigManager;
 import cn.muziseo.service.system.module.system.repository.entity.SystemConfigEntity;
 import cn.muziseo.service.system.module.system.service.SystemConfigService;
@@ -30,18 +31,21 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     @Resource
     private SystemConfigManager systemConfigManager;
 
+    @Resource
+    private SystemConfigConverter systemConfigConverter;
+
     @Override
     public PageResponse<SystemConfigVO> pageConfig(SystemConfigPageRequest request) {
         var page = systemConfigManager.pageConfig(request);
         List<SystemConfigVO> voList = page.getRecords().stream()
-                .map(this::toConfigVO)
+                .map(systemConfigConverter::toVO)
                 .toList();
         return new PageResponse<>(voList, (int) page.getTotalRow());
     }
 
     @Override
     public SystemConfigVO getConfigById(Long id) {
-        return toConfigVO(systemConfigManager.getById(id));
+        return systemConfigConverter.toVO(systemConfigManager.getById(id));
     }
 
     @Override
@@ -75,7 +79,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             throw new BusinessException(SystemErrorCode.CONFIG_KEY_EXISTS);
         }
 
-        SystemConfigEntity entity = BeanUtil.copyProperties(request, SystemConfigEntity.class);
+        SystemConfigEntity entity = systemConfigConverter.toEntity(request);
         if (entity.getBuiltin() == null) {
             entity.setBuiltin("N");
         }
@@ -106,7 +110,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             throw new BusinessException(SystemErrorCode.CONFIG_KEY_EXISTS);
         }
 
-        SystemConfigEntity entity = BeanUtil.copyProperties(request, SystemConfigEntity.class);
+        SystemConfigEntity entity = systemConfigConverter.toEntity(request);
         entity.setId(id);
         // 保留原有的 builtin 标记，不允许通过编辑修改
         entity.setBuiltin(existing.getBuiltin());
@@ -133,24 +137,5 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         systemConfigManager.removeById(id);
         // 清除缓存
         ConfigCacheManager.evictCache(existing.getConfigKey());
-    }
-
-    /**
-     * Entity 转 VO
-     */
-    private SystemConfigVO toConfigVO(SystemConfigEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        return SystemConfigVO.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .configKey(entity.getConfigKey())
-                .configValue(entity.getConfigValue())
-                .builtin(entity.getBuiltin())
-                .isPublic(entity.getIsPublic())
-                .remark(entity.getRemark())
-                .createTime(entity.getCreateTime())
-                .build();
     }
 }

@@ -4,6 +4,9 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
+import cn.muziseo.service.system.module.system.controller.request.SysOssConfigAddRequest;
+import cn.muziseo.service.system.module.system.controller.vo.SysOssConfigVO;
+import cn.muziseo.service.system.module.system.convert.SysOssConfigConverter;
 import cn.muziseo.service.system.module.system.repository.entity.SysOssConfigEntity;
 import cn.muziseo.service.system.module.system.service.SysOssConfigService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,18 +32,23 @@ public class SysOssConfigController {
     @Resource
     private SysOssConfigService sysOssConfigService;
 
+    @Resource
+    private SysOssConfigConverter sysOssConfigConverter;
+
     @Operation(summary = "查询所有配置")
     @GetMapping("/list")
     @SaCheckPermission("system:oss:config")
-    public ResponseDTO<List<SysOssConfigEntity>> list() {
-        return ResponseDTO.success(sysOssConfigService.listAll());
+    public ResponseDTO<List<SysOssConfigVO>> list() {
+        List<SysOssConfigEntity> entities = sysOssConfigService.listAll();
+        return ResponseDTO.success(entities.stream().map(sysOssConfigConverter::toVO).toList());
     }
 
     @Operation(summary = "保存/修改配置")
     @PostMapping("/save")
     @SaCheckPermission("system:oss:config:add")
     @Log(title = "OSS配置", businessType = BusinessType.UPDATE)
-    public ResponseDTO<Void> save(@Valid @RequestBody SysOssConfigEntity entity) {
+    public ResponseDTO<Void> save(@Valid @RequestBody SysOssConfigAddRequest request) {
+        SysOssConfigEntity entity = sysOssConfigConverter.toEntity(request);
         sysOssConfigService.saveConfig(entity);
         return ResponseDTO.success();
     }
@@ -66,7 +74,8 @@ public class SysOssConfigController {
     @Operation(summary = "测试配置是否可用")
     @PostMapping("/test")
     @SaCheckPermission("system:oss:config:add")
-    public ResponseDTO<Void> test(@RequestBody SysOssConfigEntity entity) {
+    public ResponseDTO<Void> test(@RequestBody SysOssConfigAddRequest request) {
+        SysOssConfigEntity entity = sysOssConfigConverter.toEntity(request);
         sysOssConfigService.testConfig(entity);
         return ResponseDTO.success();
     }

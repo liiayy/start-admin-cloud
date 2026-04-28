@@ -7,6 +7,7 @@ import cn.muziseo.service.system.enums.DictErrorCode;
 import cn.muziseo.service.system.module.system.controller.request.DictTypeAddRequest;
 import cn.muziseo.service.system.module.system.controller.request.DictTypePageRequest;
 import cn.muziseo.service.system.module.system.controller.vo.DictTypeVO;
+import cn.muziseo.service.system.module.system.convert.DictTypeConverter;
 import cn.muziseo.service.system.module.system.manager.DictManager;
 import cn.muziseo.service.system.module.system.manager.DictTypeManager;
 import cn.muziseo.service.system.module.system.repository.entity.DictTypeEntity;
@@ -34,10 +35,13 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Resource
     private DictManager dictManager;
 
+    @Resource
+    private DictTypeConverter dictTypeConverter;
+
     @Override
     public List<DictTypeVO> list() {
         return dictTypeManager.listAll().stream()
-                .map(this::toDictTypeVO)
+                .map(dictTypeConverter::toVO)
                 .toList();
     }
 
@@ -45,7 +49,7 @@ public class DictTypeServiceImpl implements DictTypeService {
     public PageResponse<DictTypeVO> pageDictType(DictTypePageRequest request) {
         var page = dictTypeManager.pageDictType(request);
         List<DictTypeVO> voList = page.getRecords().stream()
-                .map(this::toDictTypeVO)
+                .map(dictTypeConverter::toVO)
                 .toList();
         return new PageResponse<>(voList, (int) page.getTotalRow());
     }
@@ -53,7 +57,7 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Override
     public DictTypeVO getDictTypeById(Long id) {
         DictTypeEntity entity = dictTypeManager.getById(id);
-        return toDictTypeVO(entity);
+        return dictTypeConverter.toVO(entity);
     }
 
     @Override
@@ -64,7 +68,7 @@ public class DictTypeServiceImpl implements DictTypeService {
             throw new BusinessException(DictErrorCode.DICT_TYPE_CODE_EXISTS);
         }
 
-        DictTypeEntity entity = BeanUtil.copyProperties(request, DictTypeEntity.class);
+        DictTypeEntity entity = dictTypeConverter.toEntity(request);
         if (entity.getStatus() == null) {
             entity.setStatus(0);
         }
@@ -85,7 +89,7 @@ public class DictTypeServiceImpl implements DictTypeService {
             throw new BusinessException(DictErrorCode.DICT_TYPE_CODE_EXISTS);
         }
 
-        DictTypeEntity entity = BeanUtil.copyProperties(request, DictTypeEntity.class);
+        DictTypeEntity entity = dictTypeConverter.toEntity(request);
         entity.setId(id);
         dictTypeManager.updateById(entity);
         log.info("更新字典类型成功: id={}", id);
@@ -106,22 +110,5 @@ public class DictTypeServiceImpl implements DictTypeService {
 
         dictTypeManager.removeById(id);
         log.info("删除字典类型成功: id={}", id);
-    }
-
-    /**
-     * Entity 转 VO
-     */
-    private DictTypeVO toDictTypeVO(DictTypeEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        return DictTypeVO.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .type(entity.getType())
-                .status(entity.getStatus())
-                .remark(entity.getRemark())
-                .createTime(entity.getCreateTime())
-                .build();
     }
 }

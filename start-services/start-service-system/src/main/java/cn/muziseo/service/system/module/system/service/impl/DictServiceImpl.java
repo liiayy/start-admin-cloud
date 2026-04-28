@@ -9,6 +9,7 @@ import cn.muziseo.service.system.enums.DictErrorCode;
 import cn.muziseo.service.system.module.system.controller.request.DictDataAddRequest;
 import cn.muziseo.service.system.module.system.controller.request.DictDataPageRequest;
 import cn.muziseo.service.system.module.system.controller.vo.DictDataVO;
+import cn.muziseo.service.system.module.system.convert.DictConverter;
 import cn.muziseo.service.system.module.system.manager.DictManager;
 import cn.muziseo.service.system.module.system.manager.DictTypeManager;
 import cn.muziseo.service.system.module.system.repository.entity.DictEntity;
@@ -36,17 +37,20 @@ public class DictServiceImpl implements DictService {
     @Resource
     private DictTypeManager dictTypeManager;
 
+    @Resource
+    private DictConverter dictConverter;
+
     @Override
     public List<DictDataVO> listByDictType(String dictType) {
         return dictManager.listByDictType(dictType).stream()
-                .map(this::toDictDataVO)
+                .map(dictConverter::toVO)
                 .toList();
     }
 
     @Override
     public List<DictDataSimpleDTO> listSimpleByDictType(String dictType) {
         return dictManager.listByDictType(dictType).stream()
-                .map(this::toDictDataSimpleDTO)
+                .map(dictConverter::toSimpleDTO)
                 .toList();
     }
 
@@ -54,7 +58,7 @@ public class DictServiceImpl implements DictService {
     public PageResponse<DictDataVO> pageDictData(DictDataPageRequest request) {
         var page = dictManager.pageDictData(request);
         List<DictDataVO> voList = page.getRecords().stream()
-                .map(this::toDictDataVO)
+                .map(dictConverter::toVO)
                 .toList();
         return new PageResponse<>(voList, (int) page.getTotalRow());
     }
@@ -62,7 +66,7 @@ public class DictServiceImpl implements DictService {
     @Override
     public DictDataVO getDictDataById(Long id) {
         DictEntity entity = dictManager.getById(id);
-        return toDictDataVO(entity);
+        return dictConverter.toVO(entity);
     }
 
     @Override
@@ -73,7 +77,7 @@ public class DictServiceImpl implements DictService {
             throw new BusinessException(DictErrorCode.DICT_TYPE_NOT_EXISTS);
         }
 
-        DictEntity entity = BeanUtil.copyProperties(request, DictEntity.class);
+        DictEntity entity = dictConverter.toEntity(request);
         if (entity.getStatus() == null) {
             entity.setStatus(0);
         }
@@ -92,7 +96,7 @@ public class DictServiceImpl implements DictService {
             throw new BusinessException(DictErrorCode.DICT_DATA_NOT_EXISTS);
         }
 
-        DictEntity entity = BeanUtil.copyProperties(request, DictEntity.class);
+        DictEntity entity = dictConverter.toEntity(request);
         entity.setId(id);
         dictManager.updateById(entity);
 
@@ -117,42 +121,5 @@ public class DictServiceImpl implements DictService {
         // 清除该字典类型的二级缓存
         DictCacheManager.evictCache(existing.getDictType());
         log.info("删除字典数据成功: id={}", id);
-    }
-
-    /**
-     * Entity 转 VO（完整版，用于管理后台详情）
-     */
-    private DictDataVO toDictDataVO(DictEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        return DictDataVO.builder()
-                .id(entity.getId())
-                .dictType(entity.getDictType())
-                .label(entity.getLabel())
-                .value(entity.getValue())
-                .sort(entity.getSort())
-                .status(entity.getStatus())
-                .colorType(entity.getColorType())
-                .cssClass(entity.getCssClass())
-                .remark(entity.getRemark())
-                .createTime(entity.getCreateTime())
-                .build();
-    }
-
-    /**
-     * Entity 转 SimpleDTO（精简版，用于缓存 & RPC 传输）
-     */
-    private DictDataSimpleDTO toDictDataSimpleDTO(DictEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        return DictDataSimpleDTO.builder()
-                .label(entity.getLabel())
-                .value(entity.getValue())
-                .dictType(entity.getDictType())
-                .colorType(entity.getColorType())
-                .cssClass(entity.getCssClass())
-                .build();
     }
 }

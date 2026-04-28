@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.muziseo</groupId>
+        <artifactId>start-commons</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>start-common-websocket</artifactId>
+    <description>WebSocket 实时通讯模块 - 提供实时双向通信与分布式消息推送功能</description>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- 核心模块 - SpringUtils、基础工具类 -->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-core</artifactId>
+        </dependency>
+
+        <!-- 缓存模块 - RedisUtils，用于分布式 Pub/Sub -->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-cache</artifactId>
+        </dependency>
+
+        <!-- Sa-Token 认证 - 握手阶段校验 Token -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot3-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-jwt</artifactId>
+        </dependency>
+
+        <!-- Spring Boot WebSocket -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>

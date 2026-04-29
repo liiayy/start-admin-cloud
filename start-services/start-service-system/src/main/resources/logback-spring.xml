@@ -11,7 +11,7 @@
     <property name="ENCODING" value="UTF-8"/>
     <!-- 日志文件的存储地址 -->
     <property name="LOG_HOME" value="./logs"/>
-    <property name="APP_NAME" value="application"/>
+    <property name="APP_NAME" value="system-service"/>
     <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="./logs"/>
     <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="application"/>
 

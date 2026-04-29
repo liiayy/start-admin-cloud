@@ -1,6 +1,6 @@
 mybatis-flex:
-  audit_enable: true
-  sql_print: true
+  audit_enable: false
+  sql_print: false
   global-config:
     logic-delete-column: deleted
     # 如果数据库是 boolean 类型，改为 true / false

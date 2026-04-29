@@ -39,14 +39,19 @@ start-admin-cloud
 ├── start-commons          # 公共模块
 │   ├── start-common-cache     # 缓存模块 (Redis/Redisson)
 │   ├── start-common-core      # 核心工具类
-│   ├── start-common-db       # 数据库配置
-│   ├── start-common-env      # 环境配置
-│   ├── start-common-job      # 定时任务
-│   ├── start-common-mq       # 消息队列
-│   ├── start-common-satoken  # 认证授权
-│   ├── start-common-seata    # 分布式事务
-│   ├── start-common-sentinel # 熔断限流
-│   └── start-common-web      # Web 公共组件
+│   ├── start-common-db        # 数据库配置
+│   ├── start-common-env       # 环境配置
+│   ├── start-common-excel     # Excel 导入导出
+│   ├── start-common-http      # HTTP 框架封装
+│   ├── start-common-job       # 分布式定时任务
+│   ├── start-common-log       # 行为审计日志
+│   ├── start-common-mq        # 消息队列
+│   ├── start-common-oss       # 对象存储 (MinIO/阿里OSS)
+│   ├── start-common-satoken   # 认证授权
+│   ├── start-common-seata     # 分布式事务
+│   ├── start-common-sentinel  # 熔断限流
+│   ├── start-common-web       # Web 通用响应
+│   └── start-common-websocket # 集群式实时推送
 ├── start-dependencies    # 依赖版本管理
 ├── start-gateway         # API 网关
 ├── start-service-api    # API 接口定义

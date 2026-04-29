@@ -75,14 +75,12 @@ public class DynamicSwaggerConfig implements ApplicationListener<RefreshRoutesEv
                                     // 生成友好的服务名称 (如 system-admin-api -> system-admin)
                                     String name = routeId.replace("-api", "");
                                     urls.add(new AbstractSwaggerUiConfigProperties.SwaggerUrl(name, docPath, name));
-                                    log.info("[Swagger聚合] 发现服务文档: {} -> {}", name, docPath);
                                 }
                             });
                 }
             });
             if (!urls.isEmpty()) {
                 swaggerUiConfigProperties.setUrls(urls);
-                log.info("[Swagger聚合] 已成功更新文档列表: {} 个服务", urls.size());
             }
         }, error -> log.error("[Swagger聚合] 获取路由列表失败", error));
     }

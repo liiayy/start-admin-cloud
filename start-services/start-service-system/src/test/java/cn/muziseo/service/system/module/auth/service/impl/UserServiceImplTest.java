@@ -24,6 +24,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
@@ -162,7 +163,7 @@ class UserServiceImplTest {
             request.setUsername("admin");
             request.setPassword("123456");
             request.setNickname("管理员");
-            when(userManager.existsByUsername("admin")).thenReturn(true);
+            when(userManager.existsByUsername(eq("admin"), any())).thenReturn(true);
 
             // When & Then
             assertThatThrownBy(() -> userService.createUser(request))
@@ -179,7 +180,7 @@ class UserServiceImplTest {
             request.setUsername("newuser");
             request.setPassword("123456");
             request.setNickname("新用户");
-            when(userManager.existsByUsername("newuser")).thenReturn(false);
+            when(userManager.existsByUsername(eq("newuser"), any())).thenReturn(false);
             when(userManager.save(any(UserEntity.class))).thenReturn(true);
 
             // When
@@ -204,7 +205,7 @@ class UserServiceImplTest {
             request.setPassword("123456");
             request.setNickname("新用户");
             request.setStatus(1); // 指定停用状态
-            when(userManager.existsByUsername("newuser")).thenReturn(false);
+            when(userManager.existsByUsername(eq("newuser"), any())).thenReturn(false);
             when(userManager.save(any(UserEntity.class))).thenReturn(true);
 
             // When

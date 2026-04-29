@@ -26,6 +26,9 @@ public class LoginUserVO {
     @Schema(description = "头像地址")
     private String avatar;
 
+    @Schema(description = "邮箱地址")
+    private String email;
+
     @Schema(description = "角色列表")
     private Set<String> roles;
 

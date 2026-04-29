@@ -126,6 +126,7 @@ public class AuthController {
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .avatar(user.getAvatar())
+                .email(user.getEmail())
                 .roles(roleCodes)
                 .permissions(permissions)
                 .build();

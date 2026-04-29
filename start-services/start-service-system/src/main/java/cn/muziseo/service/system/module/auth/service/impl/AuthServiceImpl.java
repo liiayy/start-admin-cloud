@@ -105,6 +105,7 @@ public class AuthServiceImpl implements AuthService {
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .avatar(user.getAvatar())
+                .email(user.getEmail())
                 .tokenName(tokenInfo.getTokenName())
                 .tokenValue(tokenInfo.getTokenValue())
                 .build();

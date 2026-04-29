@@ -20,6 +20,9 @@ public class LoginVO {
     @Schema(description = "头像地址")
     private String avatar;
 
+    @Schema(description = "邮箱地址")
+    private String email;
+
     @Schema(description = "Token名称")
     private String tokenName;
 

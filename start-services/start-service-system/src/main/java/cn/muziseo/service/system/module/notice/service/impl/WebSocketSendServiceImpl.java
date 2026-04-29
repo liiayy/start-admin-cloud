@@ -26,6 +26,16 @@ public class WebSocketSendServiceImpl implements WebSocketSendService {
     @Resource
     private UserManager userManager;
 
+    /**
+     * 多维路由灰度分发 WebSocket 消息
+     * <p>
+     * 根据部门、角色、岗位交叉范围定位用户，并发布消息
+     *
+     * @param deptIds 部门 ID 列表
+     * @param roleIds 角色 ID 列表
+     * @param postIds 岗位 ID 列表
+     * @param payload 推送载荷
+     */
     @Override
     public void sendToScope(List<Long> deptIds, List<Long> roleIds, List<Long> postIds, String payload) {
         QueryWrapper qw = QueryWrapper.create().where(UserEntity::getDeleted).eq(false);

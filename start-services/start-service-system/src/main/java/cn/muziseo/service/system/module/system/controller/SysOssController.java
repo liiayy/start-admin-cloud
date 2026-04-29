@@ -1,5 +1,6 @@
 package cn.muziseo.service.system.module.system.controller;
 
+import org.springframework.validation.annotation.Validated;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.io.FileUtil;
@@ -41,6 +42,7 @@ import cn.muziseo.service.system.module.system.service.SysOssConfigService;
  */
 @Tag(name = "OSS资源管理")
 @RestController
+@Validated
 @Slf4j
 @RequestMapping("/admin/system/oss")
 public class SysOssController {

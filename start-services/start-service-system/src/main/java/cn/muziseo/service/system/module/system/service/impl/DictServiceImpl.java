@@ -40,6 +40,12 @@ public class DictServiceImpl implements DictService {
     @Resource
     private DictConverter dictConverter;
 
+    /**
+     * 根据字典类型获取字典数据列表
+     *
+     * @param dictType 字典类型
+     * @return 字典数据视图对象列表
+     */
     @Override
     public List<DictDataVO> listByDictType(String dictType) {
         return dictManager.listByDictType(dictType).stream()
@@ -47,6 +53,12 @@ public class DictServiceImpl implements DictService {
                 .toList();
     }
 
+    /**
+     * 根据字典类型获取精简字典数据列表
+     *
+     * @param dictType 字典类型
+     * @return 精简字典数据列表
+     */
     @Override
     public List<DictDataSimpleDTO> listSimpleByDictType(String dictType) {
         return dictManager.listByDictType(dictType).stream()
@@ -54,6 +66,12 @@ public class DictServiceImpl implements DictService {
                 .toList();
     }
 
+    /**
+     * 分页查询字典数据
+     *
+     * @param request 字典数据分页查询请求
+     * @return 字典数据分页结果
+     */
     @Override
     public PageResponse<DictDataVO> pageDictData(DictDataPageRequest request) {
         var page = dictManager.pageDictData(request);
@@ -63,12 +81,26 @@ public class DictServiceImpl implements DictService {
         return new PageResponse<>(voList, (int) page.getTotalRow());
     }
 
+    /**
+     * 根据 ID 获取字典数据详情
+     *
+     * @param id 字典数据 ID
+     * @return 字典数据视图对象
+     */
     @Override
     public DictDataVO getDictDataById(Long id) {
         DictEntity entity = dictManager.getById(id);
         return dictConverter.toVO(entity);
     }
 
+    /**
+     * 新增字典数据
+     * <p>
+     * 1. 校验字典类型是否存在
+     * 2. 保存字典数据并清除对应缓存
+     *
+     * @param request 新增字典数据请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addDictData(DictDataAddRequest request) {
@@ -88,6 +120,15 @@ public class DictServiceImpl implements DictService {
         log.info("新增字典数据成功: id={}, type={}", entity.getId(), entity.getDictType());
     }
 
+    /**
+     * 修改字典数据
+     * <p>
+     * 1. 校验字典数据是否存在
+     * 2. 更新并清除受影响的缓存
+     *
+     * @param id      字典数据 ID
+     * @param request 修改字典数据请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateDictData(Long id, DictDataAddRequest request) {
@@ -108,6 +149,14 @@ public class DictServiceImpl implements DictService {
         log.info("更新字典数据成功: id={}", id);
     }
 
+    /**
+     * 删除字典数据
+     * <p>
+     * 1. 校验字典数据是否存在
+     * 2. 删除并清除缓存
+     *
+     * @param id 字典数据 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteDictData(Long id) {

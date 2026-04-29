@@ -39,6 +39,11 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
     /**
      * 项目启动时自动初始化
      */
+    /**
+     * 初始化 OSS 客户端工厂
+     * <p>
+     * 项目启动时自动执行，加载所有启用的存储配置
+     */
     @PostConstruct
     @Override
     public void initOssFactory() {
@@ -53,6 +58,11 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
         log.info("OSS 客户端工厂初始化完成，共加载 {} 个配置", list.size());
     }
 
+    /**
+     * 重新加载指定配置的客户端
+     *
+     * @param configKey 配置 Key
+     */
     @Override
     public void reloadClient(String configKey) {
         SysOssConfigEntity config = sysOssConfigManager.getByConfigKey(configKey);
@@ -63,6 +73,15 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
         }
     }
 
+    /**
+     * 保存或更新存储配置
+     * <p>
+     * 1. 检查 Key 是否重复
+     * 2. 状态切换逻辑：启用某配置时将其他配置设为停用
+     * 3. 刷新 OSS 客户端工厂缓存
+     *
+     * @param entity 存储配置实体
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveConfig(SysOssConfigEntity entity) {
@@ -107,6 +126,11 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
         initOssFactory();
     }
 
+    /**
+     * 删除存储配置
+     *
+     * @param id 配置 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteConfig(Long id) {
@@ -117,16 +141,34 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
         }
     }
 
+    /**
+     * 根据配置 Key 获取存储配置
+     *
+     * @param configKey 配置 Key
+     * @return 存储配置实体
+     */
     @Override
     public SysOssConfigEntity getByConfigKey(String configKey) {
         return sysOssConfigManager.getByConfigKey(configKey);
     }
 
+    /**
+     * 获取所有存储配置列表
+     *
+     * @return 存储配置实体列表
+     */
     @Override
     public List<SysOssConfigEntity> listAll() {
         return sysOssConfigManager.list();
     }
 
+    /**
+     * 测试存储配置有效性
+     * <p>
+     * 尝试创建临时客户端并上传测试文件
+     *
+     * @param entity 待测试的存储配置实体
+     */
     @Override
     public void testConfig(SysOssConfigEntity entity) {
         OssProperties properties = toProperties(entity);

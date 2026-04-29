@@ -60,6 +60,12 @@ public class NoticeServiceImpl implements NoticeService {
     private NoticeConverter noticeConverter;
 
 
+    /**
+     * 分页查询通知公告
+     *
+     * @param request 分页查询请求参数
+     * @return 分页结果
+     */
     @Override
     public PageResponse<NoticeVO> pageNotice(NoticePageRequest request) {
         Page<NoticeEntity> page = noticeManager.pageNotice(request);
@@ -75,6 +81,12 @@ public class NoticeServiceImpl implements NoticeService {
         return response;
     }
 
+    /**
+     * 获取通知公告详情
+     *
+     * @param id 公告 ID
+     * @return 公告视图对象
+     */
     @Override
     public NoticeVO getNotice(Long id) {
         NoticeEntity entity = noticeManager.getById(id);
@@ -84,6 +96,11 @@ public class NoticeServiceImpl implements NoticeService {
         return toNoticeVO(entity);
     }
 
+    /**
+     * 创建通知公告
+     *
+     * @param request 新增公告请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createNotice(NoticeAddRequest request) {
@@ -95,6 +112,11 @@ public class NoticeServiceImpl implements NoticeService {
         log.info("创建公告成功: id={}, title={}", entity.getId(), entity.getTitle());
     }
 
+    /**
+     * 修改通知公告
+     *
+     * @param request 修改公告请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateNotice(NoticeUpdateRequest request) {
@@ -107,6 +129,11 @@ public class NoticeServiceImpl implements NoticeService {
         log.info("更新公告成功: id={}", request.getId());
     }
 
+    /**
+     * 删除通知公告
+     *
+     * @param id 公告 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteNotice(Long id) {
@@ -114,6 +141,13 @@ public class NoticeServiceImpl implements NoticeService {
         log.info("删除公告成功: id={}", id);
     }
 
+    /**
+     * 发布通知公告
+     * <p>
+     * 支持全量广播或基于部门、角色、岗位的灰度定向推送（WebSocket）
+     *
+     * @param id 公告 ID
+     */
     @Override
     public void publishNotice(Long id) {
         NoticeEntity notice = noticeManager.getById(id);
@@ -166,6 +200,13 @@ public class NoticeServiceImpl implements NoticeService {
         }
     }
 
+    /**
+     * 获取当前用户未读的通知公告列表
+     * <p>
+     * 过滤符合当前用户灰度范围的已发布公告
+     *
+     * @return 未读公告视图对象列表
+     */
     @Override
     public List<NoticeVO> listUnreadNotices() {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -255,6 +296,11 @@ public class NoticeServiceImpl implements NoticeService {
         return unreadList;
     }
 
+    /**
+     * 标记通知公告为已读
+     *
+     * @param noticeId 公告 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void markAsRead(Long noticeId) {

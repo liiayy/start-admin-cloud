@@ -44,6 +44,11 @@ public class PostServiceImpl implements PostService {
     @Resource
     private PostConverter postConverter;
 
+    /**
+     * 获取所有岗位列表
+     *
+     * @return 岗位视图对象列表
+     */
     @Override
     public List<PostVO> list() {
         return postManager.listAll().stream()
@@ -60,6 +65,12 @@ public class PostServiceImpl implements PostService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 分页查询岗位列表
+     *
+     * @param request 岗位分页查询请求
+     * @return 岗位分页结果
+     */
     @Override
     @DataScope
     public PageResponse<PostVO> pagePost(PostPageRequest request) {
@@ -89,6 +100,12 @@ public class PostServiceImpl implements PostService {
         return response;
     }
 
+    /**
+     * 根据 ID 获取岗位详情
+     *
+     * @param id 岗位 ID
+     * @return 岗位视图对象
+     */
     @Override
     public PostVO getById(Long id) {
         PostEntity post = postManager.getById(id);
@@ -105,6 +122,11 @@ public class PostServiceImpl implements PostService {
         return vo;
     }
 
+    /**
+     * 新增岗位
+     *
+     * @param request 新增岗位请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addPost(PostAddRequest request) {
@@ -121,6 +143,12 @@ public class PostServiceImpl implements PostService {
         log.info("新增岗位成功: id={}, code={}", entity.getId(), entity.getCode());
     }
 
+    /**
+     * 修改岗位
+     *
+     * @param id      岗位 ID
+     * @param request 修改岗位请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePost(Long id, PostAddRequest request) {
@@ -140,6 +168,14 @@ public class PostServiceImpl implements PostService {
         log.info("更新岗位成功: id={}", id);
     }
 
+    /**
+     * 删除岗位
+     * <p>
+     * 1. 检查是否有关联用户
+     * 2. 删除岗位记录
+     *
+     * @param id 岗位 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deletePost(Long id) {
@@ -157,6 +193,12 @@ public class PostServiceImpl implements PostService {
         log.info("删除岗位成功: id={}", id);
     }
 
+    /**
+     * 更新岗位状态
+     *
+     * @param id     岗位 ID
+     * @param status 状态值
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Long id, Integer status) {

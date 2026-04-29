@@ -50,6 +50,12 @@ public class MenuServiceImpl implements MenuService {
     @Resource
     private MenuConverter menuConverter;
 
+    /**
+     * 根据角色 ID 列表获取菜单列表
+     *
+     * @param roleIds 角色 ID 列表
+     * @return 菜单视图对象列表
+     */
     @Override
     public List<MenuVO> getMenusByRoleIds(List<Long> roleIds) {
         if (roleIds == null || roleIds.isEmpty()) {
@@ -64,6 +70,15 @@ public class MenuServiceImpl implements MenuService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 获取用户的菜单树
+     * <p>
+     * 1. 超级管理员获取所有菜单
+     * 2. 普通用户根据角色获取关联菜单
+     *
+     * @param userId 用户 ID
+     * @return 菜单树视图对象列表
+     */
     @Override
     public List<MenuTreeVO> getUserMenuTree(Long userId) {
         List<MenuEntity> menus;
@@ -90,6 +105,11 @@ public class MenuServiceImpl implements MenuService {
         return buildTree(menus, 0L);
     }
 
+    /**
+     * 获取全量菜单树
+     *
+     * @return 菜单树视图对象列表
+     */
     @Override
     public List<MenuTreeVO> getMenuTree() {
         List<MenuEntity> allMenus = menuManager.list(
@@ -99,6 +119,12 @@ public class MenuServiceImpl implements MenuService {
         return buildTree(allMenus, 0L);
     }
 
+    /**
+     * 获取菜单详情
+     *
+     * @param id 菜单 ID
+     * @return 菜单视图对象
+     */
     @Override
     public MenuVO getMenu(Long id) {
         MenuEntity entity = menuManager.getById(id);
@@ -108,6 +134,11 @@ public class MenuServiceImpl implements MenuService {
         return menuConverter.toVO(entity);
     }
 
+    /**
+     * 新增菜单
+     *
+     * @param request 新增菜单请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addMenu(MenuAddRequest request) {
@@ -127,6 +158,11 @@ public class MenuServiceImpl implements MenuService {
         log.info("新增菜单成功: id={}, name={}", entity.getId(), entity.getName());
     }
 
+    /**
+     * 修改菜单
+     *
+     * @param request 修改菜单请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateMenu(MenuUpdateRequest request) {
@@ -143,6 +179,16 @@ public class MenuServiceImpl implements MenuService {
         log.info("修改菜单成功: id={}", request.getId());
     }
 
+    /**
+     * 删除菜单
+     * <p>
+     * 1. 检查菜单是否存在
+     * 2. 检查是否有子菜单
+     * 3. 删除关联的角色菜单关系
+     * 4. 删除菜单并刷新受影响用户的权限缓存
+     *
+     * @param id 菜单 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteMenu(Long id) {

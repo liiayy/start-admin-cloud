@@ -10,6 +10,7 @@ import cn.muziseo.service.system.module.monitor.service.LoginLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "登录日志管理")
 @RestController
+@Validated
 @RequestMapping("/admin/system/login-log")
 @RequiredArgsConstructor
 public class LoginLogController {

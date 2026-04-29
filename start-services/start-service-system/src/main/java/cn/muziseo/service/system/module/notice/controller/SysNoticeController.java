@@ -17,6 +17,7 @@ import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 @Tag(name = "通知公告管理")
 @RestController
+@Validated
 @RequestMapping("/admin/system/notice")
 public class SysNoticeController {
 

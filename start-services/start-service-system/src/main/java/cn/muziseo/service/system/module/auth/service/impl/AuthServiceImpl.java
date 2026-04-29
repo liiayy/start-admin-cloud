@@ -54,6 +54,17 @@ public class AuthServiceImpl implements AuthService {
     @Resource
     private IpLocationUtils ipLocationUtils;
 
+    /**
+     * 用户登录认证
+     * <p>
+     * 1. 校验验证码（若开启）
+     * 2. 检查账号是否因多次失败被锁定
+     * 3. 校验账号密码
+     * 4. 登录成功后加载权限数据并记录日志
+     *
+     * @param request 登录请求参数
+     * @return 登录成功后的用户信息与 Token
+     */
     @Override
     public LoginVO login(LoginRequest request) {
         // 0. 校验验证码
@@ -111,6 +122,11 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    /**
+     * 用户退出登录
+     * <p>
+     * 清除 Sa-Token 会话并记录退出日志
+     */
     @Override
     public void logout() {
         String username = "";

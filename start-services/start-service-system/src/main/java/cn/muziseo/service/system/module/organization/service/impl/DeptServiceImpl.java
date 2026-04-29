@@ -42,6 +42,11 @@ public class DeptServiceImpl implements DeptService {
     @Resource
     private DeptConverter deptConverter;
 
+    /**
+     * 获取所有部门列表
+     *
+     * @return 部门视图对象列表
+     */
     @Override
     public List<DeptVO> list() {
         return deptManager.listAll().stream()
@@ -49,12 +54,23 @@ public class DeptServiceImpl implements DeptService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 获取部门树结构
+     *
+     * @return 部门树视图对象列表
+     */
     @Override
     public List<DeptTreeVO> tree() {
         List<DeptEntity> allDepts = deptManager.listAll();
         return buildTree(allDepts, 0L);
     }
 
+    /**
+     * 根据 ID 获取部门详情
+     *
+     * @param id 部门 ID
+     * @return 部门视图对象
+     */
     @Override
     public DeptVO getById(Long id) {
         DeptEntity dept = deptManager.getById(id);
@@ -64,6 +80,14 @@ public class DeptServiceImpl implements DeptService {
         return deptConverter.toVO(dept);
     }
 
+    /**
+     * 新增部门
+     * <p>
+     * 1. 校验部门名称是否唯一
+     * 2. 校验父部门是否存在
+     *
+     * @param request 新增部门请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addDept(DeptAddRequest request) {
@@ -89,6 +113,16 @@ public class DeptServiceImpl implements DeptService {
         log.info("新增部门成功: id={}, name={}", entity.getId(), entity.getName());
     }
 
+    /**
+     * 修改部门
+     * <p>
+     * 1. 校验部门是否存在
+     * 2. 校验名称是否唯一（排除自身）
+     * 3. 校验父部门有效性（不能把自己设为父部门）
+     *
+     * @param id      部门 ID
+     * @param request 修改部门请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateDept(Long id, DeptAddRequest request) {
@@ -117,6 +151,15 @@ public class DeptServiceImpl implements DeptService {
         log.info("更新部门成功: id={}", id);
     }
 
+    /**
+     * 删除部门
+     * <p>
+     * 1. 检查是否存在子部门
+     * 2. 检查是否有关联用户
+     * 3. 检查是否有关联岗位
+     *
+     * @param id 部门 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteDept(Long id) {
@@ -144,6 +187,12 @@ public class DeptServiceImpl implements DeptService {
         log.info("删除部门成功: id={}", id);
     }
 
+    /**
+     * 更新部门状态
+     *
+     * @param id     部门 ID
+     * @param status 状态值
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Long id, Integer status) {

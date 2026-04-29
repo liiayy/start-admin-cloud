@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.PostConstruct;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ import java.util.HashMap;
  */
 @Tag(name = "WebSocket在线连接")
 @RestController
+@Validated
 @RequestMapping("/admin/system/websocket")
 public class WebSocketOnlineController {
 

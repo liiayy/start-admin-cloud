@@ -49,6 +49,12 @@ public class RoleServiceImpl implements RoleService {
     @Resource
     private RoleConverter roleConverter;
 
+    /**
+     * 根据用户 ID 获取所属角色列表
+     *
+     * @param userId 用户 ID
+     * @return 角色实体列表
+     */
     @Override
     public List<RoleEntity> getRolesByUserId(Long userId) {
         List<Long> roleIds = userRoleManager.getRoleIdsByUserId(userId);
@@ -58,6 +64,12 @@ public class RoleServiceImpl implements RoleService {
         return roleManager.listByIds(roleIds);
     }
 
+    /**
+     * 分页查询角色列表
+     *
+     * @param request 角色分页查询请求
+     * @return 角色分页结果
+     */
     @Override
     public PageResponse<RoleVO> pageRole(RolePageRequest request) {
         var page = roleManager.pageRole(request);
@@ -71,6 +83,12 @@ public class RoleServiceImpl implements RoleService {
         return response;
     }
 
+    /**
+     * 获取角色详情
+     *
+     * @param id 角色 ID
+     * @return 角色视图对象
+     */
     @Override
     public RoleVO getRole(Long id) {
         RoleEntity entity = roleManager.getById(id);
@@ -80,6 +98,11 @@ public class RoleServiceImpl implements RoleService {
         return roleConverter.toVO(entity);
     }
 
+    /**
+     * 新增角色
+     *
+     * @param request 新增角色请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addRole(RoleAddRequest request) {
@@ -96,6 +119,11 @@ public class RoleServiceImpl implements RoleService {
         log.info("新增角色成功: id={}, code={}", entity.getId(), entity.getCode());
     }
 
+    /**
+     * 修改角色
+     *
+     * @param request 修改角色请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRole(RoleUpdateRequest request) {
@@ -118,6 +146,15 @@ public class RoleServiceImpl implements RoleService {
         log.info("更新角色成功: id={}", request.getId());
     }
 
+    /**
+     * 删除角色
+     * <p>
+     * 1. 检查是否有用户关联
+     * 2. 清理角色菜单关联关系
+     * 3. 删除角色记录
+     *
+     * @param id 角色 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteRole(Long id) {
@@ -138,6 +175,12 @@ public class RoleServiceImpl implements RoleService {
         log.info("删除角色成功: id={}", id);
     }
 
+    /**
+     * 更新角色状态
+     *
+     * @param id     角色 ID
+     * @param status 状态值
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Long id, Integer status) {
@@ -156,6 +199,12 @@ public class RoleServiceImpl implements RoleService {
         log.info("更新角色状态: id={}, status={}", id, status);
     }
 
+    /**
+     * 分配角色菜单权限
+     *
+     * @param roleId  角色 ID
+     * @param menuIds 菜单 ID 列表
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void assignMenus(Long roleId, List<Long> menuIds) {

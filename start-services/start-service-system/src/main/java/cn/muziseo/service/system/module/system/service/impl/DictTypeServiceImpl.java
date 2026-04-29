@@ -38,6 +38,11 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Resource
     private DictTypeConverter dictTypeConverter;
 
+    /**
+     * 获取所有字典类型列表
+     *
+     * @return 字典类型视图对象列表
+     */
     @Override
     public List<DictTypeVO> list() {
         return dictTypeManager.listAll().stream()
@@ -45,6 +50,12 @@ public class DictTypeServiceImpl implements DictTypeService {
                 .toList();
     }
 
+    /**
+     * 分页查询字典类型
+     *
+     * @param request 字典类型分页查询请求
+     * @return 字典类型分页结果
+     */
     @Override
     public PageResponse<DictTypeVO> pageDictType(DictTypePageRequest request) {
         var page = dictTypeManager.pageDictType(request);
@@ -54,12 +65,26 @@ public class DictTypeServiceImpl implements DictTypeService {
         return new PageResponse<>(voList, (int) page.getTotalRow());
     }
 
+    /**
+     * 根据 ID 获取字典类型详情
+     *
+     * @param id 字典类型 ID
+     * @return 字典类型视图对象
+     */
     @Override
     public DictTypeVO getDictTypeById(Long id) {
         DictTypeEntity entity = dictTypeManager.getById(id);
         return dictTypeConverter.toVO(entity);
     }
 
+    /**
+     * 新增字典类型
+     * <p>
+     * 1. 检查字典类型编码是否已存在
+     * 2. 保存字典类型
+     *
+     * @param request 新增字典类型请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addDictType(DictTypeAddRequest request) {
@@ -76,6 +101,15 @@ public class DictTypeServiceImpl implements DictTypeService {
         log.info("新增字典类型成功: id={}, type={}", entity.getId(), entity.getType());
     }
 
+    /**
+     * 修改字典类型
+     * <p>
+     * 1. 校验字典类型是否存在
+     * 2. 检查新编码是否冲突
+     *
+     * @param id      字典类型 ID
+     * @param request 修改字典类型请求参数
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateDictType(Long id, DictTypeAddRequest request) {
@@ -95,6 +129,14 @@ public class DictTypeServiceImpl implements DictTypeService {
         log.info("更新字典类型成功: id={}", id);
     }
 
+    /**
+     * 删除字典类型
+     * <p>
+     * 1. 检查是否包含字典数据
+     * 2. 删除字典类型
+     *
+     * @param id 字典类型 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteDictType(Long id) {

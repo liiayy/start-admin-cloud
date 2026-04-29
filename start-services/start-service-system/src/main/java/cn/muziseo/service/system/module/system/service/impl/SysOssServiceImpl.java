@@ -40,6 +40,17 @@ public class SysOssServiceImpl implements SysOssService {
     @Resource
     private OssConfigProperties ossConfigProperties;
 
+    /**
+     * 上传文件
+     * <p>
+     * 1. 安全校验：文件大小及后缀
+     * 2. 安全校验：基于魔数验证真实文件类型
+     * 3. 执行物理上传并记录元数据
+     *
+     * @param file       Multipart 文件对象
+     * @param moduleName 模块名称（用于分类存储）
+     * @return OSS 文件实体
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SysOssEntity upload(MultipartFile file, String moduleName) {
@@ -125,6 +136,14 @@ public class SysOssServiceImpl implements SysOssService {
         }
     }
 
+    /**
+     * 删除文件
+     * <p>
+     * 1. 删除数据库元数据
+     * 2. 尝试删除云端物理文件
+     *
+     * @param id OSS 文件 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
@@ -147,11 +166,23 @@ public class SysOssServiceImpl implements SysOssService {
         }
     }
 
+    /**
+     * 根据 ID 获取 OSS 文件元数据
+     *
+     * @param id OSS 文件 ID
+     * @return OSS 文件实体
+     */
     @Override
     public SysOssEntity getById(Long id) {
         return sysOssManager.getById(id);
     }
 
+    /**
+     * 根据 ID 列表批量获取 OSS 文件元数据
+     *
+     * @param ids OSS 文件 ID 列表
+     * @return OSS 文件实体列表
+     */
     @Override
     public List<SysOssEntity> listByIds(List<Long> ids) {
         return sysOssManager.listByIds(ids);

@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Tag(name = "用户管理")
 @RestController
+@Validated
 @Slf4j
 @RequestMapping("/admin/system/user")
 public class UserController {

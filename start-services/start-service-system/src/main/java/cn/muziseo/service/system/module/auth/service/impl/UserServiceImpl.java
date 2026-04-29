@@ -66,16 +66,34 @@ public class UserServiceImpl implements UserService {
     @Resource
     private UserConverter userConverter;
 
+    /**
+     * 根据用户名获取用户实体
+     *
+     * @param username 用户名
+     * @return 用户实体
+     */
     @Override
     public UserEntity getByUsername(String username) {
         return userManager.getByUsername(username);
     }
 
+    /**
+     * 根据用户 ID 获取用户实体
+     *
+     * @param id 用户 ID
+     * @return 用户实体
+     */
     @Override
     public UserEntity getUserById(Long id) {
         return userManager.getById(id);
     }
 
+    /**
+     * 分页查询用户列表
+     *
+     * @param request 用户分页查询请求
+     * @return 用户分页结果
+     */
     @Override
     @DataScope
     public PageResponse<UserVO> pageUser(UserPageRequest request) {
@@ -93,6 +111,12 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
+    /**
+     * 获取用户列表（不分页）
+     *
+     * @param request 用户查询请求
+     * @return 用户视图对象列表
+     */
     @Override
     @DataScope
     public List<UserVO> listUser(UserPageRequest request) {
@@ -103,6 +127,12 @@ public class UserServiceImpl implements UserService {
         return buildUserVOList(records);
     }
 
+    /**
+     * 获取用户详情
+     *
+     * @param id 用户 ID
+     * @return 用户视图对象
+     */
     @Override
     public UserVO getUser(Long id) {
         UserEntity entity = userManager.getById(id);
@@ -112,6 +142,14 @@ public class UserServiceImpl implements UserService {
         return toUserVO(entity);
     }
 
+    /**
+     * 创建用户
+     * <p>
+     * 1. 校验用户名、手机号、邮箱唯一性
+     * 2. 加密密码并保存
+     *
+     * @param request 创建用户请求
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createUser(UserAddRequest request) {
@@ -135,6 +173,14 @@ public class UserServiceImpl implements UserService {
         log.info("创建用户成功: id={}, username={}", entity.getId(), entity.getUsername());
     }
 
+    /**
+     * 更新用户基本信息
+     * <p>
+     * 1. 校验手机号、邮箱唯一性
+     * 2. 更新用户信息并根据需要刷新数据权限缓存
+     *
+     * @param request 更新用户请求
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUser(UserUpdateRequest request) {
@@ -161,6 +207,15 @@ public class UserServiceImpl implements UserService {
         log.info("更新用户成功: id={}", request.getId());
     }
 
+    /**
+     * 删除用户
+     * <p>
+     * 1. 校验是否为超级管理员（受保护）
+     * 2. 删除关联的角色关系
+     * 3. 删除用户记录
+     *
+     * @param id 用户 ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long id) {
@@ -172,6 +227,11 @@ public class UserServiceImpl implements UserService {
         log.info("删除用户成功: id={}", id);
     }
 
+    /**
+     * 更新用户状态
+     *
+     * @param request 更新状态请求
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(UserUpdateStatusRequest request) {
@@ -189,6 +249,11 @@ public class UserServiceImpl implements UserService {
         log.info("更新用户状态: id={}, status={}", request.getId(), request.getStatus());
     }
 
+    /**
+     * 重置用户密码
+     *
+     * @param request 重置密码请求
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void resetPassword(UserResetPasswordRequest request) {
@@ -203,6 +268,11 @@ public class UserServiceImpl implements UserService {
         log.info("重置用户密码: id={}", request.getId());
     }
 
+    /**
+     * 用户修改自身密码
+     *
+     * @param request 修改密码请求
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePassword(UserUpdatePasswordRequest request) {
@@ -221,6 +291,11 @@ public class UserServiceImpl implements UserService {
         log.info("用户修改密码成功: userId={}", userId);
     }
 
+    /**
+     * 分配用户角色
+     *
+     * @param request 分配角色请求
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void assignRole(UserRoleAssignRequest request) {
@@ -234,6 +309,13 @@ public class UserServiceImpl implements UserService {
         log.info("分配用户角色: userId={}, roleIds={}", request.getUserId(), request.getRoleIds());
     }
 
+    /**
+     * 批量导入用户
+     *
+     * @param list          导入用户数据列表
+     * @param updateSupport 是否支持更新已存在的数据
+     * @return 导入结果描述
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String importUsers(List<UserImportVO> list, boolean updateSupport) {

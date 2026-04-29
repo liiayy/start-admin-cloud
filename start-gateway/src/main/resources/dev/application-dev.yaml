@@ -19,10 +19,16 @@ spring:
         file-extension: yaml
         namespace: public
         group: DEFAULT_GROUP
+  data:
+    redis:
+      host: 192.168.100.20
+      port: 6379
+      password: WeEvBhLapEHJMG4JFfFG
+      database: 0
 
 # 安全加固配置 (开发环境)
 sa-token:
-  # 开发环境专用强密钥
+  # 统一秘钥
   jwt-secret-key: dev-secret-key-start-admin-cloud-2026-04-27
  
 gateway:

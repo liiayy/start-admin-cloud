@@ -1,9 +1,13 @@
 package cn.muziseo.gateway.config;
 
+import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.stp.StpLogic;
+import cn.dev33.satoken.stp.StpUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * Sa-Token 配置（Gateway Reactive）
@@ -18,12 +22,17 @@ public class SaTokenConfig {
 
     @Bean
     public StpLogic getStpLogicJwt() {
-        return new cn.dev33.satoken.jwt.StpLogicJwtForStateless();
+        return new cn.dev33.satoken.jwt.StpLogicJwtForMixin();
+    }
+
+    @Bean
+    public SaTokenDao saTokenDao(StringRedisTemplate stringRedisTemplate, ObjectMapper objectMapper) {
+        return new GatewaySaTokenDao(stringRedisTemplate, objectMapper);
     }
 
     @org.springframework.beans.factory.annotation.Autowired
     public void setStpLogic(StpLogic stpLogic) {
-        cn.dev33.satoken.stp.StpUtil.setStpLogic(stpLogic);
+        StpUtil.setStpLogic(stpLogic);
     }
 
     /**

@@ -1,7 +1,7 @@
 sa-token:
   token-name: Authorization    # 统一名称
   token-prefix: Bearer         # 统一前缀
-  jwt-secret-key: abcdefghijklmnopqrstuvwxyz   # 统一秘钥（非常关键！）
+  jwt-secret-key: dev-secret-key-start-admin-cloud-2026-04-27   # 统一秘钥（非常关键！）
   is-concurrent: true          # 是否允许并发登录
   is-share: false              # 是否共用 Token
   timeout: 2592000             # Token 有效期

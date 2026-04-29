@@ -13,9 +13,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PostErrorCode implements IErrorCode {
 
-    POST_NOT_EXISTS(70001, "岗位不存在"),
-    POST_CODE_EXISTS(70002, "岗位编码已存在"),
-    POST_HAS_USERS(70003, "岗位下存在用户，无法删除"),
+    POST_NOT_EXISTS(10105001, "岗位不存在"),
+    POST_CODE_EXISTS(10105002, "岗位编码已存在"),
+    POST_HAS_USERS(10105003, "岗位下存在用户，无法删除"),
     ;
 
     private final int code;

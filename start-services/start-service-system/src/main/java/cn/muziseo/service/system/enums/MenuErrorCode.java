@@ -13,9 +13,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MenuErrorCode implements IErrorCode {
 
-    MENU_NOT_EXISTS(100001, "菜单不存在"),
-    MENU_HAS_CHILDREN(100002, "存在子菜单，无法删除"),
-    MENU_PERMISSION_EXISTS(100003, "权限标识已存在"),
+    MENU_NOT_EXISTS(10103001, "菜单不存在"),
+    MENU_HAS_CHILDREN(10103002, "存在子菜单，无法删除"),
+    MENU_PERMISSION_EXISTS(10103003, "权限标识已存在"),
     ;
 
     private final int code;

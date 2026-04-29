@@ -13,17 +13,17 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum UserErrorCode implements IErrorCode {
 
-    USERNAME_EXISTS(30001, "用户名已存在"),
-    LOGIN_FAILED(30002, "账号或密码错误"),
-    USER_DISABLED(30003, "账号已被停用"),
-    USER_NOT_EXISTS(30004, "用户不存在"),
-    PHONE_EXISTS(30005, "手机号已存在"),
-    EMAIL_EXISTS(30006, "邮箱已存在"),
-    OLD_PASSWORD_ERROR(30007, "原密码错误"),
-    SUPER_ADMIN_PROTECTED(30008, "超级管理员受到保护，禁止该操作"),
-    CAPTCHA_EMPTY(30009, "验证码不能为空"),
-    CAPTCHA_EXPIRED(30010, "验证码已过期"),
-    CAPTCHA_ERROR(30011, "验证码错误"),
+    USERNAME_EXISTS(10101001, "用户名已存在"),
+    LOGIN_FAILED(10101002, "账号或密码错误"),
+    USER_DISABLED(10101003, "账号已被停用"),
+    USER_NOT_EXISTS(10101004, "用户不存在"),
+    PHONE_EXISTS(10101005, "手机号已存在"),
+    EMAIL_EXISTS(10101006, "邮箱已存在"),
+    OLD_PASSWORD_ERROR(10101007, "原密码错误"),
+    SUPER_ADMIN_PROTECTED(10101008, "超级管理员受到保护，禁止该操作"),
+    CAPTCHA_EMPTY(10101009, "验证码不能为空"),
+    CAPTCHA_EXPIRED(10101010, "验证码已过期"),
+    CAPTCHA_ERROR(10101011, "验证码错误"),
     ;
 
     private final int code;

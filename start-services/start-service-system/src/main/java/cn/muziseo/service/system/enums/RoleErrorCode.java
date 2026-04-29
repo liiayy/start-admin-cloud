@@ -13,9 +13,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum RoleErrorCode implements IErrorCode {
 
-    ROLE_NOT_EXISTS(90001, "角色不存在"),
-    ROLE_CODE_EXISTS(90002, "角色编码已存在"),
-    ROLE_HAS_USERS(90003, "角色下存在用户，无法删除"),
+    ROLE_NOT_EXISTS(10102001, "角色不存在"),
+    ROLE_CODE_EXISTS(10102002, "角色编码已存在"),
+    ROLE_HAS_USERS(10102003, "角色下存在用户，无法删除"),
     ;
 
     private final int code;

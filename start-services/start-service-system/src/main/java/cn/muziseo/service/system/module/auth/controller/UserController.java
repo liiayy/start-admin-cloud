@@ -2,6 +2,7 @@ package cn.muziseo.service.system.module.auth.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
@@ -37,6 +38,9 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private cn.muziseo.service.system.module.auth.convert.UserConverter userConverter;
 
     @Operation(summary = "分页查询用户")
     @GetMapping("/page")
@@ -143,6 +147,26 @@ public class UserController {
     public ResponseDTO<Void> assignRole(@Valid @RequestBody UserRoleAssignRequest request) {
         log.info("分配用户角色: userId={}", request.getUserId());
         userService.assignRole(request);
+        return ResponseDTO.success();
+    }
+
+    @Operation(summary = "获取当前登录用户资料")
+    @GetMapping("/profile")
+    @SaCheckLogin
+    public ResponseDTO<UserVO> getProfile() {
+        Long userId = StpUtil.getLoginIdAsLong();
+        return ResponseDTO.success(userService.getUser(userId));
+    }
+
+    @Operation(summary = "更新当前登录用户资料")
+    @PutMapping("/profile")
+    @SaCheckLogin
+    @Log(title = "用户资料", businessType = BusinessType.UPDATE)
+    public ResponseDTO<Void> updateProfile(@Valid @RequestBody UserProfileUpdateRequest request) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        UserUpdateRequest updateRequest = userConverter.toUpdateRequest(request);
+        updateRequest.setId(userId);
+        userService.updateUser(updateRequest);
         return ResponseDTO.success();
     }
 }

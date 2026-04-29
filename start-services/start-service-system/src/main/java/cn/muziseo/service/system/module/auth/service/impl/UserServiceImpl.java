@@ -151,16 +151,7 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(UserErrorCode.EMAIL_EXISTS);
         }
 
-        UserEntity entity = new UserEntity();
-        entity.setId(request.getId());
-        entity.setNickname(request.getNickname());
-        entity.setDeptId(request.getDeptId());
-        entity.setPostIds(request.getPostIds());
-        entity.setMobile(request.getMobile());
-        entity.setEmail(request.getEmail());
-        entity.setSex(request.getSex());
-        entity.setAvatar(request.getAvatar());
-        entity.setRemark(request.getRemark());
+        UserEntity entity = userConverter.toEntity(request);
         userManager.updateById(entity);
         
         // 如果修改了部门，需要刷新数据权限缓存

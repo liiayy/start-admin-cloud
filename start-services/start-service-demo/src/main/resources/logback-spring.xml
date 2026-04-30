@@ -11,7 +11,7 @@
     <property name="ENCODING" value="UTF-8"/>
     <!-- 日志文件的存储地址 -->
     <property name="LOG_HOME" value="./logs"/>
-    <property name="APP_NAME" value="start-system"/>
+    <property name="APP_NAME" value="start-demo"/>
 
     <!-- 日志格式 -->
     <property name="NORMAL_LOG_PATTERN"

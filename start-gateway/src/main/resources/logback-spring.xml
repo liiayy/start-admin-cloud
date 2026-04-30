@@ -12,8 +12,6 @@
     <!-- 日志文件的存储地址 -->
     <property name="LOG_HOME" value="./logs"/>
     <property name="APP_NAME" value="start-gateway"/>
-    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="./logs"/>
-    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="start-gateway"/>
 
     <!-- 日志格式 -->
     <property name="NORMAL_LOG_PATTERN"

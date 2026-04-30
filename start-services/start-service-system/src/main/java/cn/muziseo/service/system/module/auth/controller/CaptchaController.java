@@ -3,6 +3,7 @@ package cn.muziseo.service.system.module.auth.controller;
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import cn.muziseo.common.cache.utils.RedisUtils;
+import cn.muziseo.common.core.constant.CacheConstants;
 import cn.muziseo.common.core.constant.ConfigConstants;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.cache.config.ConfigUtils;
@@ -29,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/admin/system/auth")
 public class CaptchaController {
 
-    private static final String CAPTCHA_CODE_KEY = "captcha_codes:";
     private static final long CAPTCHA_EXPIRATION_MINUTES = 2;
 
     @Operation(summary = "获取验证码")
@@ -47,7 +47,7 @@ public class CaptchaController {
 
         // 2. 生成 UUID 并存储至 Redis
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String redisKey = CAPTCHA_CODE_KEY + uuid;
+        String redisKey = CacheConstants.CAPTCHA_CODE_PREFIX + uuid;
         RedisUtils.setCacheObject(redisKey, code, Duration.ofMinutes(CAPTCHA_EXPIRATION_MINUTES));
 
         // 3. 构建返回结果

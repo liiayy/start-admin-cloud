@@ -3,6 +3,7 @@ package cn.muziseo.service.system.module.auth.service.impl;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.cache.utils.RedisUtils;
+import cn.muziseo.common.core.constant.CacheConstants;
 import cn.muziseo.common.core.constant.ConfigConstants;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.cache.config.ConfigUtils;
@@ -38,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
-    private static final String LOGIN_FAIL_KEY = "login_fail:";
     private static final int MAX_FAIL_COUNT = 5;
     private static final int LOCK_MINUTES = 15;
 
@@ -71,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
         validateCaptcha(request);
 
         String username = request.getUsername();
-        String failKey = LOGIN_FAIL_KEY + username;
+        String failKey = CacheConstants.LOGIN_FAIL_PREFIX + username;
 
         // 1. 检查是否被锁定
         String failCountStr = stringRedisTemplate.opsForValue().get(failKey);
@@ -162,7 +162,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(UserErrorCode.CAPTCHA_EXPIRED);
         }
 
-        String redisKey = "captcha_codes:" + uuid;
+        String redisKey = CacheConstants.CAPTCHA_CODE_PREFIX + uuid;
         String captchaCode = RedisUtils.getCacheObject(redisKey);
         // 验证后立即删除，防止重放攻击
         RedisUtils.deleteObject(redisKey);

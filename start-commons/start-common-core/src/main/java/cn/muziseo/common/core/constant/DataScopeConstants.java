@@ -7,9 +7,4 @@ package cn.muziseo.common.core.constant;
  */
 public class DataScopeConstants {
 
-    /**
-     * 数据权限缓存前缀
-     */
-    public static final String DATA_SCOPE_CACHE_PREFIX = "system:data_scope:";
-
 }

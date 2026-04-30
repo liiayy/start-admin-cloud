@@ -1,6 +1,7 @@
 package cn.muziseo.common.cache.datascope;
 
 import cn.muziseo.common.cache.utils.RedisUtils;
+import cn.muziseo.common.core.constant.CacheConstants;
 import cn.muziseo.common.core.constant.DataScopeConstants;
 import cn.muziseo.common.core.domain.dto.DataScopeInfo;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -41,7 +42,7 @@ public class DataScopeCacheManager {
     public static DataScopeInfo getDataScope(Long userId, Function<Long, DataScopeInfo> rpcFallback) {
         return CAFFEINE.get(userId, id -> {
             // 1. L1 未命中，查 L2（Redis）
-            String redisKey = DataScopeConstants.DATA_SCOPE_CACHE_PREFIX + id;
+            String redisKey = CacheConstants.DATA_SCOPE_PREFIX + id;
             DataScopeInfo redisData = RedisUtils.getCacheObject(redisKey);
 
             if (redisData != null) {
@@ -61,7 +62,7 @@ public class DataScopeCacheManager {
      * 清除指定用户的缓存
      */
     public static void evictCache(Long userId) {
-        String redisKey = DataScopeConstants.DATA_SCOPE_CACHE_PREFIX + userId;
+        String redisKey = CacheConstants.DATA_SCOPE_PREFIX + userId;
         RedisUtils.deleteObject(redisKey);
         CAFFEINE.invalidate(userId);
     }

@@ -5,6 +5,7 @@ import cn.dev33.satoken.exception.ApiDisabledException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.json.JSONUtil;
 import cn.muziseo.common.cache.utils.RedisUtils;
+import cn.muziseo.common.core.constant.CacheConstants;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.websocket.dto.WebSocketMessageDTO;
 import cn.muziseo.common.websocket.holder.WebSocketSessionHolder;
@@ -54,7 +55,7 @@ public class WebSocketOnlineController {
     @SaCheckPermission("monitor:websocket:query")
     public ResponseDTO<WebSocketOnlineVO> getOnlineStats() {
         // 1. 查找所有活跃节点的前缀键
-        Iterable<String> nodeKeys = RedisUtils.getClient().getKeys().getKeysByPattern("ws:cluster:node:*:sessions");
+        Iterable<String> nodeKeys = RedisUtils.getClient().getKeys().getKeysByPattern(CacheConstants.WS_ONLINE_PREFIX + "*:sessions");
         Map<Long, Integer> aggregatedCounts = new java.util.HashMap<>();
         int totalSessionCount = 0;
 

@@ -15,14 +15,6 @@ public final class DictConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    // ================== Redis 缓存 Key 前缀 ================== //
-
-    /**
-     * 字典数据 Redis 缓存 Key 前缀
-     * <p>完整 Key 格式：sys:dict:type:{dictType}</p>
-     */
-    public static final String DICT_CACHE_KEY_PREFIX = "sys:dict:type:";
-
     // ================== 通用字典类型编码 ================== //
 
     /** 用户性别 */

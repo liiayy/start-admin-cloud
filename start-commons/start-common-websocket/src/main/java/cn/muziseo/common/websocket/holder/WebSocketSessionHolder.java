@@ -1,6 +1,7 @@
 package cn.muziseo.common.websocket.holder;
 
 import cn.muziseo.common.cache.utils.RedisUtils;
+import cn.muziseo.common.core.constant.CacheConstants;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,15 +38,12 @@ public class WebSocketSessionHolder {
      */
     public static final String NODE_ID = java.util.UUID.randomUUID().toString();
 
-    /**
-     * Redis 在线状态 Hash 键名前缀
-     */
-    public static final String ONLINE_USERS_PREFIX = "ws:cluster:node:";
+
 
     static {
         java.util.concurrent.Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             try {
-                String key = ONLINE_USERS_PREFIX + NODE_ID + ":sessions";
+                String key = CacheConstants.WS_ONLINE_PREFIX + NODE_ID + ":sessions";
                 org.redisson.api.RMap<String, Integer> nodeMap = RedisUtils.getClient().getMap(key);
                 if (!nodeMap.isEmpty()) {
                     nodeMap.expire(java.time.Duration.ofSeconds(60));
@@ -81,7 +79,7 @@ public class WebSocketSessionHolder {
         // 分布式集群状态同步：若为新会话，递增本节点的全局连接引用计数
         if (oldSession == null) {
             try {
-                String key = ONLINE_USERS_PREFIX + NODE_ID + ":sessions";
+                String key = CacheConstants.WS_ONLINE_PREFIX + NODE_ID + ":sessions";
                 org.redisson.api.RMap<String, Integer> nodeMap = RedisUtils.getClient().getMap(key);
                 nodeMap.addAndGet(userId.toString(), 1);
                 nodeMap.expire(java.time.Duration.ofSeconds(60));
@@ -111,7 +109,7 @@ public class WebSocketSessionHolder {
         // 分布式集群状态同步：仅当该会话确实存在并被移除时，才扣减引用计数
         if (removedSession != null) {
             try {
-                String key = ONLINE_USERS_PREFIX + NODE_ID + ":sessions";
+                String key = CacheConstants.WS_ONLINE_PREFIX + NODE_ID + ":sessions";
                 org.redisson.api.RMap<String, Integer> nodeMap = RedisUtils.getClient().getMap(key);
                 long remaining = nodeMap.addAndGet(userId.toString(), -1);
                 if (remaining <= 0) {

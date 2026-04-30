@@ -15,14 +15,6 @@ public final class ConfigConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    // ================== Redis 缓存 Key 前缀 ================== //
-
-    /**
-     * 系统参数 Redis 缓存 Key 前缀
-     * <p>完整 Key 格式：sys:config:key:{configKey}</p>
-     */
-    public static final String CONFIG_CACHE_KEY_PREFIX = "sys:config:key:";
-
     // ================== 通用配置键名 ================== //
 
     /** 用户初始密码 */

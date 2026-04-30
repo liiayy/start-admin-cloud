@@ -1,6 +1,7 @@
 package cn.muziseo.common.cache.dict;
 
 import cn.muziseo.common.cache.utils.RedisUtils;
+import cn.muziseo.common.core.constant.CacheConstants;
 import cn.muziseo.common.core.constant.DictConstants;
 import cn.muziseo.common.core.domain.dto.DictDataSimpleDTO;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -57,7 +58,7 @@ public class DictCacheManager {
     public static List<DictDataSimpleDTO> getDict(String dictType, Function<String, List<DictDataSimpleDTO>> rpcFallback) {
         List<DictDataSimpleDTO> result = CAFFEINE.get(dictType, k -> {
             // 1. L1 未命中，查 L2（Redis）
-            String redisKey = DictConstants.DICT_CACHE_KEY_PREFIX + dictType;
+            String redisKey = CacheConstants.DICT_PREFIX + dictType;
             List<DictDataSimpleDTO> redisData = RedisUtils.getCacheObjectSafe(redisKey);
 
             if (redisData != null && !redisData.isEmpty()) {
@@ -87,7 +88,7 @@ public class DictCacheManager {
      * @param dictType 字典类型编码
      */
     public static void evictCache(String dictType) {
-        String redisKey = DictConstants.DICT_CACHE_KEY_PREFIX + dictType;
+        String redisKey = CacheConstants.DICT_PREFIX + dictType;
         RedisUtils.deleteObject(redisKey);
         // 顺手把本机的 L1 也清掉，让本机立即生效
         CAFFEINE.invalidate(dictType);
@@ -98,7 +99,7 @@ public class DictCacheManager {
      * 清除所有字典缓存（用于全量刷新场景）
      */
     public static void evictAllCache() {
-        RedisUtils.deleteKeys(DictConstants.DICT_CACHE_KEY_PREFIX + "*");
+        RedisUtils.deleteKeys(CacheConstants.DICT_PREFIX + "*");
         CAFFEINE.invalidateAll();
         log.info("[DictCache] 所有字典缓存已清除");
     }

@@ -1,6 +1,7 @@
 package cn.muziseo.common.cache.config;
 
 import cn.muziseo.common.cache.utils.RedisUtils;
+import cn.muziseo.common.core.constant.CacheConstants;
 import cn.muziseo.common.core.constant.ConfigConstants;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -63,7 +64,7 @@ public class ConfigCacheManager {
     public static String getConfigValue(String configKey, Function<String, String> rpcFallback) {
         String result = CAFFEINE.get(configKey, k -> {
             // 1. L1 未命中，查 L2（Redis）
-            String redisKey = ConfigConstants.CONFIG_CACHE_KEY_PREFIX + configKey;
+            String redisKey = CacheConstants.CONFIG_PREFIX + configKey;
             String redisData = RedisUtils.getCacheObjectSafe(redisKey);
 
             if (redisData != null) {
@@ -94,7 +95,7 @@ public class ConfigCacheManager {
      * @param configKey 参数键名
      */
     public static void evictCache(String configKey) {
-        String redisKey = ConfigConstants.CONFIG_CACHE_KEY_PREFIX + configKey;
+        String redisKey = CacheConstants.CONFIG_PREFIX + configKey;
         RedisUtils.deleteObject(redisKey);
         // 顺手把本机的 L1 也清掉，让本机立即生效
         CAFFEINE.invalidate(configKey);
@@ -105,7 +106,7 @@ public class ConfigCacheManager {
      * 清除所有系统参数缓存（用于全量刷新场景）
      */
     public static void evictAllCache() {
-        RedisUtils.deleteKeys(ConfigConstants.CONFIG_CACHE_KEY_PREFIX + "*");
+        RedisUtils.deleteKeys(CacheConstants.CONFIG_PREFIX + "*");
         CAFFEINE.invalidateAll();
         log.info("[ConfigCache] 所有系统参数缓存已清除");
     }

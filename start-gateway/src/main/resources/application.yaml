@@ -21,6 +21,13 @@ spring:
                 - Path=/api/admin/system/websocket/**
               filters:
                 - StripPrefix=1
+            ## python-service 服务 (异构微服务)
+            - id: python-admin-api
+              uri: lb://start-python-demo
+              predicates:
+                - Path=/api/admin/python/**
+              filters:
+                - StripPrefix=1
             ## system-server 服务
             - id: system-admin-api
               uri: lb://system-service
@@ -41,7 +48,13 @@ spring:
                 - Path=/api/admin/demo/**
               filters:
                 - StripPrefix=1
-
+            ## python-service 服务
+            - id: python-admin-api
+              uri: lb://python-service
+              predicates:
+                - Path=/api/admin/python/**
+              filters:
+                - StripPrefix=1
 
 logging:
   level:

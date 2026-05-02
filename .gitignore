@@ -48,3 +48,14 @@ nbdist/
 !*/build/*.xml
 
 .flattened-pom.xml
+
+######################################################################
+# Python & uv & Ruff
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.env
+.ruff_cache/

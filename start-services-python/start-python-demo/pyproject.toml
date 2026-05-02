@@ -1,0 +1,25 @@
+[project]
+name = "start-python-demo"
+version = "0.1.0"
+description = "Python FastAPI microservice for Start Admin Cloud"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.111.0",
+    "nacos-sdk-python==3.2.0",
+    "uvicorn>=0.30.0",
+]
+
+[tool.ruff]
+# 设置 Ruff 规范
+line-length = 120
+indent-width = 4
+
+[tool.ruff.lint]
+# 启用 isort (I) 自动处理 import 顺序，以及标准的 PEP8 规则 (E, F)
+select = ["E", "F", "I"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

@@ -98,6 +98,9 @@ gateway:
     white-prefixes:
       - /api/admin/system/oss/download
       - /api/admin/system/websocket
+      - /api/admin/system/social/auth
+      - /api/admin/system/social/callback
+
       - /swagger-ui
       - /v3/api-docs
       - /actuator

@@ -9,16 +9,20 @@ import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 
 /**
- * 系统参数 Manager 层
+ * 系统参数配置管理 Manager 层
+ * <p>
+ * 处理系统运行所需的动态参数配置，提供按键名查询、唯一性校验及分页管理功能。
  *
  * @author 木子软件
- * @Date 2026-02-27
  */
 @Service
 public class SystemConfigManager extends BaseServiceImpl<SystemConfigMapper, SystemConfigEntity> {
 
     /**
-     * 根据参数键名获取配置
+     * 根据参数键名查询配置信息
+     *
+     * @param configKey 参数键名（如：sys.user.initPassword）
+     * @return 系统参数实体信息，如果不存在则返回 null
      */
     public SystemConfigEntity getByConfigKey(String configKey) {
         return queryChain()
@@ -27,7 +31,10 @@ public class SystemConfigManager extends BaseServiceImpl<SystemConfigMapper, Sys
     }
 
     /**
-     * 检查参数键名是否存在
+     * 校验参数键名是否已存在
+     *
+     * @param configKey 参数键名
+     * @return true 表示已存在，false 表示不存在
      */
     public boolean existsByConfigKey(String configKey) {
         return exists(QueryWrapper.create()
@@ -35,7 +42,10 @@ public class SystemConfigManager extends BaseServiceImpl<SystemConfigMapper, Sys
     }
 
     /**
-     * 分页查询系统参数
+     * 分页查询系统参数列表
+     *
+     * @param request 分页及筛选条件（支持参数名称、键名模糊查询）
+     * @return 分页结果对象
      */
     public Page<SystemConfigEntity> pageConfig(SystemConfigPageRequest request) {
         QueryWrapper wrapper = QueryWrapper.create()

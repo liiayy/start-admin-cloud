@@ -16,19 +16,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
- * 字典二级缓存管理器
+ * 字典数据缓存管理层（二级缓存方案）
+ * <p>
+ * 采用本地内存（Caffeine）与分布式缓存（Redis）结合的二级缓存架构，专为高频字典翻译场景设计。
  *
  * <p>
- * <b>设计思路：</b>
+ * <b>设计方案：</b>
  * <ul>
- *   <li><b>一级缓存（Caffeine）</b>：JVM 本地内存，10 秒极短 TTL，
- *       核心目的是在短时间高频请求场景下（如 Excel 导出循环翻译 10000 行）
- *       避免大量重复网络 IO 打穿 Redis。</li>
- *   <li><b>二级缓存（Redis）</b>：集中共享缓存，无过期时间，
- *       仅在后台管理端执行字典增删改时由 system 服务主动清除。</li>
- *   <li><b>兜底回调（RPC / DB）</b>：当两级缓存均未命中时，通过调用方传入的
- *       {@code Function} 回调（可以是 Feign 调用、也可以是直接查询 DB）获取最新数据，
- *       并回写入 Redis + Caffeine。</li>
+ *   <li><b>一级缓存（L1 - Caffeine）：</b> JVM 本地内存，设置 10 秒短生存期（TTL）。
+ *       在高并发场景（如万级数据导出翻译）下，能极大减少对 Redis 的并发压力和网络消耗。</li>
+ *   <li><b>二级缓存（L2 - Redis）：</b> 分布式共享缓存，无固定过期时间，数据一致性由业务更新时主动清除保证。</li>
+ *   <li><b>数据回源：</b> 两级缓存均未命中时，通过 {@code rpcFallback} 回调函数获取最新数据，并同步更新双级缓存。</li>
  * </ul>
  * </p>
  *

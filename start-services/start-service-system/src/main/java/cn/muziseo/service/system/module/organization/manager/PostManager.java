@@ -11,23 +11,21 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 岗位表 Manager 层
+ * 岗位管理 Manager 层
  * <p>
- * 提供岗位表的数据查询和基础数据库操作
+ * 处理岗位数据的持久化逻辑，提供岗位查询、编码校验及分页筛选功能。
  *
  * @author 木子软件
- * @Date 2026-02-11
- * @Wechat liiayy
- * @Email 773582348@qq.com
- * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
 public class PostManager extends BaseServiceImpl<PostMapper, PostEntity> {
 
     /**
-     * 获取所有岗位列表（按排序）
+     * 获取所有岗位列表
+     * <p>
+     * 结果按显示顺序（sort 字段）升序排列。
      *
-     * @return 岗位列表
+     * @return 岗位实体列表
      */
     public List<PostEntity> listAll() {
         return list(QueryWrapper.create()
@@ -36,10 +34,10 @@ public class PostManager extends BaseServiceImpl<PostMapper, PostEntity> {
     }
 
     /**
-     * 根据岗位编码获取岗位
+     * 根据岗位编码查询岗位信息
      *
      * @param code 岗位编码
-     * @return 岗位实体
+     * @return 岗位实体信息，如果不存在则返回 null
      */
     public PostEntity getByCode(String code) {
         return queryChain()
@@ -48,11 +46,11 @@ public class PostManager extends BaseServiceImpl<PostMapper, PostEntity> {
     }
 
     /**
-     * 检查岗位编码是否已存在
+     * 校验岗位编码是否已存在
      *
      * @param code      岗位编码
-     * @param excludeId 排除的岗位ID（更新时排除自身）
-     * @return 是否存在
+     * @param excludeId 需要排除的岗位 ID（用于修改时校验）
+     * @return true 表示已存在，false 表示不存在
      */
     public boolean existsByCode(String code, Long excludeId) {
         QueryWrapper qw = QueryWrapper.create().where(PostEntity::getCode).eq(code);
@@ -63,7 +61,10 @@ public class PostManager extends BaseServiceImpl<PostMapper, PostEntity> {
     }
 
     /**
-     * 统计部门下的岗位数量
+     * 统计指定部门下的岗位总数
+     *
+     * @param deptId 部门 ID
+     * @return 岗位数量
      */
     public long countByDeptId(Long deptId) {
         return count(QueryWrapper.create()
@@ -71,7 +72,13 @@ public class PostManager extends BaseServiceImpl<PostMapper, PostEntity> {
     }
 
     /**
-     * 分页查询岗位（支持部门+子部门过滤）
+     * 分页查询岗位列表
+     * <p>
+     * 支持所属部门集合过滤及岗位名称模糊查询。
+     *
+     * @param request 分页及基本筛选条件
+     * @param deptIds 所属部门 ID 集合（支持包含子部门的批量过滤）
+     * @return 分页结果对象
      */
     public Page<PostEntity> pagePost(PostPageRequest request, List<Long> deptIds) {
         QueryWrapper wrapper = QueryWrapper.create();

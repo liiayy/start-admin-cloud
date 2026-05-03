@@ -10,24 +10,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 角色菜单关联 Manager 层
+ * 角色菜单关联管理 Manager 层
  * <p>
- * 提供角色菜单关联表的数据查询和基础数据库操作
+ * 处理角色与菜单之间的多对多关联关系，提供权限分配、关联查询及清理功能。
  *
  * @author 木子软件
- * @Date 2026-01-07
- * @Wechat liiayy
- * @Email 773582348@qq.com
- * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
 public class RoleMenuManager extends BaseServiceImpl<RoleMenuMapper, RoleMenuEntity> {
 
     /**
-     * 根据角色ID列表获取菜单ID列表
+     * 根据一组角色 ID 获取关联的所有菜单 ID 列表
+     * <p>
+     * 常用于计算用户最终拥有的权限集合。
      *
-     * @param roleIds 角色ID列表
-     * @return 菜单ID列表
+     * @param roleIds 角色 ID 列表
+     * @return 去重后的菜单 ID 列表
      */
     public List<Long> getMenuIdsByRoleIds(List<Long> roleIds) {
         return queryChain()
@@ -40,9 +38,9 @@ public class RoleMenuManager extends BaseServiceImpl<RoleMenuMapper, RoleMenuEnt
     }
 
     /**
-     * 根据角色ID删除关联
+     * 根据角色 ID 删除其所有的菜单关联记录
      *
-     * @param roleId 角色ID
+     * @param roleId 角色 ID
      */
     public void deleteByRoleId(Long roleId) {
         remove(QueryWrapper.create()
@@ -50,7 +48,10 @@ public class RoleMenuManager extends BaseServiceImpl<RoleMenuMapper, RoleMenuEnt
     }
 
     /**
-     * 根据菜单ID获取角色ID列表
+     * 根据菜单 ID 获取所有关联的角色 ID 列表
+     *
+     * @param menuId 菜单 ID
+     * @return 关联的角色 ID 列表
      */
     public List<Long> getRoleIdsByMenuId(Long menuId) {
         return queryChain()
@@ -63,9 +64,9 @@ public class RoleMenuManager extends BaseServiceImpl<RoleMenuMapper, RoleMenuEnt
     }
 
     /**
-     * 根据菜单ID删除关联
+     * 根据菜单 ID 删除其所有的角色关联记录
      *
-     * @param menuId 菜单ID
+     * @param menuId 菜单 ID
      */
     public void deleteByMenuId(Long menuId) {
         remove(QueryWrapper.create()

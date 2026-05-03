@@ -11,13 +11,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 超时 Redis 缓存管理器
+ * 自定义超时 Redis 缓存管理器
  * <p>
- * 支持多级过期时间的 Redis 缓存管理器
+ * 扩展 Spring Data Redis 默认的缓存管理器，支持通过缓存名称动态指定过期时间。
+ * <p>
+ * <b>使用示例：</b>
+ * <pre>{@code
+ * @Cacheable(value = "user#1h", key = "#id") // 设置 1 小时过期
+ * @Cacheable(value = "token#30s", key = "#token") // 设置 30 秒过期
+ * }</pre>
  *
  * @author 木子软件
- * @Date 2026-01-26
- * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 public class TimeoutRedisCacheManager extends RedisCacheManager {
 

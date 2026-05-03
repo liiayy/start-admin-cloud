@@ -14,7 +14,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
- * 数据权限二级缓存管理器
+ * 数据权限缓存管理层（二级缓存方案）
+ * <p>
+ * 缓存用户的数据权限范围（DataScopeInfo），用于在 AOP 拦截器中快速获取权限策略，避免频繁的数据库权限计算。
  *
  * @author 木子软件
  */

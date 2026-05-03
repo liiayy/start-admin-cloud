@@ -8,13 +8,22 @@ import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 
 /**
- * 操作日志管理
+ * 操作日志管理 Manager 层
+ * <p>
+ * 处理系统操作日志的持久化，提供分页查询及审计日志记录功能。
+ *
+ * @author 木子软件
  */
 @Service
 public class OperLogManager extends BaseServiceImpl<OperLogMapper, OperLogEntity> {
 
     /**
-     * 分页查询
+     * 分页查询操作日志
+     *
+     * @param pageNum  当前页码
+     * @param pageSize 每页显示数量
+     * @param query    筛选条件实体
+     * @return 分页结果对象
      */
     public Page<OperLogEntity> pageLog(int pageNum, int pageSize, OperLogEntity query) {
         QueryWrapper wrapper = QueryWrapper.create()

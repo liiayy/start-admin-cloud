@@ -11,16 +11,19 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 字典类型 Manager 层
+ * 字典类型管理 Manager 层
+ * <p>
+ * 处理字典分类（类型）的持久化逻辑，提供分类查询、编码唯一性校验及分页功能。
  *
  * @author 木子软件
- * @Date 2026-02-27
  */
 @Service
 public class DictTypeManager extends BaseServiceImpl<DictTypeMapper, DictTypeEntity> {
 
     /**
-     * 获取所有字典类型列表
+     * 获取全量字典类型列表
+     *
+     * @return 字典类型实体列表
      */
     public List<DictTypeEntity> listAll() {
         return list(QueryWrapper.create()
@@ -28,7 +31,10 @@ public class DictTypeManager extends BaseServiceImpl<DictTypeMapper, DictTypeEnt
     }
 
     /**
-     * 分页查询字典类型
+     * 分页查询字典类型列表
+     *
+     * @param request 分页及筛选条件（支持名称、类型模糊查询）
+     * @return 分页结果对象
      */
     public Page<DictTypeEntity> pageDictType(DictTypePageRequest request) {
         QueryWrapper wrapper = QueryWrapper.create()
@@ -41,7 +47,10 @@ public class DictTypeManager extends BaseServiceImpl<DictTypeMapper, DictTypeEnt
     }
 
     /**
-     * 根据字典类型获取字典类型实体
+     * 根据字典类型标识查询类型详情
+     *
+     * @param type 字典类型标识
+     * @return 字典类型实体，如果不存在则返回 null
      */
     public DictTypeEntity getByType(String type) {
         return queryChain()
@@ -50,7 +59,11 @@ public class DictTypeManager extends BaseServiceImpl<DictTypeMapper, DictTypeEnt
     }
 
     /**
-     * 检查字典类型是否存在（支持排除指定ID）
+     * 校验字典类型标识是否已存在
+     *
+     * @param type      字典类型标识
+     * @param excludeId 需要排除的字典类型 ID（用于修改时校验）
+     * @return true 表示已存在，false 表示不存在
      */
     public boolean existsByType(String type, Long excludeId) {
         QueryWrapper wrapper = QueryWrapper.create()

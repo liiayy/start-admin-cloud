@@ -13,23 +13,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
- * 系统参数二级缓存管理器
+ * 系统参数缓存管理层（二级缓存方案）
+ * <p>
+ * 采用本地内存（Caffeine）与分布式缓存（Redis）结合的二级缓存架构，有效降低 Redis 网络 IO 并防止缓存击穿。
  *
  * <p>
- * <b>设计思路（与 DictCacheManager 完全一致）：</b>
+ * <b>设计方案：</b>
  * <ul>
- *   <li><b>一级缓存（Caffeine）</b>：JVM 本地内存，10 秒极短 TTL，
- *       防止短时间高频请求打穿 Redis。</li>
- *   <li><b>二级缓存（Redis）</b>：集中共享缓存，无过期时间，
- *       仅在后台管理端执行参数修改/删除时由 system 服务主动清除。</li>
- *   <li><b>兜底回调（RPC / DB）</b>：当两级缓存均未命中时，通过调用方传入的
- *       {@code Function} 回调获取最新数据，并回写入 Redis + Caffeine。</li>
+ *   <li><b>一级缓存（L1 - Caffeine）：</b> JVM 本地内存，设置 10 秒短生存期（TTL），用于吸纳瞬时高并发流量。</li>
+ *   <li><b>二级缓存（L2 - Redis）：</b> 分布式共享缓存，无固定过期时间，数据一致性由后台更新时主动清除保证。</li>
+ *   <li><b>数据回源：</b> 两级缓存均未命中时，通过 {@code rpcFallback} 回调函数从持久化层（DB 或 RPC）加载。</li>
  * </ul>
- * </p>
- *
- * <p>
- * <b>与 DictCacheManager 的区别：</b>缓存粒度为单条 configKey → String value，
- * 而非字典的 dictType → List&lt;DTO&gt;。
  * </p>
  *
  * @author 木子软件

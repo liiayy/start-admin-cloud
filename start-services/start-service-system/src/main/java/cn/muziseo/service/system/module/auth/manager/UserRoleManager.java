@@ -10,21 +10,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 用户角色关联 Manager 层
+ * 用户角色关联管理 Manager 层
  * <p>
- * 提供用户角色关联表的数据查询和基础数据库操作
+ * 处理用户与角色之间的多对多关联关系，提供查询、维护及批量操作功能。
  *
  * @author 木子软件
- * @Date 2026-01-07
- * @Wechat liiayy
- * @Email 773582348@qq.com
- * @Copyright <a href="https://code.muziseo.cn">木子软件</a>
  */
 @Service
 public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEntity> {
 
     /**
-     * 根据用户ID获取角色ID列表
+     * 根据用户ID获取其关联的所有角色ID列表
      *
      * @param userId 用户ID
      * @return 角色ID列表
@@ -39,7 +35,10 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
     }
 
     /**
-     * 根据角色ID获取用户ID列表
+     * 根据角色ID获取所有关联的用户ID列表
+     *
+     * @param roleId 角色ID
+     * @return 用户ID列表
      */
     public List<Long> getUserIdsByRoleId(Long roleId) {
         return queryChain()
@@ -51,10 +50,10 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
     }
 
     /**
-     * 根据用户ID列表批量获取角色关联
+     * 批量查询多个用户的角色关联信息
      *
      * @param userIds 用户ID列表
-     * @return 角色关联列表
+     * @return 角色关联实体列表
      */
     public List<UserRoleEntity> listByUserIds(List<Long> userIds) {
         if (userIds == null || userIds.isEmpty()) {
@@ -67,7 +66,10 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
 
 
     /**
-     * 根据多个角色ID获取用户ID列表
+     * 根据多个角色ID获取去重后的用户ID列表
+     *
+     * @param roleIds 角色ID列表
+     * @return 关联的用户ID列表（已去重）
      */
     public List<Long> getUserIdsByRoleIds(List<Long> roleIds) {
         if (roleIds == null || roleIds.isEmpty()) {
@@ -83,7 +85,7 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
     }
 
     /**
-     * 根据用户ID删除角色关联
+     * 根据用户ID删除其所有的角色关联记录
      *
      * @param userId 用户ID
      */
@@ -93,7 +95,7 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
     }
 
     /**
-     * 根据角色ID删除用户关联
+     * 根据角色ID删除其所有的用户关联记录
      *
      * @param roleId 角色ID
      */
@@ -103,7 +105,10 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
     }
 
     /**
-     * 统计拥有指定角色的用户数量
+     * 统计分配了指定角色的用户总数
+     *
+     * @param roleId 角色ID
+     * @return 用户数量
      */
     public long countByRoleId(Long roleId) {
         return count(QueryWrapper.create()
@@ -111,7 +116,9 @@ public class UserRoleManager extends BaseServiceImpl<UserRoleMapper, UserRoleEnt
     }
 
     /**
-     * 批量插入用户角色关联
+     * 批量为用户分配多个角色
+     * <p>
+     * 该方法直接执行批量插入，调用前应确保旧的关联已根据需要清理。
      *
      * @param userId  用户ID
      * @param roleIds 角色ID列表

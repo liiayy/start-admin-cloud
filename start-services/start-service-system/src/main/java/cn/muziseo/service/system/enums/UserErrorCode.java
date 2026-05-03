@@ -24,7 +24,10 @@ public enum UserErrorCode implements IErrorCode {
     CAPTCHA_EMPTY(10101009, "验证码不能为空"),
     CAPTCHA_EXPIRED(10101010, "验证码已过期"),
     CAPTCHA_ERROR(10101011, "验证码错误"),
+    SOCIAL_USER_NOT_BOUND(10101012, "社交账号未绑定系统用户"),
+    SOCIAL_USER_ALREADY_BOUND(10101013, "该社交账号已被其他用户绑定"),
     ;
+
 
     private final int code;
     private final String message;

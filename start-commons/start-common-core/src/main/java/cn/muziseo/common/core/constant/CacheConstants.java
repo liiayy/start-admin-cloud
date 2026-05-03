@@ -44,4 +44,10 @@ public final class CacheConstants {
      */
     public static final String WS_ONLINE_PREFIX = "sys:ws:cluster:";
 
+    /**
+     * 社交登录认证状态缓存前缀
+     */
+    public static final String SOCIAL_AUTH_CODE_PREFIX = "sys:auth:social:";
+
 }
+

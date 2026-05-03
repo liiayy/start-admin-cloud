@@ -31,7 +31,9 @@
         <module>start-common-oss</module>
         <module>start-common-excel</module>
         <module>start-common-websocket</module>
+        <module>start-common-social</module>
     </modules>
+
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

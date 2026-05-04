@@ -1,6 +1,8 @@
 package cn.muziseo.service.system.module.social.controller;
 
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.log.annotation.Log;
+import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.service.system.module.auth.controller.vo.LoginVO;
 import cn.muziseo.service.system.module.social.service.SocialService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,6 +41,7 @@ public class SocialController {
 
     @Operation(summary = "绑定社交账号")
     @PostMapping("/bind/{source}")
+    @Log(title = "社交登录", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> bind(
             @PathVariable String source,
             @RequestParam String code,
@@ -49,6 +52,7 @@ public class SocialController {
 
     @Operation(summary = "解绑社交账号")
     @DeleteMapping("/unbind/{source}")
+    @Log(title = "社交登录", businessType = BusinessType.DELETE)
     public ResponseDTO<Void> unbind(@PathVariable String source) {
         socialService.unbind(source);
         return ResponseDTO.success();

@@ -137,6 +137,7 @@ public class UserController {
     @Operation(summary = "修改密码（用户自己）")
     @PutMapping("/update-password")
     @SaCheckLogin
+    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> updatePassword(@Valid @RequestBody UserUpdatePasswordRequest request) {
         userService.updatePassword(request);
         return ResponseDTO.success();

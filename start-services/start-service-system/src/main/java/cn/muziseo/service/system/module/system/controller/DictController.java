@@ -3,6 +3,8 @@ package cn.muziseo.service.system.module.system.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.cache.dict.DictUtils;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.log.annotation.Log;
+import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.common.core.domain.dto.DictDataSimpleDTO;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.system.controller.request.DictDataAddRequest;
@@ -70,6 +72,7 @@ public class DictController {
     @Operation(summary = "新增字典数据")
     @SaCheckPermission("system:dict:add")
     @PostMapping("/add")
+    @Log(title = "字典数据", businessType = BusinessType.INSERT)
     public ResponseDTO<Void> add(@Valid @RequestBody DictDataAddRequest request) {
         dictService.addDictData(request);
         return ResponseDTO.success();
@@ -78,6 +81,7 @@ public class DictController {
     @Operation(summary = "更新字典数据")
     @SaCheckPermission("system:dict:update")
     @PutMapping("/update")
+    @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> update(@RequestParam Long id, @Valid @RequestBody DictDataAddRequest request) {
         dictService.updateDictData(id, request);
         return ResponseDTO.success();
@@ -86,6 +90,7 @@ public class DictController {
     @Operation(summary = "删除字典数据")
     @SaCheckPermission("system:dict:delete")
     @DeleteMapping("/delete")
+    @Log(title = "字典数据", businessType = BusinessType.DELETE)
     public ResponseDTO<Void> delete(@RequestParam Long id) {
         dictService.deleteDictData(id);
         return ResponseDTO.success();

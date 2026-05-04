@@ -3,6 +3,8 @@ package cn.muziseo.service.system.module.system.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.cache.config.ConfigUtils;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.log.annotation.Log;
+import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigAddRequest;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigPageRequest;
@@ -62,6 +64,7 @@ public class SystemConfigController {
     @Operation(summary = "新增系统参数")
     @SaCheckPermission("system:config:add")
     @PostMapping("/add")
+    @Log(title = "系统参数", businessType = BusinessType.INSERT)
     public ResponseDTO<Void> add(@Valid @RequestBody SystemConfigAddRequest request) {
         systemConfigService.addConfig(request);
         return ResponseDTO.success();
@@ -70,6 +73,7 @@ public class SystemConfigController {
     @Operation(summary = "更新系统参数")
     @SaCheckPermission("system:config:update")
     @PutMapping("/update")
+    @Log(title = "系统参数", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> update(@RequestParam Long id, @Valid @RequestBody SystemConfigAddRequest request) {
         systemConfigService.updateConfig(id, request);
         return ResponseDTO.success();
@@ -78,6 +82,7 @@ public class SystemConfigController {
     @Operation(summary = "删除系统参数")
     @SaCheckPermission("system:config:delete")
     @DeleteMapping("/delete")
+    @Log(title = "系统参数", businessType = BusinessType.DELETE)
     public ResponseDTO<Void> delete(@RequestParam Long id) {
         systemConfigService.deleteConfig(id);
         return ResponseDTO.success();

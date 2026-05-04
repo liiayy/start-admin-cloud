@@ -2,6 +2,8 @@ package cn.muziseo.service.system.module.system.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.log.annotation.Log;
+import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.module.system.controller.request.DictTypeAddRequest;
 import cn.muziseo.service.system.module.system.controller.request.DictTypePageRequest;
@@ -57,6 +59,7 @@ public class DictTypeController {
     @Operation(summary = "新增字典类型")
     @SaCheckPermission("system:dict:add")
     @PostMapping("/add")
+    @Log(title = "字典类型", businessType = BusinessType.INSERT)
     public ResponseDTO<Void> add(@Valid @RequestBody DictTypeAddRequest request) {
         dictTypeService.addDictType(request);
         return ResponseDTO.success();
@@ -65,6 +68,7 @@ public class DictTypeController {
     @Operation(summary = "更新字典类型")
     @SaCheckPermission("system:dict:update")
     @PutMapping("/update")
+    @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> update(@RequestParam Long id, @Valid @RequestBody DictTypeAddRequest request) {
         dictTypeService.updateDictType(id, request);
         return ResponseDTO.success();
@@ -73,6 +77,7 @@ public class DictTypeController {
     @Operation(summary = "删除字典类型")
     @SaCheckPermission("system:dict:delete")
     @DeleteMapping("/delete")
+    @Log(title = "字典类型", businessType = BusinessType.DELETE)
     public ResponseDTO<Void> delete(@RequestParam Long id) {
         dictTypeService.deleteDictType(id);
         return ResponseDTO.success();

@@ -94,6 +94,7 @@ public class RoleController {
     @Operation(summary = "分配菜单")
     @PostMapping("/assign-menus")
     @SaCheckPermission("system:role:update")
+    @Log(title = "角色管理", businessType = BusinessType.GRANT)
     public ResponseDTO<Void> assignMenus(@RequestParam Long roleId, @RequestBody List<Long> menuIds) {
         log.info("分配角色菜单: roleId={}, menuCount={}", roleId, menuIds.size());
         roleService.assignMenus(roleId, menuIds);

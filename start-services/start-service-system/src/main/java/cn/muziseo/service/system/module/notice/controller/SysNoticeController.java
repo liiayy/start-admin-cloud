@@ -96,6 +96,7 @@ public class SysNoticeController {
 
     @Operation(summary = "标记公告为已读")
     @PostMapping("/read/{id}")
+    @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> markRead(@PathVariable Long id) {
         noticeService.markAsRead(id);
         return ResponseDTO.success();

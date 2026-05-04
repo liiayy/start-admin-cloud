@@ -2,6 +2,8 @@ package cn.muziseo.service.system.module.organization.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.log.annotation.Log;
+import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.service.system.module.organization.controller.request.DeptAddRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptTreeVO;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptVO;
@@ -52,6 +54,7 @@ public class DeptController {
     @Operation(summary = "新增部门")
     @PostMapping("/add")
     @SaCheckPermission("system:dept:add")
+    @Log(title = "部门管理", businessType = BusinessType.INSERT)
     public ResponseDTO<Void> add(@Valid @RequestBody DeptAddRequest request) {
         deptService.addDept(request);
         return ResponseDTO.success();
@@ -60,6 +63,7 @@ public class DeptController {
     @Operation(summary = "更新部门")
     @PutMapping("/{id}")
     @SaCheckPermission("system:dept:update")
+    @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> update(@PathVariable Long id, @Valid @RequestBody DeptAddRequest request) {
         deptService.updateDept(id, request);
         return ResponseDTO.success();
@@ -68,6 +72,7 @@ public class DeptController {
     @Operation(summary = "删除部门")
     @DeleteMapping("/{id}")
     @SaCheckPermission("system:dept:delete")
+    @Log(title = "部门管理", businessType = BusinessType.DELETE)
     public ResponseDTO<Void> delete(@PathVariable Long id) {
         deptService.deleteDept(id);
         return ResponseDTO.success();
@@ -76,6 +81,7 @@ public class DeptController {
     @Operation(summary = "更新部门状态")
     @PutMapping("/update-status")
     @SaCheckPermission("system:dept:update")
+    @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> updateStatus(@RequestParam Long id, @RequestParam Integer status) {
         deptService.updateStatus(id, status);
         return ResponseDTO.success();

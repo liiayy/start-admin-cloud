@@ -3,6 +3,8 @@ package cn.muziseo.service.system.module.permission.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.log.annotation.Log;
+import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.service.system.module.permission.controller.request.MenuAddRequest;
 import cn.muziseo.service.system.module.permission.controller.request.MenuUpdateRequest;
 import cn.muziseo.service.system.module.permission.controller.vo.MenuTreeVO;
@@ -57,6 +59,7 @@ public class MenuController {
     @Operation(summary = "新增菜单")
     @PostMapping("/add")
     @SaCheckPermission("system:menu:add")
+    @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     public ResponseDTO<Void> add(@Valid @RequestBody MenuAddRequest request) {
         log.info("新增菜单: name={}, type={}", request.getName(), request.getType());
         menuService.addMenu(request);
@@ -66,6 +69,7 @@ public class MenuController {
     @Operation(summary = "修改菜单")
     @PutMapping("/update")
     @SaCheckPermission("system:menu:update")
+    @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     public ResponseDTO<Void> update(@Valid @RequestBody MenuUpdateRequest request) {
         log.info("修改菜单: id={}", request.getId());
         menuService.updateMenu(request);
@@ -75,6 +79,7 @@ public class MenuController {
     @Operation(summary = "删除菜单")
     @DeleteMapping("/delete")
     @SaCheckPermission("system:menu:delete")
+    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     public ResponseDTO<Void> delete(@RequestParam Long id) {
         log.info("删除菜单: id={}", id);
         menuService.deleteMenu(id);

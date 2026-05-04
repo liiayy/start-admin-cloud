@@ -57,7 +57,13 @@ public class DictCacheManager {
         List<DictDataSimpleDTO> result = CAFFEINE.get(dictType, k -> {
             // 1. L1 未命中，查 L2（Redis）
             String redisKey = CacheConstants.DICT_PREFIX + dictType;
-            List<DictDataSimpleDTO> redisData = RedisUtils.getCacheObjectSafe(redisKey);
+            List<DictDataSimpleDTO> redisData = null;
+            try {
+                redisData = RedisUtils.getCacheList(redisKey);
+            } catch (Exception e) {
+                log.warn("[DictCache] 缓存列表读取失败，清理脏数据: key={}, error={}", redisKey, e.getMessage());
+                RedisUtils.deleteObject(redisKey);
+            }
 
             if (redisData != null && !redisData.isEmpty()) {
                 log.debug("[DictCache] L2 命中: dictType={}", dictType);
@@ -69,7 +75,7 @@ public class DictCacheManager {
             List<DictDataSimpleDTO> fallbackData = rpcFallback.apply(dictType);
             if (fallbackData != null && !fallbackData.isEmpty()) {
                 // 回写到 Redis（不设过期时间，靠管理后台主动清除）
-                RedisUtils.setCacheObject(redisKey, fallbackData);
+                RedisUtils.setCacheList(redisKey, fallbackData);
             }
             return fallbackData;
         });

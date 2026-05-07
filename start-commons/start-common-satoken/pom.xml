@@ -21,6 +21,7 @@
         <dependency>
             <groupId>cn.muziseo</groupId>
             <artifactId>start-common-core</artifactId>
+            <version>${revision}</version>
         </dependency>
 
 
@@ -36,6 +37,7 @@
         <dependency>
             <groupId>cn.muziseo</groupId>
             <artifactId>start-common-cache</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>

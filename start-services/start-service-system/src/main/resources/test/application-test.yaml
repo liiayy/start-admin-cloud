@@ -1,0 +1,28 @@
+# ===================================================================
+# 系统服务 - 开发环境本地配置
+# ===================================================================
+# 敏感配置（数据库、Redis、Seata）已迁移到 Nacos 配置中心
+# Nacos DataId: system-service-dev.yaml
+# 本地仅保留 Nacos 连接地址，用于引导加载远程配置
+# ===================================================================
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.100.156:8848
+        namespace: public
+        group: DEFAULT_GROUP
+      config:
+        server-addr: 192.168.100.156:8848
+        file-extension: yaml
+        namespace: public
+        group: DEFAULT_GROUP
+    sentinel:
+      transport:
+        dashboard: 192.168.100.156:8858
+
+# 安全加固配置 (开发环境)
+sa-token:
+  # 开发环境专用强密钥
+  jwt-secret-key: dev-secret-key-start-admin-cloud-2026-04-27

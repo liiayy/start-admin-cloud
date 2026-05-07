@@ -216,21 +216,12 @@
         </plugins>
 
         <finalName>${project.name}-${profiles.active}-${project.version}</finalName>
-        <!--这部分定义了如何处理 src/main/resources目录下的非代码文件（如配置文件、图片等）。-->
+        <!--采用“精准控制”风格的资源处理策略-->
         <resources>
+            <!-- 1. 基础资源：原样复制所有文件，不开启过滤（保护二进制文件，如 ip2region.xdb） -->
             <resource>
                 <directory>src/main/resources</directory>
-                <!-- 引入所有 匹配文件进行过滤 -->
-                <includes>
-                    <include>banner*</include>
-                </includes>
-                <!-- 启用过滤 即该资源中的变量将会被过滤器中的值替换 -->
-                <filtering>true</filtering>
-            </resource>
-            <!-- 复制 src/main/resources根目录下的所有文件，但排除各个环境特定的配置目录-->
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
                 <excludes>
                     <exclude>dev/*</exclude>
                     <exclude>test/*</exclude>
@@ -238,21 +229,34 @@
                     <exclude>prod/*</exclude>
                 </excludes>
             </resource>
-            <!-- 从当前激活环境对应的目录（如 src/main/resources/dev）中，只复制 YAML 文件到最终包的根目录，并开启变量替换 -->
+
+            <!-- 2. 特殊文件：仅对 banner 文件开启过滤（用于替换版本号变量） -->
             <resource>
-                <directory>src/main/resources/${profiles.active}</directory>
-                <filtering>true</filtering> <!-- 开启变量替换 YAML 文件中的 Maven 属性占位符（如 @project.version@）会被替换为实际值。-->
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
                 <includes>
-                    <include>*.yaml</include>
+                    <include>banner*</include>
                 </includes>
             </resource>
-            <!--复制当前环境目录下的所有非YAML文件到最终包的根目录-->
+
+            <!-- 3. 环境配置：仅对当前激活环境目录下的 YAML 开启过滤 -->
+            <resource>
+                <directory>src/main/resources/${profiles.active}</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>*.yaml</include>
+                    <include>*.yml</include>
+                </includes>
+            </resource>
+
+            <!-- 4. 环境附属文件：环境目录下的非 YAML 文件（如证书、脚本等）原样复制 -->
             <resource>
                 <directory>src/main/resources/${profiles.active}</directory>
                 <filtering>false</filtering>
-                <includes>
-                    <include>*.*</include>
-                </includes>
+                <excludes>
+                    <exclude>*.yaml</exclude>
+                    <exclude>*.yml</exclude>
+                </excludes>
             </resource>
         </resources>
 

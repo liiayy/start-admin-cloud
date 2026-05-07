@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.muziseo</groupId>
         <artifactId>start-commons</artifactId>
-        <version>1.0.0</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>start-common-satoken</artifactId>

@@ -1,10 +1,12 @@
 package cn.muziseo.service.system.module.monitor.listener;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.event.ErrorLogEvent;
 import cn.muziseo.common.core.event.LoginLogEvent;
 import cn.muziseo.common.core.event.OperLogEvent;
 import cn.muziseo.service.system.module.monitor.repository.entity.LoginLogEntity;
 import cn.muziseo.service.system.module.monitor.repository.entity.OperLogEntity;
+import cn.muziseo.service.system.module.monitor.service.SysErrorLogService;
 import cn.muziseo.service.system.module.monitor.convert.LogConverter;
 import cn.muziseo.service.system.module.monitor.repository.mapper.LoginLogMapper;
 import cn.muziseo.service.system.module.monitor.repository.mapper.OperLogMapper;
@@ -24,6 +26,7 @@ public class LogEventListener {
 
     private final OperLogMapper operLogMapper;
     private final LoginLogMapper loginLogMapper;
+    private final SysErrorLogService errorLogService;
     private final LogConverter logConverter;
 
     /**
@@ -57,6 +60,20 @@ public class LogEventListener {
             loginLogMapper.insert(entity);
         } catch (Exception e) {
             log.error("保存登录日志失败: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 保存错误日志
+     */
+    @Async
+    @EventListener
+    public void saveErrorLog(ErrorLogEvent event) {
+        log.info("收到错误日志事件：{}", event.getErrorType());
+        try {
+            errorLogService.saveErrorLog(event);
+        } catch (Exception e) {
+            log.error("保存错误日志失败: {}", e.getMessage(), e);
         }
     }
 }

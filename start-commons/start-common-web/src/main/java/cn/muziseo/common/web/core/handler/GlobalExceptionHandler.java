@@ -1,17 +1,25 @@
 package cn.muziseo.common.web.core.handler;
 
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.muziseo.common.core.constant.HttpStatus;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
+import cn.muziseo.common.core.event.ErrorLogEvent;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.core.exception.ServiceException;
 import cn.muziseo.common.core.exception.errorCode.CommonErrorCode;
 import cn.muziseo.common.core.exception.errorCode.SystemErrorCode;
+import cn.muziseo.common.core.utils.json.JsonUtils;
+import cn.muziseo.common.core.utils.servlet.ServletUtils;
+import cn.muziseo.common.core.utils.spring.SpringUtils;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -26,6 +34,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -37,7 +46,14 @@ import java.util.Optional;
  */
 @RestControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler implements ApplicationEventPublisherAware {
+
+    private ApplicationEventPublisher eventPublisher;
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
 
     /**
@@ -66,6 +82,10 @@ public class GlobalExceptionHandler {
     public ResponseDTO<?> handleServiceException(ServiceException ex) {
         // 记录错误日志，包含完整堆栈信息
         log.error("[系统异常] 错误码: {}, 错误信息: {}", ex.getCode(), ex.getMessage(), ex);
+        
+        // 记录错误日志到数据库
+        publishErrorLog(ServletUtils.getRequest(), ex);
+        
         // 返回统一的错误响应
         return ex.getErrorCode() != null
                 ? ResponseDTO.fail(ex.getErrorCode(), ex.getMessage())
@@ -247,10 +267,49 @@ public class GlobalExceptionHandler {
      * @return ResponseDTO
      */
     @ExceptionHandler(value = Throwable.class)
-    public ResponseDTO<?> handleDefaultException(HttpServletRequest req, Exception ex) {
+    public ResponseDTO<?> handleDefaultException(HttpServletRequest req, Throwable ex) {
         log.error("[系统异常] 请求地址: {}, 异常原因: ", req.getRequestURI(), ex);
+        
+        // 记录错误日志到数据库
+        publishErrorLog(req, ex);
+        
         // 在生产环境下，不建议直接把 ex.getMessage() 返回给前端，防止泄露堆栈或数据库结构
         return ResponseDTO.fail(SystemErrorCode.INTERNAL_ERROR);
+    }
+
+    /**
+     * 发布错误日志事件
+     */
+    private void publishErrorLog(HttpServletRequest req, Throwable ex) {
+        if (req == null || eventPublisher == null) {
+            return;
+        }
+        try {
+            ErrorLogEvent event = new ErrorLogEvent();
+            event.setErrorType(ex.getClass().getName());
+            event.setErrorMessage(ex.getMessage());
+            event.setErrorStack(ExceptionUtil.stacktraceToString(ex));
+            event.setRequestUri(req.getRequestURI());
+            event.setRequestMethod(req.getMethod());
+            event.setRequestParams(JsonUtils.toJsonString(ServletUtils.getParams(req)));
+            event.setRequestIp(ServletUtils.getClientIP(req));
+            event.setUserAgent(req.getHeader("User-Agent"));
+            event.setModuleName(SpringUtils.getApplicationName());
+            event.setCreateTime(LocalDateTime.now());
+            
+            // 获取用户信息
+            try {
+                if (StpUtil.isLogin()) {
+                    event.setUserId(StpUtil.getLoginIdAsLong());
+                    // 如果有需要，可以从 Session 获取更多信息，这里简单设置 ID 为登录名占位
+                    event.setUserName(StpUtil.getLoginIdAsString());
+                }
+            } catch (Exception ignored) {}
+            
+            eventPublisher.publishEvent(event);
+        } catch (Exception e) {
+            log.error("发布错误日志事件失败", e);
+        }
     }
 
 

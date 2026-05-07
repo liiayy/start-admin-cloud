@@ -3,6 +3,7 @@ package cn.muziseo.common.log.config;
 import cn.muziseo.common.log.aspect.LogAspect;
 import cn.muziseo.common.log.listener.RemoteLogEventListener;
 import cn.muziseo.common.log.utils.IpLocationUtils;
+import cn.muziseo.service.system.module.monitor.api.ErrorLogApi;
 import cn.muziseo.service.system.module.monitor.api.OperLogApi;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -38,8 +39,8 @@ public class LogAutoConfiguration {
      */
     @Bean
     @ConditionalOnProperty(name = "start.log.remote.enabled", havingValue = "true")
-    @ConditionalOnBean(OperLogApi.class)
-    public RemoteLogEventListener remoteLogEventListener(OperLogApi operLogApi) {
-        return new RemoteLogEventListener(operLogApi);
+    @ConditionalOnBean({OperLogApi.class, ErrorLogApi.class})
+    public RemoteLogEventListener remoteLogEventListener(OperLogApi operLogApi, ErrorLogApi errorLogApi) {
+        return new RemoteLogEventListener(operLogApi, errorLogApi);
     }
 }

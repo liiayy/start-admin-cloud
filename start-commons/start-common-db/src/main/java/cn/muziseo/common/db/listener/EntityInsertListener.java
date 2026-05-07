@@ -1,6 +1,7 @@
 package cn.muziseo.common.db.listener;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.muziseo.common.core.constant.SaSessionConstants;
 import cn.muziseo.common.db.entity.BaseEntity;
 import com.mybatisflex.annotation.InsertListener;
 
@@ -25,23 +26,31 @@ public class EntityInsertListener implements InsertListener {
             if (baseEntity.getUpdateTime() == null) {
                 baseEntity.setUpdateTime(now);
             }
-            String userId = getUserId();
+            String userName = getUserName();
             if (baseEntity.getCreator() == null || baseEntity.getCreator().isEmpty()) {
-                baseEntity.setCreator(userId);
+                baseEntity.setCreator(userName);
             }
             if (baseEntity.getUpdater() == null || baseEntity.getUpdater().isEmpty()) {
-                baseEntity.setUpdater(userId);
+                baseEntity.setUpdater(userName);
             }
         }
     }
 
     /**
-     * 获取当前登录用户 ID，未登录返回 "system"
+     * 获取当前登录用户名，未登录返回 "system"
      */
-    private String getUserId() {
+    private String getUserName() {
         try {
-            Object loginId = StpUtil.getLoginIdDefaultNull();
-            return loginId != null ? loginId.toString() : "system";
+            if (StpUtil.isLogin()) {
+                // 优先从 Session 获取用户名字符串
+                String username = StpUtil.getSession().getString(SaSessionConstants.USERNAME);
+                if (username != null && !username.isEmpty()) {
+                    return username;
+                }
+                // 兜底返回登录 ID
+                return StpUtil.getLoginIdAsString();
+            }
+            return "system";
         } catch (Exception e) {
             return "system";
         }

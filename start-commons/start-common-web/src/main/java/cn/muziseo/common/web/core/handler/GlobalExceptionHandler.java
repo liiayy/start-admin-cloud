@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.muziseo.common.core.constant.HttpStatus;
+import cn.muziseo.common.core.constant.SaSessionConstants;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.core.event.ErrorLogEvent;
 import cn.muziseo.common.core.exception.BusinessException;
@@ -301,8 +302,9 @@ public class GlobalExceptionHandler implements ApplicationEventPublisherAware {
             try {
                 if (StpUtil.isLogin()) {
                     event.setUserId(StpUtil.getLoginIdAsLong());
-                    // 如果有需要，可以从 Session 获取更多信息，这里简单设置 ID 为登录名占位
-                    event.setUserName(StpUtil.getLoginIdAsString());
+                    // 优先从 Session 获取用户名
+                    String username = StpUtil.getSession().getString(SaSessionConstants.USERNAME);
+                    event.setUserName(username != null ? username : StpUtil.getLoginIdAsString());
                 }
             } catch (Exception ignored) {}
             

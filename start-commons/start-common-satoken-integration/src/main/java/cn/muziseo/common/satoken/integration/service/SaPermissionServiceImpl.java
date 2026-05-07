@@ -2,6 +2,7 @@ package cn.muziseo.common.satoken.integration.service;
 
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.muziseo.common.core.constant.SaSessionConstants;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
@@ -18,16 +19,13 @@ import java.util.Set;
 @Slf4j
 public class SaPermissionServiceImpl implements SaPermissionService {
 
-    private static final String SESSION_ROLES_KEY = "roles";
-    private static final String SESSION_PERMISSIONS_KEY = "permissions";
-
     @Override
     public Set<String> getRoleCodes(Long userId) {
         SaSession session = StpUtil.getSessionByLoginId(userId, false);
         if (session == null) {
             return Set.of();
         }
-        Set<String> roles = session.getModel(SESSION_ROLES_KEY, Set.class);
+        Set<String> roles = session.getModel(SaSessionConstants.ROLES, Set.class);
         return roles != null ? roles : Set.of();
     }
 
@@ -37,7 +35,7 @@ public class SaPermissionServiceImpl implements SaPermissionService {
         if (session == null) {
             return Set.of();
         }
-        Set<String> permissions = session.getModel(SESSION_PERMISSIONS_KEY, Set.class);
+        Set<String> permissions = session.getModel(SaSessionConstants.PERMISSIONS, Set.class);
         return permissions != null ? permissions : Set.of();
     }
 }

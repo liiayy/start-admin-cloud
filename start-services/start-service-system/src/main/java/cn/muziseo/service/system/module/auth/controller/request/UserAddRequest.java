@@ -2,6 +2,8 @@ package cn.muziseo.service.system.module.auth.controller.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -13,6 +15,8 @@ public class UserAddRequest {
 
     @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "用户账号不能为空")
+    @Size(min = 4, max = 20, message = "用户账号长度必须在 4 到 20 个字符之间")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "用户账号只能包含字母、数字和下划线")
     private String username;
 
     @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED)

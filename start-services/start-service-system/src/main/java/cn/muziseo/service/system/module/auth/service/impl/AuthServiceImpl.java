@@ -5,6 +5,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.cache.utils.RedisUtils;
 import cn.muziseo.common.core.constant.CacheConstants;
 import cn.muziseo.common.core.constant.ConfigConstants;
+import cn.muziseo.common.core.constant.SaSessionConstants;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.cache.config.ConfigUtils;
 import cn.muziseo.common.satoken.core.util.PasswordUtils;
@@ -132,7 +133,9 @@ public class AuthServiceImpl implements AuthService {
         String username = "";
         try {
             if (StpUtil.isLogin()) {
-                username = StpUtil.getLoginIdAsString();
+                // 优先从 Session 获取用户名
+                String sessionUsername = StpUtil.getSession().getString(SaSessionConstants.USERNAME);
+                username = sessionUsername != null ? sessionUsername : StpUtil.getLoginIdAsString();
             }
         } catch (Exception e) {
             // 忽略非登录态

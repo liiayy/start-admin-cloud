@@ -3,6 +3,7 @@ package cn.muziseo.common.log.aspect;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
+import cn.muziseo.common.core.constant.SaSessionConstants;
 import cn.muziseo.common.core.event.OperLogEvent;
 import cn.muziseo.common.core.utils.json.JsonUtils;
 import cn.muziseo.common.core.utils.mask.SensitiveUtils;
@@ -85,7 +86,9 @@ public class LogAspect {
             String username = "unknown";
             try {
                 if (StpUtil.isLogin()) {
-                    username = StpUtil.getLoginIdAsString();
+                    // 优先从 Session 获取用户名
+                    String sessionUsername = StpUtil.getSession().getString(SaSessionConstants.USERNAME);
+                    username = sessionUsername != null ? sessionUsername : StpUtil.getLoginIdAsString();
                 }
             } catch (Exception ignored) {}
  

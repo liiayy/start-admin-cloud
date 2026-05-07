@@ -6,6 +6,8 @@ import cn.muziseo.common.excel.annotation.ExcelDictFormat;
 import cn.muziseo.common.excel.annotation.ExcelRequired;
 import cn.muziseo.common.excel.convert.ExcelDictConvert;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -19,6 +21,8 @@ public class UserImportVO {
     @ExcelProperty(value = "用户账号")
     @ExcelRequired
     @NotBlank(message = "用户账号不能为空")
+    @Size(min = 4, max = 20, message = "用户账号长度必须在 4 到 20 个字符之间")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "用户账号只能包含字母、数字和下划线")
     private String username;
 
     @ExcelProperty(value = "用户昵称")

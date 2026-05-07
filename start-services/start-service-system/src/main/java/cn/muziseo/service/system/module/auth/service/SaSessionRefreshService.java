@@ -2,12 +2,15 @@ package cn.muziseo.service.system.module.auth.service;
 
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.muziseo.common.core.constant.SaSessionConstants;
+import cn.muziseo.service.system.module.auth.repository.entity.UserEntity;
 import cn.muziseo.service.system.module.permission.controller.vo.MenuVO;
 import cn.muziseo.service.system.module.permission.repository.entity.RoleEntity;
 import cn.muziseo.service.system.module.permission.service.MenuService;
 import cn.muziseo.service.system.module.permission.service.RoleService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,14 +29,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SaSessionRefreshService {
 
-    private static final String SESSION_ROLES_KEY = "roles";
-    private static final String SESSION_PERMISSIONS_KEY = "permissions";
-
     @Resource
     private RoleService roleService;
 
     @Resource
     private MenuService menuService;
+
+    @Resource
+    @Lazy
+    private UserService userService;
 
     /**
      * 刷新指定用户的 Session 权限数据
@@ -99,7 +103,16 @@ public class SaSessionRefreshService {
                     .collect(Collectors.toSet());
         }
 
-        session.set(SESSION_ROLES_KEY, roleCodes);
-        session.set(SESSION_PERMISSIONS_KEY, permissions);
+        session.set(SaSessionConstants.ROLES, roleCodes);
+        session.set(SaSessionConstants.PERMISSIONS, permissions);
+        
+        // 补存用户信息
+        UserEntity user = userService.getUserById(userId);
+        if (user != null) {
+            // 存入整个对象（供 system 服务内部使用）
+            session.set(SaSessionConstants.USER, user);
+            // 存入纯文本用户名（供 common 模块跨服务使用）
+            session.set(SaSessionConstants.USERNAME, user.getUsername());
+        }
     }
 }

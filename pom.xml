@@ -236,6 +236,8 @@
                 <filtering>true</filtering>
                 <includes>
                     <include>banner*</include>
+                    <include>*.yaml</include>
+                    <include>*.yml</include>
                 </includes>
             </resource>
 

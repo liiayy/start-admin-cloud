@@ -6,7 +6,7 @@ spring:
           # 路由发现配置
           discovery:
             locator:
-              enabled: true
+              enabled: false
               lower-case-service-id: true
 
     nacos:

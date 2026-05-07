@@ -10,6 +10,10 @@ spring:
   main:
     allow-circular-references: true # 允许循环依赖
   cloud:
+    loadbalancer:
+      cache:
+        enabled: true
+        ttl: 10s
     gateway:
       server:
         webflux:

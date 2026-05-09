@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/Spring%20Cloud-2023.x-blue.svg" alt="Spring Cloud">
   <img src="https://img.shields.io/badge/MyBatis--Flex-1.7+-red.svg" alt="MyBatis-Flex">
   <img src="https://img.shields.io/badge/Sa--Token-1.37+-orange.svg" alt="Sa-Token">
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+  <img src="https://img.shields.io/badge/License-Apache--2.0-blue.svg" alt="License">
 </p>
 
 ---
@@ -40,7 +40,7 @@
 | **基础架构** | Spring Boot 3.x, Spring Cloud 2023.x | 微服务核心底座 |
 | **服务治理** | Spring Cloud Alibaba (Nacos, Sentinel, Seata) | 注册中心、配置中心、限流熔断、分布式事务 |
 | **网关路由** | Spring Cloud Gateway | 动态路由、全局鉴权、跨域与限流 |
-| **持久化层** | MyBatis-Flex, Druid | ORM、连接池 |
+| **持久化层** | MyBatis-Flex, Druid | ORM、连接池（支持 PostgreSQL） |
 | **认证授权** | Sa-Token | 登录认证、权限校验、单点登录 |
 | **缓存中间件** | Redis, Redisson, Caffeine | 分布式缓存、一二级缓存架构、分布式锁 |
 | **消息与任务** | RabbitMQ / RocketMQ, SnailJob | 异步解耦、分布式定时任务 |
@@ -82,7 +82,7 @@ start-admin-cloud
 ### 1. 环境准备
 - **JDK**: 17+
 - **Maven**: 3.8+
-- **MySQL**: 8.0+
+- **PostgreSQL**: 14+
 - **Redis**: 6.0+
 - **Nacos**: 2.x
 
@@ -96,7 +96,7 @@ mvn clean install -DskipTests
 ```
 
 ### 3. 初始化基础设施
-1. 创建 MySQL 数据库 `start_admin` 并导入基础 SQL 脚本。
+1. 创建 PostgreSQL 数据库 `start_admin` 并导入基础 SQL 脚本。
 2. 启动 Redis 与 Nacos 服务。
 3. 在 Nacos 中导入项目的公共配置文件。
 
@@ -131,4 +131,4 @@ mvn clean install -DskipTests
 
 ## 📄 许可证
 
-本项目开源协议基于 [MIT License](LICENSE)。您可以自由地使用、修改并分发，请保留作者版权信息。
+本项目开源协议基于 [Apache-2.0 License](LICENSE)。您可以自由地使用、修改并分发，请保留作者版权信息。

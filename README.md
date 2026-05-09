@@ -15,6 +15,8 @@
 
 ---
 
+> 🌐 **在线演示**：[https://start-admin.p.muziseo.cn/](https://start-admin.p.muziseo.cn/)
+
 ## 📖 项目简介
 
 **Start-Admin-Cloud** 是一款面向企业级的现代化微服务后台管理脚手架。项目采用业界最前沿的技术栈，基于 `Spring Boot 3.x`、`Spring Cloud Alibaba`、`MyBatis-Flex` 和 `Sa-Token` 构建，旨在为开发者提供一个**开箱即用、高内聚低耦合、规范统一**的微服务基础设施。

@@ -118,7 +118,7 @@ VALUES (1504, '存储配置', 'system:oss:config', 3, 40, 1500);
 
 -- 配置子权限 (按钮级别)
 INSERT INTO "public"."system_menu" ("id", "name", "permission", "type", "sort", "parent_id")
-VALUES (1505, '配置新增', 'system:oss:config:add', 3, 50, 1500);
+VALUES (1505, '配置新增', 'system:oss:config:create', 3, 50, 1500);
 
 INSERT INTO "public"."system_menu" ("id", "name", "permission", "type", "sort", "parent_id")
 VALUES (1506, '配置删除', 'system:oss:config:delete', 3, 60, 1500);

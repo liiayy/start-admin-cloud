@@ -1,6 +1,6 @@
 package cn.muziseo.service.system.module.permission.service;
 
-import cn.muziseo.service.system.module.permission.controller.request.MenuAddRequest;
+import cn.muziseo.service.system.module.permission.controller.request.MenuCreateRequest;
 import cn.muziseo.service.system.module.permission.controller.request.MenuUpdateRequest;
 import cn.muziseo.service.system.module.permission.controller.vo.MenuTreeVO;
 import cn.muziseo.service.system.module.permission.controller.vo.MenuVO;
@@ -43,7 +43,7 @@ public interface MenuService {
     /**
      * 新增菜单
      */
-    void addMenu(MenuAddRequest request);
+    void createMenu(MenuCreateRequest request);
 
     /**
      * 修改菜单

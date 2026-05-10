@@ -26,7 +26,7 @@ public interface UserService {
 
     UserVO getUser(Long id);
 
-    void createUser(UserAddRequest request);
+    void createUser(UserCreateRequest request);
 
     void updateUser(UserUpdateRequest request);
 

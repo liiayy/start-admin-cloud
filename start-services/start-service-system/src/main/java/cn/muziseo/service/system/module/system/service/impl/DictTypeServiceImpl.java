@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.DictErrorCode;
-import cn.muziseo.service.system.module.system.controller.request.DictTypeAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.DictTypeCreateRequest;
 import cn.muziseo.service.system.module.system.controller.request.DictTypePageRequest;
 import cn.muziseo.service.system.module.system.controller.vo.DictTypeVO;
 import cn.muziseo.service.system.module.system.convert.DictTypeConverter;
@@ -87,7 +87,7 @@ public class DictTypeServiceImpl implements DictTypeService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addDictType(DictTypeAddRequest request) {
+    public void createDictType(DictTypeCreateRequest request) {
         // 检查字典类型是否已存在
         if (dictTypeManager.existsByType(request.getType(), null)) {
             throw new BusinessException(DictErrorCode.DICT_TYPE_CODE_EXISTS);
@@ -112,7 +112,7 @@ public class DictTypeServiceImpl implements DictTypeService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateDictType(Long id, DictTypeAddRequest request) {
+    public void updateDictType(Long id, DictTypeCreateRequest request) {
         DictTypeEntity existing = dictTypeManager.getById(id);
         if (existing == null) {
             throw new BusinessException(DictErrorCode.DICT_TYPE_NOT_EXISTS);

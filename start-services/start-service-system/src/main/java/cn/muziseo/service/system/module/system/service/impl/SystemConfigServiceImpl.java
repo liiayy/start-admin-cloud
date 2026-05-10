@@ -5,7 +5,7 @@ import cn.muziseo.common.cache.config.ConfigCacheManager;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.SystemErrorCode;
-import cn.muziseo.service.system.module.system.controller.request.SystemConfigAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.SystemConfigCreateRequest;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigPageRequest;
 import cn.muziseo.service.system.module.system.controller.vo.SystemConfigVO;
 import cn.muziseo.service.system.module.system.convert.SystemConfigConverter;
@@ -107,7 +107,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * @param request 新增参数请求
      */
     @Override
-    public void addConfig(SystemConfigAddRequest request) {
+    public void createConfig(SystemConfigCreateRequest request) {
         // 检查参数键名是否已存在
         if (systemConfigManager.existsByConfigKey(request.getConfigKey())) {
             throw new BusinessException(SystemErrorCode.CONFIG_KEY_EXISTS);
@@ -137,7 +137,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * @param request 修改参数请求
      */
     @Override
-    public void updateConfig(Long id, SystemConfigAddRequest request) {
+    public void updateConfig(Long id, SystemConfigCreateRequest request) {
         SystemConfigEntity existing = systemConfigManager.getById(id);
         if (existing == null) {
             throw new BusinessException(SystemErrorCode.CONFIG_NOT_EXISTS);

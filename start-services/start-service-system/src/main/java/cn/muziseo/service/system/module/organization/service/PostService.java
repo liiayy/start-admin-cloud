@@ -1,7 +1,7 @@
 package cn.muziseo.service.system.module.organization.service;
 
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.service.system.module.organization.controller.request.PostAddRequest;
+import cn.muziseo.service.system.module.organization.controller.request.PostCreateRequest;
 import cn.muziseo.service.system.module.organization.controller.request.PostPageRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.PostVO;
 
@@ -20,9 +20,9 @@ public interface PostService {
 
     PostVO getById(Long id);
 
-    void addPost(PostAddRequest request);
+    void createPost(PostCreateRequest request);
 
-    void updatePost(Long id, PostAddRequest request);
+    void updatePost(Long id, PostCreateRequest request);
 
     void deletePost(Long id);
 

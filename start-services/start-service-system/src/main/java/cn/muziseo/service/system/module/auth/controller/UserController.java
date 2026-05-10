@@ -86,9 +86,9 @@ public class UserController {
 
     @Operation(summary = "创建用户")
     @PostMapping("/create")
-    @SaCheckPermission("system:user:add")
+    @SaCheckPermission("system:user:create")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
-    public ResponseDTO<Void> create(@Valid @RequestBody UserAddRequest request) {
+    public ResponseDTO<Void> create(@Valid @RequestBody UserCreateRequest request) {
         log.info("创建用户: username={}", request.getUsername());
         userService.createUser(request);
         return ResponseDTO.success();

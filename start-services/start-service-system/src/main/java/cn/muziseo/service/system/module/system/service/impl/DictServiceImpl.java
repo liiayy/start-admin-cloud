@@ -6,7 +6,7 @@ import cn.muziseo.common.core.domain.dto.DictDataSimpleDTO;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.DictErrorCode;
-import cn.muziseo.service.system.module.system.controller.request.DictDataAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.DictDataCreateRequest;
 import cn.muziseo.service.system.module.system.controller.request.DictDataPageRequest;
 import cn.muziseo.service.system.module.system.controller.vo.DictDataVO;
 import cn.muziseo.service.system.module.system.convert.DictConverter;
@@ -103,7 +103,7 @@ public class DictServiceImpl implements DictService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addDictData(DictDataAddRequest request) {
+    public void createDictData(DictDataCreateRequest request) {
         // 检查字典类型是否存在
         if (dictTypeManager.getByType(request.getDictType()) == null) {
             throw new BusinessException(DictErrorCode.DICT_TYPE_NOT_EXISTS);
@@ -131,7 +131,7 @@ public class DictServiceImpl implements DictService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateDictData(Long id, DictDataAddRequest request) {
+    public void updateDictData(Long id, DictDataCreateRequest request) {
         DictEntity existing = dictManager.getById(id);
         if (existing == null) {
             throw new BusinessException(DictErrorCode.DICT_DATA_NOT_EXISTS);

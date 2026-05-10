@@ -7,7 +7,7 @@ import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.common.core.domain.dto.DictDataSimpleDTO;
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.service.system.module.system.controller.request.DictDataAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.DictDataCreateRequest;
 import cn.muziseo.service.system.module.system.controller.request.DictDataPageRequest;
 import cn.muziseo.service.system.module.system.controller.vo.DictDataVO;
 import cn.muziseo.service.system.module.system.service.DictService;
@@ -70,11 +70,11 @@ public class DictController {
     }
 
     @Operation(summary = "新增字典数据")
-    @SaCheckPermission("system:dict:add")
-    @PostMapping("/add")
+    @SaCheckPermission("system:dict:create")
+    @PostMapping("/create")
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
-    public ResponseDTO<Void> add(@Valid @RequestBody DictDataAddRequest request) {
-        dictService.addDictData(request);
+    public ResponseDTO<Void> create(@Valid @RequestBody DictDataCreateRequest request) {
+        dictService.createDictData(request);
         return ResponseDTO.success();
     }
 
@@ -82,7 +82,7 @@ public class DictController {
     @SaCheckPermission("system:dict:update")
     @PutMapping("/update")
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
-    public ResponseDTO<Void> update(@RequestParam Long id, @Valid @RequestBody DictDataAddRequest request) {
+    public ResponseDTO<Void> update(@RequestParam Long id, @Valid @RequestBody DictDataCreateRequest request) {
         dictService.updateDictData(id, request);
         return ResponseDTO.success();
     }

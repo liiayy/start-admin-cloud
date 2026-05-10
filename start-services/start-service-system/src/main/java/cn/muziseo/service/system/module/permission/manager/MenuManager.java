@@ -50,7 +50,7 @@ public class MenuManager extends BaseServiceImpl<MenuMapper, MenuEntity> {
     /**
      * 校验权限标识是否已存在
      *
-     * @param permission 权限标识串（如：system:user:add）
+     * @param permission 权限标识串（如：system:user:create）
      * @param excludeId  需要排除的菜单 ID（用于修改时校验）
      * @return true 表示已存在，false 表示不存在
      */

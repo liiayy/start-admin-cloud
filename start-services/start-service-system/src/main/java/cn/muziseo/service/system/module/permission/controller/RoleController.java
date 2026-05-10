@@ -6,7 +6,7 @@ import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
+import cn.muziseo.service.system.module.permission.controller.request.RoleCreateRequest;
 import cn.muziseo.service.system.module.permission.controller.request.RolePageRequest;
 import cn.muziseo.service.system.module.permission.controller.request.RoleUpdateRequest;
 import cn.muziseo.service.system.module.permission.controller.request.RoleUpdateStatusRequest;
@@ -52,12 +52,12 @@ public class RoleController {
     }
 
     @Operation(summary = "新增角色")
-    @PostMapping("/add")
-    @SaCheckPermission("system:role:add")
+    @PostMapping("/create")
+    @SaCheckPermission("system:role:create")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
-    public ResponseDTO<Void> add(@Valid @RequestBody RoleAddRequest request) {
+    public ResponseDTO<Void> create(@Valid @RequestBody RoleCreateRequest request) {
         log.info("新增角色: code={}, name={}", request.getCode(), request.getName());
-        roleService.addRole(request);
+        roleService.createRole(request);
         return ResponseDTO.success();
     }
 

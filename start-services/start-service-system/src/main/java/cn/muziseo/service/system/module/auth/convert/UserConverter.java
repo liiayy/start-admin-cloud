@@ -3,7 +3,7 @@ package cn.muziseo.service.system.module.auth.convert;
 import cn.muziseo.common.core.domain.dto.DataScopeInfo;
 import cn.muziseo.service.system.module.auth.api.dto.DataScopeRemoteDTO;
 import cn.muziseo.service.system.module.auth.api.dto.UserRemoteDTO;
-import cn.muziseo.service.system.module.auth.controller.request.UserAddRequest;
+import cn.muziseo.service.system.module.auth.controller.request.UserCreateRequest;
 import cn.muziseo.service.system.module.auth.controller.request.UserProfileUpdateRequest;
 import cn.muziseo.service.system.module.auth.controller.request.UserUpdateRequest;
 import cn.muziseo.service.system.module.auth.controller.vo.UserImportVO;
@@ -13,7 +13,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface UserConverter {
-    UserEntity toEntity(UserAddRequest request);
+    UserEntity toEntity(UserCreateRequest request);
     UserEntity toEntity(UserUpdateRequest request);
     UserUpdateRequest toUpdateRequest(UserProfileUpdateRequest request);
     UserEntity toEntity(UserImportVO vo);

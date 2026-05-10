@@ -6,7 +6,7 @@ import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.service.system.module.system.controller.request.SystemConfigAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.SystemConfigCreateRequest;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigPageRequest;
 import cn.muziseo.service.system.module.system.controller.vo.SystemConfigVO;
 import cn.muziseo.service.system.module.system.service.SystemConfigService;
@@ -62,11 +62,11 @@ public class SystemConfigController {
     }
 
     @Operation(summary = "新增系统参数")
-    @SaCheckPermission("system:config:add")
-    @PostMapping("/add")
+    @SaCheckPermission("system:config:create")
+    @PostMapping("/create")
     @Log(title = "系统参数", businessType = BusinessType.INSERT)
-    public ResponseDTO<Void> add(@Valid @RequestBody SystemConfigAddRequest request) {
-        systemConfigService.addConfig(request);
+    public ResponseDTO<Void> create(@Valid @RequestBody SystemConfigCreateRequest request) {
+        systemConfigService.createConfig(request);
         return ResponseDTO.success();
     }
 
@@ -74,7 +74,7 @@ public class SystemConfigController {
     @SaCheckPermission("system:config:update")
     @PutMapping("/update")
     @Log(title = "系统参数", businessType = BusinessType.UPDATE)
-    public ResponseDTO<Void> update(@RequestParam Long id, @Valid @RequestBody SystemConfigAddRequest request) {
+    public ResponseDTO<Void> update(@RequestParam Long id, @Valid @RequestBody SystemConfigCreateRequest request) {
         systemConfigService.updateConfig(id, request);
         return ResponseDTO.success();
     }

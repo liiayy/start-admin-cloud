@@ -159,7 +159,7 @@ class UserServiceImplTest {
         @DisplayName("用户名已存在时抛出异常")
         void createUser_usernameExists_throwsBusinessException() {
             // Given
-            UserAddRequest request = new UserAddRequest();
+            UserCreateRequest request = new UserCreateRequest();
             request.setUsername("admin");
             request.setPassword("123456");
             request.setNickname("管理员");
@@ -176,7 +176,7 @@ class UserServiceImplTest {
         @DisplayName("正常创建用户，密码被加密")
         void createUser_validRequest_savesWithEncodedPassword() {
             // Given
-            UserAddRequest request = new UserAddRequest();
+            UserCreateRequest request = new UserCreateRequest();
             request.setUsername("newuser");
             request.setPassword("123456");
             request.setNickname("新用户");
@@ -200,7 +200,7 @@ class UserServiceImplTest {
         @DisplayName("创建用户时指定了状态，不使用默认值")
         void createUser_withStatus_usesProvidedStatus() {
             // Given
-            UserAddRequest request = new UserAddRequest();
+            UserCreateRequest request = new UserCreateRequest();
             request.setUsername("newuser");
             request.setPassword("123456");
             request.setNickname("新用户");

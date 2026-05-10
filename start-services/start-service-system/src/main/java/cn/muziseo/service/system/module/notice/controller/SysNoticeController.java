@@ -3,7 +3,7 @@ package cn.muziseo.service.system.module.notice.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.service.system.module.notice.controller.request.NoticeAddRequest;
+import cn.muziseo.service.system.module.notice.controller.request.NoticeCreateRequest;
 import cn.muziseo.service.system.module.notice.controller.request.NoticePageRequest;
 import cn.muziseo.service.system.module.notice.controller.request.NoticeUpdateRequest;
 import cn.muziseo.service.system.module.notice.controller.vo.NoticeVO;
@@ -55,8 +55,8 @@ public class SysNoticeController {
     @Operation(summary = "新增公告")
     @PostMapping
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
-    @SaCheckPermission("system:notice:add")
-    public ResponseDTO<Void> createNotice(@RequestBody NoticeAddRequest request) {
+    @SaCheckPermission("system:notice:create")
+    public ResponseDTO<Void> createNotice(@RequestBody NoticeCreateRequest request) {
         noticeService.createNotice(request);
         return ResponseDTO.success();
     }

@@ -6,7 +6,7 @@ import cn.muziseo.common.core.util.UserSecurityUtils;
 import cn.muziseo.service.system.enums.MenuErrorCode;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
 import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
-import cn.muziseo.service.system.module.permission.controller.request.MenuAddRequest;
+import cn.muziseo.service.system.module.permission.controller.request.MenuCreateRequest;
 import cn.muziseo.service.system.module.permission.controller.request.MenuUpdateRequest;
 import cn.muziseo.service.system.module.permission.controller.vo.MenuTreeVO;
 import cn.muziseo.service.system.module.permission.controller.vo.MenuVO;
@@ -141,7 +141,7 @@ public class MenuServiceImpl implements MenuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addMenu(MenuAddRequest request) {
+    public void createMenu(MenuCreateRequest request) {
         if (request.getPermission() != null && !request.getPermission().isEmpty()) {
             if (menuManager.existsByPermission(request.getPermission(), null)) {
                 throw new BusinessException(MenuErrorCode.MENU_PERMISSION_EXISTS);

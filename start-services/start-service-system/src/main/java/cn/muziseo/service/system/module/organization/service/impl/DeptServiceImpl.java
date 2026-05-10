@@ -3,7 +3,7 @@ package cn.muziseo.service.system.module.organization.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.service.system.enums.DeptErrorCode;
-import cn.muziseo.service.system.module.organization.controller.request.DeptAddRequest;
+import cn.muziseo.service.system.module.organization.controller.request.DeptCreateRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptTreeVO;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptVO;
 import cn.muziseo.service.system.module.auth.manager.UserManager;
@@ -90,7 +90,7 @@ public class DeptServiceImpl implements DeptService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addDept(DeptAddRequest request) {
+    public void createDept(DeptCreateRequest request) {
         // 校验名称唯一
         if (deptManager.existsByName(request.getName(), null)) {
             throw new BusinessException(DeptErrorCode.DEPT_NAME_EXISTS);
@@ -125,7 +125,7 @@ public class DeptServiceImpl implements DeptService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateDept(Long id, DeptAddRequest request) {
+    public void updateDept(Long id, DeptCreateRequest request) {
         DeptEntity dept = deptManager.getById(id);
         if (dept == null) {
             throw new BusinessException(DeptErrorCode.DEPT_NOT_EXISTS);

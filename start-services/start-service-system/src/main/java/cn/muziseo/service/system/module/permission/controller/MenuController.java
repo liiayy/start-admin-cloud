@@ -5,7 +5,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
-import cn.muziseo.service.system.module.permission.controller.request.MenuAddRequest;
+import cn.muziseo.service.system.module.permission.controller.request.MenuCreateRequest;
 import cn.muziseo.service.system.module.permission.controller.request.MenuUpdateRequest;
 import cn.muziseo.service.system.module.permission.controller.vo.MenuTreeVO;
 import cn.muziseo.service.system.module.permission.controller.vo.MenuVO;
@@ -57,12 +57,12 @@ public class MenuController {
     }
 
     @Operation(summary = "新增菜单")
-    @PostMapping("/add")
-    @SaCheckPermission("system:menu:add")
+    @PostMapping("/create")
+    @SaCheckPermission("system:menu:create")
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
-    public ResponseDTO<Void> add(@Valid @RequestBody MenuAddRequest request) {
+    public ResponseDTO<Void> create(@Valid @RequestBody MenuCreateRequest request) {
         log.info("新增菜单: name={}, type={}", request.getName(), request.getType());
-        menuService.addMenu(request);
+        menuService.createMenu(request);
         return ResponseDTO.success();
     }
 

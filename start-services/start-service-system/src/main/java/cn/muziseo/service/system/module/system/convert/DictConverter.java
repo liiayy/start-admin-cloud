@@ -1,7 +1,7 @@
 package cn.muziseo.service.system.module.system.convert;
 
 import cn.muziseo.common.core.domain.dto.DictDataSimpleDTO;
-import cn.muziseo.service.system.module.system.controller.request.DictDataAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.DictDataCreateRequest;
 import cn.muziseo.service.system.module.system.controller.vo.DictDataVO;
 import cn.muziseo.service.system.module.system.repository.entity.DictEntity;
 import org.mapstruct.Mapper;
@@ -27,5 +27,5 @@ public interface DictConverter {
     /**
      * Request 转 Entity
      */
-    DictEntity toEntity(DictDataAddRequest request);
+    DictEntity toEntity(DictDataCreateRequest request);
 }

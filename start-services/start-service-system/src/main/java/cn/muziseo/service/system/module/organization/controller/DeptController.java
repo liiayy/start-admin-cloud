@@ -4,7 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
-import cn.muziseo.service.system.module.organization.controller.request.DeptAddRequest;
+import cn.muziseo.service.system.module.organization.controller.request.DeptCreateRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptTreeVO;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptVO;
 import cn.muziseo.service.system.module.organization.service.DeptService;
@@ -52,11 +52,11 @@ public class DeptController {
     }
 
     @Operation(summary = "新增部门")
-    @PostMapping("/add")
-    @SaCheckPermission("system:dept:add")
+    @PostMapping("/create")
+    @SaCheckPermission("system:dept:create")
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
-    public ResponseDTO<Void> add(@Valid @RequestBody DeptAddRequest request) {
-        deptService.addDept(request);
+    public ResponseDTO<Void> create(@Valid @RequestBody DeptCreateRequest request) {
+        deptService.createDept(request);
         return ResponseDTO.success();
     }
 
@@ -64,7 +64,7 @@ public class DeptController {
     @PutMapping("/{id}")
     @SaCheckPermission("system:dept:update")
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
-    public ResponseDTO<Void> update(@PathVariable Long id, @Valid @RequestBody DeptAddRequest request) {
+    public ResponseDTO<Void> update(@PathVariable Long id, @Valid @RequestBody DeptCreateRequest request) {
         deptService.updateDept(id, request);
         return ResponseDTO.success();
     }

@@ -1,7 +1,7 @@
 package cn.muziseo.service.system.module.system.service;
 
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.service.system.module.system.controller.request.SystemConfigAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.SystemConfigCreateRequest;
 import cn.muziseo.service.system.module.system.controller.request.SystemConfigPageRequest;
 import cn.muziseo.service.system.module.system.controller.vo.SystemConfigVO;
 
@@ -36,12 +36,12 @@ public interface SystemConfigService {
     /**
      * 添加系统参数
      */
-    void addConfig(SystemConfigAddRequest request);
+    void createConfig(SystemConfigCreateRequest request);
 
     /**
      * 更新系统参数
      */
-    void updateConfig(Long id, SystemConfigAddRequest request);
+    void updateConfig(Long id, SystemConfigCreateRequest request);
 
     /**
      * 删除系统参数

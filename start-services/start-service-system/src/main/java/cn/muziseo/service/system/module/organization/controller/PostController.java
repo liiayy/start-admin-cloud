@@ -5,7 +5,7 @@ import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.service.system.module.organization.controller.request.PostAddRequest;
+import cn.muziseo.service.system.module.organization.controller.request.PostCreateRequest;
 import cn.muziseo.service.system.module.organization.controller.request.PostPageRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.PostVO;
 import cn.muziseo.service.system.module.organization.service.PostService;
@@ -53,11 +53,11 @@ public class PostController {
     }
 
     @Operation(summary = "新增岗位")
-    @PostMapping("/add")
-    @SaCheckPermission("system:post:add")
+    @PostMapping("/create")
+    @SaCheckPermission("system:post:create")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
-    public ResponseDTO<Void> add(@Valid @RequestBody PostAddRequest request) {
-        postService.addPost(request);
+    public ResponseDTO<Void> create(@Valid @RequestBody PostCreateRequest request) {
+        postService.createPost(request);
         return ResponseDTO.success();
     }
 
@@ -65,7 +65,7 @@ public class PostController {
     @PutMapping("/{id}")
     @SaCheckPermission("system:post:update")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
-    public ResponseDTO<Void> update(@PathVariable Long id, @Valid @RequestBody PostAddRequest request) {
+    public ResponseDTO<Void> update(@PathVariable Long id, @Valid @RequestBody PostCreateRequest request) {
         postService.updatePost(id, request);
         return ResponseDTO.success();
     }

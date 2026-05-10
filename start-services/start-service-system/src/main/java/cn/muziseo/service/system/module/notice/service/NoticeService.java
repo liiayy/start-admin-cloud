@@ -1,7 +1,7 @@
 package cn.muziseo.service.system.module.notice.service;
 
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.service.system.module.notice.controller.request.NoticeAddRequest;
+import cn.muziseo.service.system.module.notice.controller.request.NoticeCreateRequest;
 import cn.muziseo.service.system.module.notice.controller.request.NoticePageRequest;
 import cn.muziseo.service.system.module.notice.controller.request.NoticeUpdateRequest;
 import cn.muziseo.service.system.module.notice.controller.vo.NoticeVO;
@@ -28,7 +28,7 @@ public interface NoticeService {
     /**
      * 创建通知公告
      */
-    void createNotice(NoticeAddRequest request);
+    void createNotice(NoticeCreateRequest request);
 
     /**
      * 更新通知公告

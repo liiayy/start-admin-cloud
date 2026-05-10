@@ -1,6 +1,6 @@
 package cn.muziseo.service.system.module.organization.service;
 
-import cn.muziseo.service.system.module.organization.controller.request.DeptAddRequest;
+import cn.muziseo.service.system.module.organization.controller.request.DeptCreateRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptTreeVO;
 import cn.muziseo.service.system.module.organization.controller.vo.DeptVO;
 
@@ -19,9 +19,9 @@ public interface DeptService {
 
     DeptVO getById(Long id);
 
-    void addDept(DeptAddRequest request);
+    void createDept(DeptCreateRequest request);
 
-    void updateDept(Long id, DeptAddRequest request);
+    void updateDept(Long id, DeptCreateRequest request);
 
     void deleteDept(Long id);
 

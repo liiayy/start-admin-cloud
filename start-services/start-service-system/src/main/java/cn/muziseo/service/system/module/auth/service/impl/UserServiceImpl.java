@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createUser(UserAddRequest request) {
+    public void createUser(UserCreateRequest request) {
         // 1. 校验唯一性
         if (userManager.existsByUsername(request.getUsername(), null)) {
             throw new BusinessException(UserErrorCode.USERNAME_EXISTS);

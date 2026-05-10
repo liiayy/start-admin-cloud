@@ -1,7 +1,7 @@
 package cn.muziseo.service.system.module.permission.service;
 
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
+import cn.muziseo.service.system.module.permission.controller.request.RoleCreateRequest;
 import cn.muziseo.service.system.module.permission.controller.request.RolePageRequest;
 import cn.muziseo.service.system.module.permission.controller.request.RoleUpdateRequest;
 import cn.muziseo.service.system.module.permission.controller.vo.RoleVO;
@@ -34,7 +34,7 @@ public interface RoleService {
     /**
      * 新增角色
      */
-    void addRole(RoleAddRequest request);
+    void createRole(RoleCreateRequest request);
 
     /**
      * 修改角色

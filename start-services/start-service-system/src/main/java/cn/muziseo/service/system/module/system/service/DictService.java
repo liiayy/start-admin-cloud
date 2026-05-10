@@ -2,7 +2,7 @@ package cn.muziseo.service.system.module.system.service;
 
 import cn.muziseo.common.core.domain.dto.DictDataSimpleDTO;
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.service.system.module.system.controller.request.DictDataAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.DictDataCreateRequest;
 import cn.muziseo.service.system.module.system.controller.request.DictDataPageRequest;
 import cn.muziseo.service.system.module.system.controller.vo.DictDataVO;
 
@@ -39,12 +39,12 @@ public interface DictService {
     /**
      * 添加字典数据
      */
-    void addDictData(DictDataAddRequest request);
+    void createDictData(DictDataCreateRequest request);
 
     /**
      * 更新字典数据
      */
-    void updateDictData(Long id, DictDataAddRequest request);
+    void updateDictData(Long id, DictDataCreateRequest request);
 
     /**
      * 删除字典数据

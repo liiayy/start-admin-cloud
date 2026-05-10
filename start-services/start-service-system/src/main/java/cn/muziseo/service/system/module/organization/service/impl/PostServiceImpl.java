@@ -5,7 +5,7 @@ import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.db.annotation.DataScope;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.PostErrorCode;
-import cn.muziseo.service.system.module.organization.controller.request.PostAddRequest;
+import cn.muziseo.service.system.module.organization.controller.request.PostCreateRequest;
 import cn.muziseo.service.system.module.organization.controller.request.PostPageRequest;
 import cn.muziseo.service.system.module.organization.controller.vo.PostVO;
 import cn.muziseo.service.system.module.auth.manager.UserManager;
@@ -129,7 +129,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addPost(PostAddRequest request) {
+    public void createPost(PostCreateRequest request) {
         // 校验编码唯一
         if (postManager.existsByCode(request.getCode(), null)) {
             throw new BusinessException(PostErrorCode.POST_CODE_EXISTS);
@@ -151,7 +151,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updatePost(Long id, PostAddRequest request) {
+    public void updatePost(Long id, PostCreateRequest request) {
         PostEntity post = postManager.getById(id);
         if (post == null) {
             throw new BusinessException(PostErrorCode.POST_NOT_EXISTS);

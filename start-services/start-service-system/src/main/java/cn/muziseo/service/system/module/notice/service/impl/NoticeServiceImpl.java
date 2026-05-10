@@ -6,7 +6,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.common.websocket.dto.WebSocketMessageDTO;
 import cn.muziseo.common.websocket.utils.WebSocketUtils;
-import cn.muziseo.service.system.module.notice.controller.request.NoticeAddRequest;
+import cn.muziseo.service.system.module.notice.controller.request.NoticeCreateRequest;
 import cn.muziseo.service.system.module.notice.controller.request.NoticePageRequest;
 import cn.muziseo.service.system.module.notice.controller.request.NoticeUpdateRequest;
 import cn.muziseo.service.system.module.notice.controller.vo.NoticeVO;
@@ -103,7 +103,7 @@ public class NoticeServiceImpl implements NoticeService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createNotice(NoticeAddRequest request) {
+    public void createNotice(NoticeCreateRequest request) {
         NoticeEntity entity = noticeConverter.toEntity(request);
         if (entity.getStatus() == null) {
             entity.setStatus(0); // 默认正常发布

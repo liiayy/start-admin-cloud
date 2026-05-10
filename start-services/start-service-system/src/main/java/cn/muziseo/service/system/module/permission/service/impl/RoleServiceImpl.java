@@ -7,7 +7,7 @@ import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.RoleErrorCode;
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
 import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
-import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
+import cn.muziseo.service.system.module.permission.controller.request.RoleCreateRequest;
 import cn.muziseo.service.system.module.permission.controller.request.RolePageRequest;
 import cn.muziseo.service.system.module.permission.controller.request.RoleUpdateRequest;
 import cn.muziseo.service.system.module.permission.controller.vo.RoleVO;
@@ -105,7 +105,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addRole(RoleAddRequest request) {
+    public void createRole(RoleCreateRequest request) {
         // 1. 校验代码唯一
         if (roleManager.existsByCode(request.getCode(), null)) {
             throw new BusinessException(RoleErrorCode.ROLE_CODE_EXISTS);
@@ -114,6 +114,9 @@ public class RoleServiceImpl implements RoleService {
         RoleEntity entity = roleConverter.toEntity(request);
         if (entity.getStatus() == null) {
             entity.setStatus(0);
+        }
+        if (entity.getType() == null) {
+            entity.setType(0);
         }
         roleManager.save(entity);
         log.info("新增角色成功: id={}, code={}", entity.getId(), entity.getCode());

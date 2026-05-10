@@ -4,7 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
-import cn.muziseo.service.system.module.system.controller.request.SysOssConfigAddRequest;
+import cn.muziseo.service.system.module.system.controller.request.SysOssConfigCreateRequest;
 import cn.muziseo.service.system.module.system.controller.vo.SysOssConfigVO;
 import cn.muziseo.service.system.module.system.convert.SysOssConfigConverter;
 import cn.muziseo.service.system.module.system.repository.entity.SysOssConfigEntity;
@@ -47,9 +47,9 @@ public class SysOssConfigController {
 
     @Operation(summary = "保存/修改配置")
     @PostMapping("/save")
-    @SaCheckPermission("system:oss:config:add")
+    @SaCheckPermission("system:oss:config:create")
     @Log(title = "OSS配置", businessType = BusinessType.UPDATE)
-    public ResponseDTO<Void> save(@Valid @RequestBody SysOssConfigAddRequest request) {
+    public ResponseDTO<Void> save(@Valid @RequestBody SysOssConfigCreateRequest request) {
         SysOssConfigEntity entity = sysOssConfigConverter.toEntity(request);
         sysOssConfigService.saveConfig(entity);
         return ResponseDTO.success();
@@ -75,8 +75,8 @@ public class SysOssConfigController {
 
     @Operation(summary = "测试配置是否可用")
     @PostMapping("/test")
-    @SaCheckPermission("system:oss:config:add")
-    public ResponseDTO<Void> test(@RequestBody SysOssConfigAddRequest request) {
+    @SaCheckPermission("system:oss:config:create")
+    public ResponseDTO<Void> test(@RequestBody SysOssConfigCreateRequest request) {
         SysOssConfigEntity entity = sysOssConfigConverter.toEntity(request);
         sysOssConfigService.testConfig(entity);
         return ResponseDTO.success();

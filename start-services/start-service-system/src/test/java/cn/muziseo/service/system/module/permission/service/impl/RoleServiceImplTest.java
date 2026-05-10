@@ -2,7 +2,7 @@ package cn.muziseo.service.system.module.permission.service.impl;
 
 import cn.muziseo.service.system.module.auth.manager.UserRoleManager;
 import cn.muziseo.service.system.module.auth.service.SaSessionRefreshService;
-import cn.muziseo.service.system.module.permission.controller.request.RoleAddRequest;
+import cn.muziseo.service.system.module.permission.controller.request.RoleCreateRequest;
 import cn.muziseo.service.system.module.permission.manager.RoleManager;
 import cn.muziseo.service.system.module.permission.manager.RoleMenuManager;
 import cn.muziseo.service.system.module.permission.repository.entity.RoleEntity;
@@ -86,17 +86,17 @@ class RoleServiceImplTest {
         }
     }
 
-    // ==================== addRole ====================
+    // ==================== createRole ====================
 
     @Nested
-    @DisplayName("addRole - 新增角色")
+    @DisplayName("createRole - 新增角色")
     class AddRoleTests {
 
         @Test
         @DisplayName("正常新增角色")
-        void addRole_validRequest_savesRole() {
+        void createRole_validRequest_savesRole() {
             // Given
-            RoleAddRequest request = new RoleAddRequest();
+            RoleCreateRequest request = new RoleCreateRequest();
             request.setName("测试角色");
             request.setCode("test_role");
             request.setSort(1);
@@ -104,7 +104,7 @@ class RoleServiceImplTest {
             when(roleManager.save(any(RoleEntity.class))).thenReturn(true);
 
             // When
-            roleService.addRole(request);
+            roleService.createRole(request);
 
             // Then
             ArgumentCaptor<RoleEntity> captor = ArgumentCaptor.forClass(RoleEntity.class);

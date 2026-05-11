@@ -17,6 +17,7 @@ import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,7 +57,7 @@ public class SysNoticeController {
     @PostMapping
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @SaCheckPermission("system:notice:create")
-    public ResponseDTO<Void> createNotice(@RequestBody NoticeCreateRequest request) {
+    public ResponseDTO<Void> createNotice(@Valid @RequestBody NoticeCreateRequest request) {
         noticeService.createNotice(request);
         return ResponseDTO.success();
     }
@@ -65,7 +66,7 @@ public class SysNoticeController {
     @PutMapping
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @SaCheckPermission("system:notice:update")
-    public ResponseDTO<Void> updateNotice(@RequestBody NoticeUpdateRequest request) {
+    public ResponseDTO<Void> updateNotice(@Valid @RequestBody NoticeUpdateRequest request) {
         noticeService.updateNotice(request);
         return ResponseDTO.success();
     }

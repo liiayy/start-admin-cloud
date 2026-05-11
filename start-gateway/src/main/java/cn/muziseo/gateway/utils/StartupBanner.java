@@ -59,7 +59,7 @@ public class StartupBanner implements ApplicationListener<ApplicationReadyEvent>
 
         // 文档链接
         System.out.println("\n📚 相关文档：");
-        System.out.println("   接口文档 → https://cloud.iocoder.cn/api-doc/");
+        System.out.println("   GITEE → https://gitee.com/liiayy/start-admin-cloud");
 
 
         // 内存信息

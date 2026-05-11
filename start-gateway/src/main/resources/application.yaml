@@ -1,3 +1,12 @@
+# ===================================================================
+# 网关服务 - 主配置文件
+# ===================================================================
+# 说明：API 网关，负责请求路由、认证鉴权、跨域处理
+# ===================================================================
+
+server:
+  port: 48080
+
 spring:
   application:
     name: start-gateway
@@ -6,7 +15,7 @@ spring:
   config:
     import:
       - optional:application-${spring.profiles.active}.yaml
-      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml # 加载【Nacos】的配置
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
   main:
     allow-circular-references: true # 允许循环依赖
   cloud:
@@ -19,79 +28,59 @@ spring:
         webflux:
           routes:
             ## WebSocket 路由（必须在 HTTP 路由之前）
-            - id: system-websocket
-              uri: lb:ws://system-service
-              predicates:
-                - Path=/api/admin/system/websocket/**
-              filters:
-                - StripPrefix=1
-            ## python-service 服务 (异构微服务)
-            - id: python-admin-api
-              uri: lb://start-python-demo
-              predicates:
-                - Path=/api/admin/python/**
-              filters:
-                - StripPrefix=1
-            ## system-server 服务
-            - id: system-admin-api
-              uri: lb://system-service
-              predicates:
-                - Path=/api/admin/system/**
-              filters:
-                - StripPrefix=1
-            - id: system-app-api
-              uri: lb://system-service
-              predicates:
-                - Path=/api/app/system/**
-              filters:
-                - StripPrefix=1
-            ## demo-server 服务
-            - id: demo-admin-api
-              uri: lb://demo-service
-              predicates:
-                - Path=/api/admin/demo/**
-              filters:
-                - StripPrefix=1
-            ## python-service 服务
-            - id: python-admin-api
-              uri: lb://python-service
-              predicates:
-                - Path=/api/admin/python/**
-              filters:
-                - StripPrefix=1
+                    - id: system-websocket
+                      uri: lb:ws://system-service
+                      predicates:
+                        - Path=/api/admin/system/websocket/**
+                      filters:
+                        - StripPrefix=1
+                    ## system-server 服务
+                    - id: system-admin-api
+                      uri: lb://system-service
+                      predicates:
+                        - Path=/api/admin/system/**
+                      filters:
+                        - StripPrefix=1
+                    - id: system-app-api
+                      uri: lb://system-service
+                      predicates:
+                        - Path=/api/app/system/**
+                      filters:
+                        - StripPrefix=1
+                    ## demo-server 服务
+                    - id: demo-admin-api
+                      uri: lb://demo-service
+                      predicates:
+                        - Path=/api/admin/demo/**
+                      filters:
+                        - StripPrefix=1
+                    ## python-service 服务（异构微服务）
+                    - id: python-admin-api
+                      uri: lb://start-python-demo
+                      predicates:
+                        - Path=/api/admin/python/**
+                      filters:
+                        - StripPrefix=1
 
-logging:
-  level:
-    com.alibaba.nacos: WARN
-    com.alibaba.nacos.client.config.impl.ClientWorker: ERROR
-    com.alibaba.nacos.client.naming: WARN
-server:
-  port: 48080
-
-# Sa-Token 配置（网关层只校验 JWT，不查 Redis）
+# ===================================================================
+# Sa-Token 认证配置（网关层只校验 JWT，不查 Redis）
+# ===================================================================
 sa-token:
-  # token名称 (同时也是cookie名称)
   token-name: Authorization
-  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
   is-concurrent: true
-  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
   is-share: false
-  # jwt秘钥 (建议从 Nacos 或 环境变量读取)
   jwt-secret-key: ${sa-token.jwt-secret-key:start-admin-cloud-default-secret-key-32bits}
-  # 关闭无状态模式下不支持的活跃度校验
   dynamic-active-timeout: false
   active-timeout: -1
-  # 允许从 请求参数 读取 token
   is-read-body: true
-  # 允许从 header 读取 token
   is-read-header: true
-  # 关闭 cookie 鉴权 从根源杜绝 csrf 漏洞风险
   is-read-cookie: false
-  # token前缀
   token-prefix: Bearer
   timeout: -1
 
-# 白名单配置（不需要登录认证的路径）
+# ===================================================================
+# 网关业务配置
+# ===================================================================
 gateway:
   auth:
     white-paths:
@@ -104,7 +93,6 @@ gateway:
       - /api/admin/system/websocket
       - /api/admin/system/social/auth
       - /api/admin/system/social/callback
-
       - /swagger-ui
       - /v3/api-docs
       - /actuator
@@ -117,12 +105,23 @@ gateway:
   allow-credentials: true
   max-age: "3600"
 
+# ===================================================================
+# 接口文档配置
+# ===================================================================
 springdoc:
   api-docs:
     enabled: true
   swagger-ui:
     path: /swagger-ui.html
-    # 至少保留一个 URL 占位符，触发 SwaggerUiConfigParameters Bean 的创建
     urls:
       - name: gateway
         url: /v3/api-docs
+
+# ===================================================================
+# 日志级别配置
+# ===================================================================
+logging:
+  level:
+    com.alibaba.nacos: WARN
+    com.alibaba.nacos.client.config.impl.ClientWorker: ERROR
+    com.alibaba.nacos.client.naming: WARN

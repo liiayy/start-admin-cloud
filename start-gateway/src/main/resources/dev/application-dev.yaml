@@ -1,14 +1,16 @@
+# ===================================================================
+# 网关服务 - 开发环境配置
+# ===================================================================
+
 spring:
   cloud:
     gateway:
       server:
         webflux:
-          # 路由发现配置
           discovery:
             locator:
               enabled: true
               lower-case-service-id: true
-
     nacos:
       discovery:
         server-addr: 192.168.100.20:8848
@@ -26,11 +28,8 @@ spring:
       password: WeEvBhLapEHJMG4JFfFG
       database: 0
 
-# 安全加固配置 (开发环境)
 sa-token:
-  # 统一秘钥
   jwt-secret-key: dev-secret-key-start-admin-cloud-2026-04-27
- 
+
 gateway:
-  # 开发环境允许的跨域源
   allowed-origins: "http://localhost:9000,http://localhost:5173,http://127.0.0.1:3000"

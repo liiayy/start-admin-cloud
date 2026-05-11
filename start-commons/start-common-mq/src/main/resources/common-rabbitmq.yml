@@ -1,10 +1,16 @@
+# ===================================================================
+# 消息队列 - 公共配置
+# ===================================================================
+# 说明：RabbitMQ 生产者与消费者配置
+# ===================================================================
+
 spring:
   rabbitmq:
-    host: 127.0.0.1 # RabbitMQ 服务器地址
-    port: 5672      # 端口
+    host: 127.0.0.1                    # RabbitMQ 服务器地址
+    port: 5672                         # 端口
     username: guest
     password: guest
-    virtual-host: / # 虚拟主机
+    virtual-host: /                    # 虚拟主机
 
     # --- 消息发送者相关配置 ---
     publisher-confirm-type: correlated # 开启发送确认（生产者到 Broker 的交换机）
@@ -17,7 +23,7 @@ spring:
       simple:
         acknowledge-mode: manual       # 开启手动确认模式（推荐）
         prefetch: 1                    # 限制每个消费者每次未确认的最大消息数量（能者多劳，默认 250）
-        concurrency: 3                  # 初始并发数
+        concurrency: 3                 # 初始并发数
         max-concurrency: 10            # 最大并发数
         retry:
           enabled: true                # 开启消费者重试

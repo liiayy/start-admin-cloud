@@ -1,22 +1,19 @@
 # ===================================================================
 # 系统服务 - 主配置文件
 # ===================================================================
-# 说明：系统微服务的主配置入口，通过Maven Profile切换不同环境配置
-# 作者：木子软件
+# 说明：系统管理微服务，包含用户、角色、菜单、字典等核心功能
 # ===================================================================
+
 server:
-  # 系统服务端口
   port: 58081
 
 spring:
   application:
     name: system-service
   profiles:
-    # 使用Maven过滤激活对应环境的配置：dev/test/prod
     active: @profiles.active@
   config:
     import:
-      # 加载环境特定的配置文件
       - optional:application-${spring.profiles.active}.yaml
       - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
   threads:
@@ -27,23 +24,20 @@ spring:
       max-file-size: 30MB
       max-request-size: 30MB
 
-
 # ===================================================================
 # 业务定制配置
 # ===================================================================
 start:
   oss:
-    # 最大上传大小 (字节)，当前设为 20MB
-    max-size: 20971520
-    # 禁止上传的后缀
-    forbidden-suffix:
+    max-size: 20971520 # 最大上传大小（字节），当前设为 20MB
+    forbidden-suffix: # 禁止上传的后缀
       - jsp
       - php
       - sh
       - exe
       - bat
       - jspx
- 
+
 # ===================================================================
 # WebSocket 实时通讯配置
 # ===================================================================
@@ -52,6 +46,9 @@ websocket:
   path: /admin/system/websocket
   allowed-origins: "*"
 
+# ===================================================================
+# 接口文档配置
+# ===================================================================
 springdoc:
   api-docs:
     path: /admin/system/v3/api-docs

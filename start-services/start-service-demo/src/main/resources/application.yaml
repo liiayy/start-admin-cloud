@@ -1,26 +1,25 @@
 # ===================================================================
-# 系统服务 - 主配置文件
+# 示例服务 - 主配置文件
 # ===================================================================
-# 说明：系统微服务的主配置入口，通过Maven Profile切换不同环境配置
-# 作者：木子软件
+# 说明：演示服务，用于展示框架功能和开发示例
 # ===================================================================
+
 spring:
   application:
     name: demo-service
   profiles:
-    # 使用Maven过滤激活对应环境的配置：dev/test/prod
     active: @profiles.active@
   config:
     import:
       - optional:application-${spring.profiles.active}.yaml
-      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml # 加载【Nacos】的配置
-
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
 
 server:
   port: 58082
- 
+
+# ===================================================================
+# 接口文档配置
+# ===================================================================
 springdoc:
   api-docs:
     path: /admin/demo/v3/api-docs
-
-

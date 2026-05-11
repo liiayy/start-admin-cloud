@@ -1,54 +1,47 @@
+# ===================================================================
+# 定时任务服务 - 主配置文件
+# ===================================================================
+# 说明：基于 SnailJob 的分布式定时任务调度服务
+# ===================================================================
+
 spring:
   application:
     name: job-service
   profiles:
-    active: @profiles.active@  # 使用Maven过滤 激活对应环境的配置
+    active: @profiles.active@
   config:
     import:
       - optional:application-${spring.profiles.active}.yaml
-      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml # 加载【Nacos】的配置
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
   threads:
     virtual:
       enabled: true
-  main:
-    allow-circular-references: true # 允许循环依赖
 
 server:
   port: 58083
 
-
+# ===================================================================
+# Feign 客户端配置
+# ===================================================================
 feign:
   client:
     config:
-      default: # default全局的配置
-        loggerLevel: BASIC # 日志级别，BASIC就是基本的请求和响应信息
+      default:
+        loggerLevel: BASIC
   httpclient:
-    enabled: true # 开启feign对HttpClient的支持
-    max-connections: 200 # 最大的连接数
-    max-connections-per-route: 50 # 每个路径的最大连接数
+    enabled: true
+    max-connections: 200
+    max-connections-per-route: 50
 
-
-
+# ===================================================================
+# SnailJob 定时任务配置
+# ===================================================================
 snail-job:
-  # 任务调度服务器信息
   enabled: true
-
-
   server:
-    # 服务器IP地址（或域名）；集群时建议通过 nginx 做负载均衡
     host: 192.168.100.20
-    # 服务器通讯端口（不是后台管理页面服务端口）
     port: 17888
-  # 命名空间 【上面配置的空间的唯一标识】
   namespace: 764d604ec6fc45f68cd92514c40e9e1a
-  # 接入组名【上面配置的组名称】注意: 若通过注解配置了这里的配置不生效
   group: default
-  # 接入组 token 【上面配置的token信息】
   token: SJ_Wyz3dmsdbDOkDujOTSSoBjGQP1BMsVnj
-  # 客户端绑定IP，必须服务器可以访问到；默认自动推断，在服务器无法调度客户端时需要手动配置
-  #host: 192.168.100.38
-  # 客户端通讯端口，默认 17889
   port: 17899
-
-
-

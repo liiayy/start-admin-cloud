@@ -1,14 +1,16 @@
+# ===================================================================
+# 网关服务 - 测试环境配置
+# ===================================================================
+
 spring:
   cloud:
     gateway:
       server:
         webflux:
-          # 路由发现配置
           discovery:
             locator:
               enabled: false
               lower-case-service-id: true
-
     nacos:
       discovery:
         server-addr: 192.168.100.156:8848
@@ -26,7 +28,5 @@ spring:
       password: WeEvBhLapEHJMG4JFfFG
       database: 0
 
-# 安全加固配置 (开发环境)
 sa-token:
-  # 统一秘钥
   jwt-secret-key: dev-secret-key-start-admin-cloud-2026-04-27

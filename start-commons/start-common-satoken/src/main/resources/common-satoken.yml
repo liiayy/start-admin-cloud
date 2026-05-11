@@ -1,12 +1,18 @@
+# ===================================================================
+# Sa-Token - 公共配置
+# ===================================================================
+# 说明：认证授权公共配置
+# ===================================================================
+
 sa-token:
-  token-name: Authorization    # 统一名称
-  token-prefix: Bearer         # 统一前缀
-  jwt-secret-key: dev-secret-key-start-admin-cloud-2026-04-27   # 统一秘钥（非常关键！）
-  is-concurrent: true          # 是否允许并发登录
-  is-share: false              # 是否共用 Token
-  timeout: 2592000             # Token 有效期
-  active-timeout: -1           # 活跃有效期
-  dynamic-active-timeout: true # 是否开启动态有效期
+  token-name: Authorization      # 统一名称
+  token-prefix: Bearer           # 统一前缀
+  jwt-secret-key: dev-secret-key-start-admin-cloud-2026-04-27 # 统一秘钥（非常关键！）
+  is-concurrent: true            # 是否允许并发登录
+  is-share: false                # 是否共用 Token
+  timeout: 2592000               # Token 有效期
+  active-timeout: -1             # 活跃有效期
+  dynamic-active-timeout: true   # 是否开启动态有效期
   is-read-body: true
   is-read-header: true
   is-read-cookie: false

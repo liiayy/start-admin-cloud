@@ -1,19 +1,21 @@
+# ===================================================================
+# 示例服务2 - 主配置文件
+# ===================================================================
+# 说明：第二个演示服务，用于展示 Seata 分布式事务等功能
+# ===================================================================
+
 spring:
   application:
     name: demo2-service
   profiles:
-    active: @profiles.active@  # 使用Maven过滤 激活对应环境的配置
+    active: @profiles.active@
   config:
     import:
       - optional:application-${spring.profiles.active}.yaml
-      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml # 加载【Nacos】的配置
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
   threads:
     virtual:
       enabled: true
-  main:
-    allow-circular-references: true # 允许循环依赖
 
 server:
   port: 58092
-
-

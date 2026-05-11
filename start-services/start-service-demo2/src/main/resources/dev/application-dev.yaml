@@ -1,3 +1,7 @@
+# ===================================================================
+# 示例服务2 - 开发环境配置
+# ===================================================================
+
 spring:
   cloud:
     nacos:
@@ -14,40 +18,27 @@ spring:
       transport:
         dashboard: 192.168.100.20:8858
 
-
-seata: # 应用名称，默认使用 spring.application.name，也可以不配
+seata:
   application-name: ${spring.application.name}
-
-  # Seata 事务组名称 (关键配置)
-  # 格式：自定义名，例如 my_test_tx_group
   tx-service-group: my_test_tx_group
-
   data-source-proxy-mode: AT
-
-  # 注册中心配置 (与 Server 端保持一致)
   registry:
     type: nacos
     nacos:
-      server-addr: 192.168.100.20:8848 # 你的 Nacos 地址
-      namespace:       # 你的 Nacos 命名空间 ID
-      group: DEFAULT_GROUP           # 你的 Nacos 分组
-      application: seata-server   # 客户端通常不需要配置这个，除非做特殊服务发现
-
-  # 配置中心配置 (与 Server 端保持一致)
+      server-addr: 192.168.100.20:8848
+      namespace:
+      group: DEFAULT_GROUP
+      application: seata-server
   config:
     type: nacos
     nacos:
-      server-addr: 192.168.100.20:8848 # 你的 Nacos 地址
-      namespace: seata-server      # 你的 Nacos 命名空间 ID
+      server-addr: 192.168.100.20:8848
+      namespace: seata-server
       group: DEFAULT_GROUP
-      data-id: seataServer.properties # 从 Nacos 读取的配置文件 ID
+      data-id: seataServer.properties
 
-
-# 日志文件配置
 logging:
   level:
-    root: INFO # 全局日志级别
-    # 特定包日志级别
+    root: INFO
     org.springframework.web: DEBUG
     org.mybatis: DEBUG
-

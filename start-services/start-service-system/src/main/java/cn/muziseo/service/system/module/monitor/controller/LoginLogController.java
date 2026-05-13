@@ -1,6 +1,9 @@
 package cn.muziseo.service.system.module.monitor.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.muziseo.common.core.constant.SaSessionConstants;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.common.log.annotation.Log;
@@ -33,6 +36,17 @@ public class LoginLogController {
             @RequestParam(defaultValue = "10") int pageSize,
             LoginLogEntity query) {
         return ResponseDTO.success(loginLogService.page(pageNum, pageSize, query));
+    }
+    
+    @Operation(summary = "查询个人登录日志")
+    @GetMapping("/personal")
+    @SaCheckLogin
+    public ResponseDTO<PageResponse<LoginLogEntity>> personalPage(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        // 从 Session 获取用户名，确保只能查自己的
+        String username = StpUtil.getSession().getString(SaSessionConstants.USERNAME);
+        return ResponseDTO.success(loginLogService.personalPage(pageNum, pageSize, username));
     }
 
     @Operation(summary = "批量删除登录日志")

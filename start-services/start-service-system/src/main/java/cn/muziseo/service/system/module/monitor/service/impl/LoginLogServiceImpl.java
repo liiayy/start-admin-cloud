@@ -39,6 +39,23 @@ public class LoginLogServiceImpl implements LoginLogService {
     }
 
     /**
+     * 分页查询个人登录日志
+     *
+     * @param pageNum  页码
+     * @param pageSize 每页大小
+     * @param username 用户名
+     * @return 分页结果
+     */
+    @Override
+    public PageResponse<LoginLogEntity> personalPage(int pageNum, int pageSize, String username) {
+        Page<LoginLogEntity> page = loginLogManager.personalPageLog(pageNum, pageSize, username);
+        PageResponse<LoginLogEntity> response = new PageResponse<>();
+        response.setList(page.getRecords());
+        response.setTotal(page.getTotalRow());
+        return response;
+    }
+
+    /**
      * 批量删除登录日志
      *
      * @param ids 日志 ID 数组

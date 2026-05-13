@@ -33,4 +33,19 @@ public class LoginLogManager extends BaseServiceImpl<LoginLogMapper, LoginLogEnt
                 .orderBy(LoginLogEntity::getId, false);
         return page(new Page<>(pageNum, pageSize), wrapper);
     }
+
+    /**
+     * 分页查询个人登录日志（精确匹配用户名）
+     *
+     * @param pageNum  当前页码
+     * @param pageSize 每页显示数量
+     * @param username 用户名
+     * @return 分页结果对象
+     */
+    public Page<LoginLogEntity> personalPageLog(int pageNum, int pageSize, String username) {
+        QueryWrapper wrapper = QueryWrapper.create()
+                .where(LoginLogEntity::getUsername).eq(username)
+                .orderBy(LoginLogEntity::getId, false);
+        return page(new Page<>(pageNum, pageSize), wrapper);
+    }
 }

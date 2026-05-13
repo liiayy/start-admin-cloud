@@ -14,6 +14,11 @@ public interface LoginLogService {
     PageResponse<LoginLogEntity> page(int pageNum, int pageSize, LoginLogEntity query);
 
     /**
+     * 分页查询个人登录日志
+     */
+    PageResponse<LoginLogEntity> personalPage(int pageNum, int pageSize, String username);
+
+    /**
      * 批量删除
      */
     void deleteByIds(Long[] ids);

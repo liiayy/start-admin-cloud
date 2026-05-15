@@ -89,6 +89,7 @@
         <dependency>
             <groupId>cn.muziseo</groupId>
             <artifactId>start-common-social</artifactId>
+            <version>${revision}</version>
         </dependency>
 
         <dependency>

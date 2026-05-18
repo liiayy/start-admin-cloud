@@ -13,14 +13,21 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 
 /**
- * 数据变更记录：内容解析服务
+ * 数据变更记录：内容解析与比对服务类
+ *
+ * @author 木子软件
+ * @Date 2026-05-18
  */
 @Slf4j
 @Service
 public class DataTracerContentService {
 
     /**
-     * 获取单个对象的所有被注解标记的字段内容（用于新增、删除时记录整体内容）
+     * 获取单个对象的所有被注解标记的字段内容
+     * 主要用于新增、删除时，序列化和记录实体的整体状态内容
+     *
+     * @param bean 目标对象实体
+     * @return 解析转换后的文本内容
      */
     public String getChangeContent(Object bean) {
         if (bean == null) {
@@ -43,7 +50,11 @@ public class DataTracerContentService {
     }
 
     /**
-     * 对比两个对象，获取有差异的字段内容
+     * 比对两个实体对象，并获取它们差异化字段的对比描述文本
+     *
+     * @param oldBean 变更前实体对象
+     * @param newBean 变更后实体对象
+     * @return 含有变化轨迹描述的文本内容
      */
     public String getDiffContent(Object oldBean, Object newBean) {
         if (oldBean == null && newBean == null) {
@@ -81,14 +92,18 @@ public class DataTracerContentService {
     }
 
     /**
-     * 根据字段类型和注解，将真实值转换为展示值
+     * 根据字段类型和配置的注解，将实体属性的真实值转换翻译为人类易读的可展示文本（如字典或枚举描述）
+     *
+     * @param field 目标属性反射字段
+     * @param value 属性原始属性值
+     * @return 翻译或转换后的展示文本
      */
     private String getDisplayValue(Field field, Object value) {
         if (value == null) {
             return "空";
         }
 
-        // 字典翻译
+        // 1. 字段字典翻译处理
         DataTracerFieldDict dictAnnotation = field.getAnnotation(DataTracerFieldDict.class);
         if (dictAnnotation != null) {
             String dictLabel = DictUtils.getDictLabel(dictAnnotation.dictType(), String.valueOf(value));
@@ -97,14 +112,14 @@ public class DataTracerContentService {
             }
         }
 
-        // 枚举翻译
+        // 2. 字段关联枚举翻译处理
         DataTracerFieldEnum enumAnnotation = field.getAnnotation(DataTracerFieldEnum.class);
         if (enumAnnotation != null) {
             Class<? extends Enum<?>> enumClass = enumAnnotation.enumClass();
             Enum<?>[] enumConstants = enumClass.getEnumConstants();
             for (Enum<?> enumConstant : enumConstants) {
                 try {
-                    // 假设枚举有 getValue() 方法或者名称匹配
+                    // 获取枚举的原始比较键值 (如 getValue() 或 getCode())
                     Object enumValue = null;
                     if (ReflectUtil.getMethod(enumClass, "getValue") != null) {
                         enumValue = ReflectUtil.invoke(enumConstant, "getValue");
@@ -115,7 +130,7 @@ public class DataTracerContentService {
                     if (Objects.equals(String.valueOf(enumValue), String.valueOf(value)) || 
                         enumConstant.name().equals(String.valueOf(value))) {
                         
-                        // 尝试获取 desc 或 description 或 name
+                        // 尝试获取枚举的多语言或文字描述 (getDesc() 或 getDescription() 等)
                         if (ReflectUtil.getMethod(enumClass, "getDesc") != null) {
                             return String.valueOf(ReflectUtil.invoke(enumConstant, "getDesc"));
                         }

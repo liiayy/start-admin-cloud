@@ -2,8 +2,13 @@ package cn.muziseo.service.system.module.monitor.datatracer.service;
 
 import cn.muziseo.common.core.datatracer.DataTracerForm;
 import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.core.event.DataTracerEvent;
 import cn.muziseo.common.db.page.PageResponse;
+import cn.muziseo.service.system.module.monitor.datatracer.controller.request.DataTracerPageRequest;
+import cn.muziseo.service.system.module.monitor.datatracer.controller.vo.DataTracerVO;
 import cn.muziseo.service.system.module.monitor.datatracer.repository.entity.DataTracerEntity;
+
+import java.util.List;
 
 /**
  * 数据变更记录服务
@@ -38,7 +43,7 @@ public interface DataTracerService {
     /**
      * 保存跨微服务数据变更事件
      */
-    void addTrace(cn.muziseo.common.core.event.DataTracerEvent event);
+    void addTrace(DataTracerEvent event);
 
     /**
      * 分页查询
@@ -48,12 +53,12 @@ public interface DataTracerService {
     /**
      * 高级分页查询
      */
-    PageResponse<cn.muziseo.service.system.module.monitor.datatracer.controller.vo.DataTracerVO> pageTracer(cn.muziseo.service.system.module.monitor.datatracer.controller.request.DataTracerPageRequest request);
+    PageResponse<DataTracerVO> pageTracer(DataTracerPageRequest request);
 
     /**
      * 根据主键批量删除
      */
-    void deleteByIds(java.util.List<Long> ids);
+    void deleteByIds(List<Long> ids);
 
     /**
      * 清空全部

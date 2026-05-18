@@ -39,8 +39,8 @@ public class LogAutoConfiguration {
      */
     @Bean
     @ConditionalOnProperty(name = "start.log.remote.enabled", havingValue = "true")
-    @ConditionalOnBean({OperLogApi.class, ErrorLogApi.class})
-    public RemoteLogEventListener remoteLogEventListener(OperLogApi operLogApi, ErrorLogApi errorLogApi) {
-        return new RemoteLogEventListener(operLogApi, errorLogApi);
+    @ConditionalOnBean({OperLogApi.class, ErrorLogApi.class, cn.muziseo.service.system.module.monitor.api.DataTracerApi.class})
+    public RemoteLogEventListener remoteLogEventListener(OperLogApi operLogApi, ErrorLogApi errorLogApi, cn.muziseo.service.system.module.monitor.api.DataTracerApi dataTracerApi) {
+        return new RemoteLogEventListener(operLogApi, errorLogApi, dataTracerApi);
     }
 }

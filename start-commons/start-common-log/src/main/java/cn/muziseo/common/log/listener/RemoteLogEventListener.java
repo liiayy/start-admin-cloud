@@ -1,7 +1,9 @@
 package cn.muziseo.common.log.listener;
 
+import cn.muziseo.common.core.event.DataTracerEvent;
 import cn.muziseo.common.core.event.ErrorLogEvent;
 import cn.muziseo.common.core.event.OperLogEvent;
+import cn.muziseo.service.system.module.monitor.api.DataTracerApi;
 import cn.muziseo.service.system.module.monitor.api.ErrorLogApi;
 import cn.muziseo.service.system.module.monitor.api.OperLogApi;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ public class RemoteLogEventListener {
 
     private final OperLogApi operLogApi;
     private final ErrorLogApi errorLogApi;
+    private final DataTracerApi dataTracerApi;
 
     @Async
     @EventListener
@@ -38,6 +41,17 @@ public class RemoteLogEventListener {
             errorLogApi.saveErrorLog(event);
         } catch (Exception e) {
             log.error("转发远程错误日志失败：{}", e.getMessage());
+        }
+    }
+
+    @Async
+    @EventListener
+    public void onDataTracerEvent(DataTracerEvent event) {
+        log.info("转发远程变更记录日志：dataId={}, type={}", event.getDataId(), event.getType());
+        try {
+            dataTracerApi.saveDataTracer(event);
+        } catch (Exception e) {
+            log.error("转发远程变更记录日志失败：{}", e.getMessage());
         }
     }
 }

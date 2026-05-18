@@ -12,6 +12,8 @@ import cn.muziseo.service.system.module.system.convert.SystemConfigConverter;
 import cn.muziseo.service.system.module.system.manager.SystemConfigManager;
 import cn.muziseo.service.system.module.system.repository.entity.SystemConfigEntity;
 import cn.muziseo.service.system.module.system.service.SystemConfigService;
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.log.utils.DataTracerUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -121,6 +123,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             entity.setIsPublic("N");
         }
         systemConfigManager.save(entity);
+        DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.SYSTEM_CONFIG);
         // 清除缓存（新增也要清，因为可能之前查过返回了空值标记）
         ConfigCacheManager.evictCache(request.getConfigKey());
     }
@@ -160,6 +163,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         // 保留原有的 builtin 标记，不允许通过编辑修改
         entity.setBuiltin(existing.getBuiltin());
         systemConfigManager.updateById(entity);
+        DataTracerUtils.update(id, DataTracerTypeEnum.SYSTEM_CONFIG, existing, entity);
         // 清除缓存（如果键名发生变更，需要清除旧键名和新键名两条缓存）
         ConfigCacheManager.evictCache(existing.getConfigKey());
         if (!existing.getConfigKey().equals(request.getConfigKey())) {
@@ -188,6 +192,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         }
 
         systemConfigManager.removeById(id);
+        DataTracerUtils.delete(id, DataTracerTypeEnum.SYSTEM_CONFIG);
         // 清除缓存
         ConfigCacheManager.evictCache(existing.getConfigKey());
     }

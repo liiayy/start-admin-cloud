@@ -1,9 +1,11 @@
 package cn.muziseo.service.system.module.monitor.listener;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.event.DataTracerEvent;
 import cn.muziseo.common.core.event.ErrorLogEvent;
 import cn.muziseo.common.core.event.LoginLogEvent;
 import cn.muziseo.common.core.event.OperLogEvent;
+import cn.muziseo.service.system.module.monitor.datatracer.service.DataTracerService;
 import cn.muziseo.service.system.module.monitor.repository.entity.LoginLogEntity;
 import cn.muziseo.service.system.module.monitor.repository.entity.OperLogEntity;
 import cn.muziseo.service.system.module.monitor.service.SysErrorLogService;
@@ -28,6 +30,7 @@ public class LogEventListener {
     private final LoginLogMapper loginLogMapper;
     private final SysErrorLogService errorLogService;
     private final LogConverter logConverter;
+    private final DataTracerService dataTracerService;
 
     /**
      * 保存操作日志
@@ -74,6 +77,20 @@ public class LogEventListener {
             errorLogService.saveErrorLog(event);
         } catch (Exception e) {
             log.error("保存错误日志失败: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 保存数据变更记录日志
+     */
+    @Async
+    @EventListener
+    public void saveDataTracer(DataTracerEvent event) {
+        log.info("收到变更记录事件：dataId={}, type={}", event.getDataId(), event.getType());
+        try {
+            dataTracerService.addTrace(event);
+        } catch (Exception e) {
+            log.error("保存数据变更记录失败: {}", e.getMessage(), e);
         }
     }
 }

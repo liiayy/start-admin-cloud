@@ -17,6 +17,9 @@ import cn.muziseo.service.system.module.permission.repository.entity.RoleEntity;
 import cn.muziseo.service.system.module.permission.repository.entity.RoleMenuEntity;
 import cn.muziseo.service.system.module.permission.service.RoleService;
 import cn.muziseo.service.system.module.permission.convert.RoleConverter;
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.core.datatracer.DataTracerForm;
+import cn.muziseo.common.log.utils.DataTracerUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -119,6 +122,7 @@ public class RoleServiceImpl implements RoleService {
             entity.setType(0);
         }
         roleManager.save(entity);
+        DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.ROLE);
         log.info("新增角色成功: id={}, code={}", entity.getId(), entity.getCode());
     }
 
@@ -142,6 +146,7 @@ public class RoleServiceImpl implements RoleService {
 
         RoleEntity entity = roleConverter.toEntity(request);
         roleManager.updateById(entity);
+        DataTracerUtils.update(request.getId(), DataTracerTypeEnum.ROLE, role, entity);
 
         // 刷新拥有该角色的用户 Session 和 数据权限缓存
         refreshUserCacheByRoleId(request.getId());
@@ -175,6 +180,7 @@ public class RoleServiceImpl implements RoleService {
         roleMenuManager.deleteByRoleId(id);
 
         roleManager.removeById(id);
+        DataTracerUtils.delete(id, DataTracerTypeEnum.ROLE);
         log.info("删除角色成功: id={}", id);
     }
 
@@ -195,6 +201,7 @@ public class RoleServiceImpl implements RoleService {
         entity.setId(id);
         entity.setStatus(status);
         roleManager.updateById(entity);
+        DataTracerUtils.update(id, DataTracerTypeEnum.ROLE, role, entity);
 
         // 刷新拥有该角色的用户 Session 和 数据权限缓存
         refreshUserCacheByRoleId(id);
@@ -231,6 +238,11 @@ public class RoleServiceImpl implements RoleService {
                     .collect(Collectors.toList());
             roleMenuManager.saveBatch(entities);
         }
+
+        // 记录数据变更
+        DataTracerUtils.addTrace(roleId, DataTracerTypeEnum.ROLE, "分配菜单权限",
+                "菜单数: " + roleMenuManager.queryChain().where(RoleMenuEntity::getRoleId).eq(roleId).count(),
+                "菜单数: " + (menuIds != null ? menuIds.size() : 0));
 
         // 3. 刷新权限缓存
         List<Long> userIds = userRoleManager.getUserIdsByRoleId(roleId);

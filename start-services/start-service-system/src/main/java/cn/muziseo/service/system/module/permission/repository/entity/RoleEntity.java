@@ -4,6 +4,8 @@ import cn.muziseo.common.db.entity.BaseEntity;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldDict;
 
 /**
  * 角色实体
@@ -34,11 +36,13 @@ public class RoleEntity extends BaseEntity {
     /**
      * 角色名称
      */
+    @DataTracerFieldLabel("角色名称")
     private String name;
 
     /**
      * 角色权限字符串
      */
+    @DataTracerFieldLabel("权限代码")
     private String code;
 
     /**
@@ -49,6 +53,8 @@ public class RoleEntity extends BaseEntity {
     /**
      * 数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）
      */
+    @DataTracerFieldLabel("数据范围")
+    @DataTracerFieldDict(dictType = "sys_data_scope")
     private Integer dataScope;
 
     /**
@@ -59,6 +65,8 @@ public class RoleEntity extends BaseEntity {
     /**
      * 角色状态（0正常 1停用）
      */
+    @DataTracerFieldLabel("角色状态")
+    @DataTracerFieldDict(dictType = "sys_common_status")
     private Integer status;
 
     /**

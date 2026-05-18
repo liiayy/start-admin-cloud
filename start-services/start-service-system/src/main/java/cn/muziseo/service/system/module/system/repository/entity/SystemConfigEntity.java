@@ -4,6 +4,8 @@ import cn.muziseo.common.db.entity.BaseEntity;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldDict;
 
 /**
  * 系统参数实体
@@ -31,16 +33,19 @@ public class SystemConfigEntity extends BaseEntity {
     /**
      * 参数名称
      */
+    @DataTracerFieldLabel("参数名称")
     private String name;
 
     /**
      * 参数键名
      */
+    @DataTracerFieldLabel("参数键名")
     private String configKey;
 
     /**
      * 参数键值
      */
+    @DataTracerFieldLabel("参数键值")
     private String configValue;
 
     /**
@@ -51,6 +56,8 @@ public class SystemConfigEntity extends BaseEntity {
     /**
      * 是否公开（Y=是，N=否）
      */
+    @DataTracerFieldLabel("是否公开")
+    @DataTracerFieldDict(dictType = "sys_yes_no")
     private String isPublic;
 
     /**

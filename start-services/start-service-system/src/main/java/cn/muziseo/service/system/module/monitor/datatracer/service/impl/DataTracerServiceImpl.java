@@ -17,10 +17,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import com.mybatisflex.core.row.Db;
 import java.time.LocalDateTime;
 
 /**
- * 数据变更记录服务实现
+ * 数据变更记录业务层实现类
+ *
+ * @author 木子软件
+ * @Date 2026-05-18
  */
 @Slf4j
 @Service
@@ -35,6 +39,15 @@ public class DataTracerServiceImpl implements DataTracerService {
     @Resource
     private IpLocationUtils ipLocationUtils;
 
+    @Resource
+    private cn.muziseo.service.system.module.monitor.datatracer.convert.DataTracerConverter dataTracerConverter;
+
+    /**
+     * 新增记录快照
+     *
+     * @param dataId 数据ID
+     * @param type   业务变更类型
+     */
     @Override
     public void insert(Long dataId, DataTracerTypeEnum type) {
         addTrace(DataTracerForm.builder()
@@ -44,12 +57,20 @@ public class DataTracerServiceImpl implements DataTracerService {
                 .build());
     }
 
+    /**
+     * 更新并比对记录快照
+     *
+     * @param dataId  数据ID
+     * @param type    业务变更类型
+     * @param oldBean 变更前对象实体
+     * @param newBean 变更后对象实体
+     */
     @Override
     public void update(Long dataId, DataTracerTypeEnum type, Object oldBean, Object newBean) {
         String diffOld = dataTracerContentService.getChangeContent(oldBean);
         String diffNew = dataTracerContentService.getChangeContent(newBean);
         
-        // 如果没有差异，不记录
+        // 如果没有差异，则不记录变更
         if (StrUtil.equals(diffOld, diffNew)) {
             return;
         }
@@ -63,6 +84,12 @@ public class DataTracerServiceImpl implements DataTracerService {
                 .build());
     }
 
+    /**
+     * 单个删除记录
+     *
+     * @param dataId 数据ID
+     * @param type   业务变更类型
+     */
     @Override
     public void delete(Long dataId, DataTracerTypeEnum type) {
         addTrace(DataTracerForm.builder()
@@ -72,6 +99,12 @@ public class DataTracerServiceImpl implements DataTracerService {
                 .build());
     }
 
+    /**
+     * 批量删除记录
+     *
+     * @param dataIds 数据ID数组
+     * @param type    业务变更类型
+     */
     @Override
     public void batchDelete(Long[] dataIds, DataTracerTypeEnum type) {
         if (dataIds == null || dataIds.length == 0) {
@@ -82,6 +115,11 @@ public class DataTracerServiceImpl implements DataTracerService {
         }
     }
 
+    /**
+     * 记录数据时光机本地变更审计历史
+     *
+     * @param form 数据变更表单体
+     */
     @Override
     public void addTrace(DataTracerForm form) {
         try {
@@ -116,6 +154,11 @@ public class DataTracerServiceImpl implements DataTracerService {
         }
     }
 
+    /**
+     * 记录来自于异步分布式事件远程传播的变更审计历史
+     *
+     * @param event 广播过来的数据时光机变更事件
+     */
     @Override
     public void addTrace(cn.muziseo.common.core.event.DataTracerEvent event) {
         try {
@@ -136,6 +179,15 @@ public class DataTracerServiceImpl implements DataTracerService {
         }
     }
 
+    /**
+     * 单个业务对象关联的所有数据变更历史分页查询
+     *
+     * @param dataId   业务主键ID
+     * @param type     业务变更类型
+     * @param pageNum  页码
+     * @param pageSize 每页条数
+     * @return 分页结果
+     */
     @Override
     public PageResponse<DataTracerEntity> page(Long dataId, Integer type, int pageNum, int pageSize) {
         var page = dataTracerManager.pageByDataIdAndType(dataId, type, pageNum, pageSize);
@@ -145,9 +197,12 @@ public class DataTracerServiceImpl implements DataTracerService {
         return response;
     }
 
-    @Resource
-    private cn.muziseo.service.system.module.monitor.datatracer.convert.DataTracerConverter dataTracerConverter;
-
+    /**
+     * 全局数据变更历史大盘多条件分页查询
+     *
+     * @param request 查询条件实体
+     * @return 转换后的 VO 分页结果
+     */
     @Override
     public PageResponse<cn.muziseo.service.system.module.monitor.datatracer.controller.vo.DataTracerVO> pageTracer(cn.muziseo.service.system.module.monitor.datatracer.controller.request.DataTracerPageRequest request) {
         var page = dataTracerManager.pageTracer(request);
@@ -157,6 +212,11 @@ public class DataTracerServiceImpl implements DataTracerService {
         return response;
     }
 
+    /**
+     * 根据主键 ID 数组批量物理删除变更流水
+     *
+     * @param ids 待删除流水 ID 列表
+     */
     @Override
     public void deleteByIds(java.util.List<Long> ids) {
         if (cn.hutool.core.collection.CollUtil.isNotEmpty(ids)) {
@@ -164,8 +224,11 @@ public class DataTracerServiceImpl implements DataTracerService {
         }
     }
 
+    /**
+     * 清空变更记录流水大盘的全部历史数据
+     */
     @Override
     public void clean() {
-        dataTracerManager.remove(com.mybatisflex.core.query.QueryWrapper.create());
+        Db.updateBySql("TRUNCATE TABLE system_data_tracer");
     }
 }

@@ -1,5 +1,8 @@
 package cn.muziseo.service.system.module.permission.service.impl;
 
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.log.utils.DataTracerUtils;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.core.util.UserSecurityUtils;
@@ -155,6 +158,7 @@ public class MenuServiceImpl implements MenuService {
             entity.setParentId(0L);
         }
         menuManager.save(entity);
+        DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.MENU);
         log.info("新增菜单成功: id={}, name={}", entity.getId(), entity.getName());
     }
 
@@ -173,6 +177,10 @@ public class MenuServiceImpl implements MenuService {
 
         MenuEntity entity = menuConverter.toEntity(request);
         menuManager.updateById(entity);
+
+        // 时光机记录
+        MenuEntity updated = menuManager.getById(request.getId());
+        DataTracerUtils.update(request.getId(), DataTracerTypeEnum.MENU, existing, updated);
 
         // 刷新拥有该菜单关联角色的用户 Session
         refreshByMenuId(request.getId());
@@ -206,6 +214,7 @@ public class MenuServiceImpl implements MenuService {
         List<Long> affectedUserIds = getAffectedUserIdsByMenuId(id);
         roleMenuManager.deleteByMenuId(id);
         menuManager.removeById(id);
+        DataTracerUtils.delete(id, DataTracerTypeEnum.MENU);
 
         saSessionRefreshService.refreshUserSessions(affectedUserIds);
         log.info("删除菜单成功: id={}, 影响用户数={}", id, affectedUserIds.size());

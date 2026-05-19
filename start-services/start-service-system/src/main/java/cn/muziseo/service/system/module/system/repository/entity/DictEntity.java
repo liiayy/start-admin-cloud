@@ -1,5 +1,8 @@
 package cn.muziseo.service.system.module.system.repository.entity;
 
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldDict;
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldIgnore;
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
 import cn.muziseo.common.db.entity.BaseEntity;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
@@ -31,41 +34,50 @@ public class DictEntity extends BaseEntity {
     /**
      * 字典类型
      */
+    @DataTracerFieldLabel("字典类型")
     private String dictType;
 
     /**
      * 字典标签
      */
+    @DataTracerFieldLabel("字典标签")
     private String label;
 
     /**
      * 字典值
      */
+    @DataTracerFieldLabel("字典键值")
     private String value;
 
     /**
      * 显示顺序
      */
+    @DataTracerFieldIgnore
     private Integer sort;
 
     /**
      * 状态（0正常 1停用）
      */
+    @DataTracerFieldLabel("状态")
+    @DataTracerFieldDict(dictType = "sys_normal_disable")
     private Integer status;
 
     /**
      * 备注
      */
+    @DataTracerFieldLabel("备注")
     private String remark;
 
     /**
      * 颜色类型
      */
+    @DataTracerFieldLabel("标签颜色")
     private String colorType;
 
     /**
      * CSS 样式
      */
+    @DataTracerFieldIgnore
     private String cssClass;
 
 }

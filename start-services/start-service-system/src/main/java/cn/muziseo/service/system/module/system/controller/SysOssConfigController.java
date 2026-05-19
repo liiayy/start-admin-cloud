@@ -76,6 +76,7 @@ public class SysOssConfigController {
     @Operation(summary = "测试配置是否可用")
     @PostMapping("/test")
     @SaCheckPermission("system:oss:config:create")
+    @Log(title = "OSS配置", businessType = BusinessType.OTHER)
     public ResponseDTO<Void> test(@Valid @RequestBody SysOssConfigCreateRequest request) {
         SysOssConfigEntity entity = sysOssConfigConverter.toEntity(request);
         sysOssConfigService.testConfig(entity);

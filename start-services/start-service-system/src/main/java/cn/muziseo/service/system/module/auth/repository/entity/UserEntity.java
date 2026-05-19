@@ -1,5 +1,8 @@
 package cn.muziseo.service.system.module.auth.repository.entity;
 
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldDict;
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldIgnore;
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
 import cn.muziseo.common.db.annotation.DataColumn;
 import cn.muziseo.common.db.entity.BaseEntity;
 import cn.muziseo.common.db.handler.BigIntArrayTypeHandler;
@@ -41,27 +44,32 @@ public class UserEntity extends BaseEntity {
     /**
      * 用户账号
      */
+    @DataTracerFieldLabel("用户账号")
     private String username;
 
     /**
      * 密码
      */
+    @DataTracerFieldIgnore
     private String password;
 
     /**
      * 用户昵称
      */
+    @DataTracerFieldLabel("用户昵称")
     private String nickname;
 
     /**
      * 备注
      */
+    @DataTracerFieldLabel("备注")
     private String remark;
 
     /**
      * 部门ID
      */
     @DataColumn(DataColumn.DataType.DEPT)
+    @DataTracerFieldLabel("部门ID")
     private Long deptId;
 
     /**
@@ -70,41 +78,51 @@ public class UserEntity extends BaseEntity {
      * PostgreSQL bigint[] 类型，一个用户可以担任多个岗位
      */
     @Column(value = "post_ids", typeHandler = BigIntArrayTypeHandler.class)
+    @DataTracerFieldIgnore
     private List<Long> postIds;
 
     /**
      * 用户邮箱
      */
+    @DataTracerFieldLabel("用户邮箱")
     private String email;
 
     /**
      * 手机号码
      */
+    @DataTracerFieldLabel("手机号码")
     private String mobile;
 
     /**
      * 用户性别
      */
+    @DataTracerFieldLabel("性别")
+    @DataTracerFieldDict(dictType = "sys_user_sex")
     private Integer sex;
 
     /**
      * 用户头像
      */
+    @DataTracerFieldIgnore
     private String avatar;
 
     /**
      * 帐号状态（0正常 1停用）
      */
+    @DataTracerFieldLabel("账号状态")
+    @DataTracerFieldDict(dictType = "sys_status")
     private Integer status;
 
     /**
      * 最后登录IP
      */
+    @DataTracerFieldIgnore
     private String loginIp;
 
     /**
      * 最后登录时间
      */
+    @DataTracerFieldIgnore
     private LocalDateTime loginDate;
 
 }

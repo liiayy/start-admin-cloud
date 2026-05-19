@@ -4,6 +4,8 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.db.page.PageResponse;
+import cn.muziseo.common.log.annotation.Log;
+import cn.muziseo.common.log.enums.BusinessType;
 import cn.muziseo.service.system.module.monitor.datatracer.controller.request.DataTracerPageRequest;
 import cn.muziseo.service.system.module.monitor.datatracer.controller.vo.DataTracerVO;
 import cn.muziseo.service.system.module.monitor.datatracer.repository.entity.DataTracerEntity;
@@ -36,6 +38,7 @@ public class DataTracerController {
     @Operation(summary = "批量删除变更记录")
     @DeleteMapping("/{ids}")
     @SaCheckPermission("system:datatracer:remove")
+    @Log(title = "数据时光机", businessType = BusinessType.DELETE)
     public ResponseDTO<Void> delete(@PathVariable java.util.List<Long> ids) {
         dataTracerService.deleteByIds(ids);
         return ResponseDTO.success();
@@ -44,6 +47,7 @@ public class DataTracerController {
     @Operation(summary = "清空变更记录")
     @DeleteMapping("/clean")
     @SaCheckPermission("system:datatracer:remove")
+    @Log(title = "数据时光机", businessType = BusinessType.CLEAN)
     public ResponseDTO<Void> clean() {
         dataTracerService.clean();
         return ResponseDTO.success();

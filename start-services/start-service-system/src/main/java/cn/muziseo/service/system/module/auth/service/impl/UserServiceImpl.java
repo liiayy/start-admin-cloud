@@ -1,5 +1,8 @@
 package cn.muziseo.service.system.module.auth.service.impl;
 
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.log.utils.DataTracerUtils;
+
 import cn.muziseo.common.core.utils.string.StringUtils;
 import cn.muziseo.common.cache.config.ConfigUtils;
 
@@ -170,6 +173,7 @@ public class UserServiceImpl implements UserService {
             entity.setStatus(0);
         }
         userManager.save(entity);
+        DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.USER);
         log.info("创建用户成功: id={}, username={}", entity.getId(), entity.getUsername());
     }
 
@@ -200,6 +204,10 @@ public class UserServiceImpl implements UserService {
         UserEntity entity = userConverter.toEntity(request);
         userManager.updateById(entity);
         
+        // 时光机记录
+        UserEntity updated = userManager.getById(request.getId());
+        DataTracerUtils.update(request.getId(), DataTracerTypeEnum.USER, existing, updated);
+        
         // 如果修改了部门，需要刷新数据权限缓存
         if (request.getDeptId() != null && !Objects.equals(request.getDeptId(), existing.getDeptId())) {
             DataScopeCacheManager.evictCache(request.getId());
@@ -224,6 +232,7 @@ public class UserServiceImpl implements UserService {
         }
         userRoleManager.deleteByUserId(id);
         userManager.removeById(id);
+        DataTracerUtils.delete(id, DataTracerTypeEnum.USER);
         log.info("删除用户成功: id={}", id);
     }
 
@@ -246,6 +255,8 @@ public class UserServiceImpl implements UserService {
         entity.setId(request.getId());
         entity.setStatus(request.getStatus());
         userManager.updateById(entity);
+        UserEntity updated = userManager.getById(request.getId());
+        DataTracerUtils.update(request.getId(), DataTracerTypeEnum.USER, existing, updated);
         log.info("更新用户状态: id={}, status={}", request.getId(), request.getStatus());
     }
 
@@ -265,6 +276,8 @@ public class UserServiceImpl implements UserService {
         entity.setId(request.getId());
         entity.setPassword(PasswordUtils.encode(request.getNewPassword()));
         userManager.updateById(entity);
+        UserEntity updated = userManager.getById(request.getId());
+        DataTracerUtils.update(request.getId(), DataTracerTypeEnum.USER, existing, updated);
         log.info("重置用户密码: id={}", request.getId());
     }
 
@@ -288,6 +301,8 @@ public class UserServiceImpl implements UserService {
         entity.setId(userId);
         entity.setPassword(PasswordUtils.encode(request.getNewPassword()));
         userManager.updateById(entity);
+        UserEntity updated = userManager.getById(userId);
+        DataTracerUtils.update(userId, DataTracerTypeEnum.USER, existing, updated);
         log.info("用户修改密码成功: userId={}", userId);
     }
 

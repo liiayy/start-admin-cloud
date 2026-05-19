@@ -1,5 +1,8 @@
 package cn.muziseo.service.system.module.system.service.impl;
 
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.log.utils.DataTracerUtils;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.db.page.PageResponse;
@@ -98,6 +101,7 @@ public class DictTypeServiceImpl implements DictTypeService {
             entity.setStatus(0);
         }
         dictTypeManager.save(entity);
+        DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.DICT);
         log.info("新增字典类型成功: id={}, type={}", entity.getId(), entity.getType());
     }
 
@@ -126,6 +130,10 @@ public class DictTypeServiceImpl implements DictTypeService {
         DictTypeEntity entity = dictTypeConverter.toEntity(request);
         entity.setId(id);
         dictTypeManager.updateById(entity);
+        
+        // 时光机记录
+        DictTypeEntity updated = dictTypeManager.getById(id);
+        DataTracerUtils.update(id, DataTracerTypeEnum.DICT, existing, updated);
         log.info("更新字典类型成功: id={}", id);
     }
 
@@ -151,6 +159,7 @@ public class DictTypeServiceImpl implements DictTypeService {
         }
 
         dictTypeManager.removeById(id);
+        DataTracerUtils.delete(id, DataTracerTypeEnum.DICT);
         log.info("删除字典类型成功: id={}", id);
     }
 }

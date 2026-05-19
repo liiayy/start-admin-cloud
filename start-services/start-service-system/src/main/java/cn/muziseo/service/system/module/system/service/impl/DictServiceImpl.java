@@ -1,5 +1,8 @@
 package cn.muziseo.service.system.module.system.service.impl;
 
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.log.utils.DataTracerUtils;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.muziseo.common.cache.dict.DictCacheManager;
 import cn.muziseo.common.core.domain.dto.DictDataSimpleDTO;
@@ -114,6 +117,7 @@ public class DictServiceImpl implements DictService {
             entity.setStatus(0);
         }
         dictManager.save(entity);
+        DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.DICT);
 
         // 清除该字典类型的二级缓存
         DictCacheManager.evictCache(request.getDictType());
@@ -141,6 +145,10 @@ public class DictServiceImpl implements DictService {
         entity.setId(id);
         dictManager.updateById(entity);
 
+        // 时光机记录
+        DictEntity updated = dictManager.getById(id);
+        DataTracerUtils.update(id, DataTracerTypeEnum.DICT, existing, updated);
+
         // 清除该字典类型的二级缓存（如果类型变了，两个都清）
         DictCacheManager.evictCache(existing.getDictType());
         if (!existing.getDictType().equals(request.getDictType())) {
@@ -166,6 +174,7 @@ public class DictServiceImpl implements DictService {
         }
 
         dictManager.removeById(id);
+        DataTracerUtils.delete(id, DataTracerTypeEnum.DICT);
 
         // 清除该字典类型的二级缓存
         DictCacheManager.evictCache(existing.getDictType());

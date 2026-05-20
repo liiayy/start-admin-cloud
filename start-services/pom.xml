@@ -13,9 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>start-service-system</module>
-        <module>start-service-demo</module>
         <module>start-service-job</module>
-        <module>start-service-demo2</module>
     </modules>
 
     <properties>

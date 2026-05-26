@@ -1,8 +1,10 @@
 package cn.muziseo.service.system.module.organization.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.db.annotation.DataScope;
+import cn.muziseo.common.log.utils.DataTracerUtils;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.system.enums.PostErrorCode;
 import cn.muziseo.service.system.module.organization.controller.request.PostCreateRequest;
@@ -140,6 +142,7 @@ public class PostServiceImpl implements PostService {
             entity.setStatus(0);
         }
         postManager.save(entity);
+        DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.POST);
         log.info("新增岗位成功: id={}, code={}", entity.getId(), entity.getCode());
     }
 
@@ -165,6 +168,8 @@ public class PostServiceImpl implements PostService {
         PostEntity entity = postConverter.toEntity(request);
         entity.setId(id);
         postManager.updateById(entity);
+        PostEntity updated = postManager.getById(id);
+        DataTracerUtils.update(id, DataTracerTypeEnum.POST, post, updated);
         log.info("更新岗位成功: id={}", id);
     }
 
@@ -190,6 +195,7 @@ public class PostServiceImpl implements PostService {
         }
 
         postManager.removeById(id);
+        DataTracerUtils.delete(id, DataTracerTypeEnum.POST);
         log.info("删除岗位成功: id={}", id);
     }
 
@@ -210,6 +216,8 @@ public class PostServiceImpl implements PostService {
         entity.setId(id);
         entity.setStatus(status);
         postManager.updateById(entity);
+        PostEntity updated = postManager.getById(id);
+        DataTracerUtils.update(id, DataTracerTypeEnum.POST, post, updated);
         log.info("更新岗位状态: id={}, status={}", id, status);
     }
 }

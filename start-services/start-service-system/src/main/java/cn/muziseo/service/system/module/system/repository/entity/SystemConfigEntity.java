@@ -1,6 +1,7 @@
 package cn.muziseo.service.system.module.system.repository.entity;
 
 import cn.muziseo.common.db.entity.BaseEntity;
+import cn.muziseo.common.core.constant.DictConstants;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
@@ -57,7 +58,7 @@ public class SystemConfigEntity extends BaseEntity {
      * 是否公开（Y=是，N=否）
      */
     @DataTracerFieldLabel("是否公开")
-    @DataTracerFieldDict(dictType = "sys_yes_no")
+    @DataTracerFieldDict(dictType = DictConstants.SYS_YES_NO)
     private String isPublic;
 
     /**

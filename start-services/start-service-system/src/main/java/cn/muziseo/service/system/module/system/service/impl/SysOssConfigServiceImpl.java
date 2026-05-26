@@ -1,6 +1,8 @@
 package cn.muziseo.service.system.module.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.log.utils.DataTracerUtils;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.core.enums.CommonStatus;
 import cn.muziseo.common.oss.entity.OssProperties;
@@ -120,7 +122,17 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
             }
         }
         
+        boolean isNew = entity.getId() == null;
+        SysOssConfigEntity oldConfig = !isNew ? sysOssConfigManager.getById(entity.getId()) : null;
+
         sysOssConfigManager.saveOrUpdate(entity);
+        
+        if (isNew) {
+            DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.OSS_CONFIG);
+        } else {
+            SysOssConfigEntity updatedConfig = sysOssConfigManager.getById(entity.getId());
+            DataTracerUtils.update(entity.getId(), DataTracerTypeEnum.OSS_CONFIG, oldConfig, updatedConfig);
+        }
         
         // 4. 刷新缓存：全量重载是最稳妥的方式，确保排他性启用状态和秘钥更新立即生效
         initOssFactory();
@@ -138,6 +150,7 @@ public class SysOssConfigServiceImpl implements SysOssConfigService {
         if (config != null) {
             sysOssConfigManager.removeById(id);
             OssFactory.remove(config.getConfigKey());
+            DataTracerUtils.delete(id, DataTracerTypeEnum.OSS_CONFIG);
         }
     }
 

@@ -55,4 +55,10 @@ public final class DictConstants {
 
     /** 通知公告发布对象 */
     public static final String SYS_NOTICE_TARGET_TYPE = "sys_notice_target_type";
+
+    /** 错误日志处理状态 */
+    public static final String SYS_ERROR_LOG_STATUS = "sys_error_log_status";
+
+    /** 数据权限范围 */
+    public static final String SYS_DATA_SCOPE = "sys_data_scope";
 }

@@ -1,6 +1,7 @@
 package cn.muziseo.service.system.module.permission.repository.entity;
 
 import cn.muziseo.common.db.entity.BaseEntity;
+import cn.muziseo.common.core.constant.DictConstants;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
@@ -54,7 +55,7 @@ public class RoleEntity extends BaseEntity {
      * 数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）
      */
     @DataTracerFieldLabel("数据范围")
-    @DataTracerFieldDict(dictType = "sys_data_scope")
+    @DataTracerFieldDict(dictType = DictConstants.SYS_DATA_SCOPE)
     private Integer dataScope;
 
     /**
@@ -66,7 +67,7 @@ public class RoleEntity extends BaseEntity {
      * 角色状态（0正常 1停用）
      */
     @DataTracerFieldLabel("角色状态")
-    @DataTracerFieldDict(dictType = "sys_common_status")
+    @DataTracerFieldDict(dictType = DictConstants.SYS_STATUS)
     private Integer status;
 
     /**

@@ -1,5 +1,6 @@
 package cn.muziseo.service.system.module.system.repository.entity;
 
+import cn.muziseo.common.core.constant.DictConstants;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldDict;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldIgnore;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
@@ -59,7 +60,7 @@ public class DictEntity extends BaseEntity {
      * 状态（0正常 1停用）
      */
     @DataTracerFieldLabel("状态")
-    @DataTracerFieldDict(dictType = "sys_normal_disable")
+    @DataTracerFieldDict(dictType = DictConstants.SYS_STATUS)
     private Integer status;
 
     /**

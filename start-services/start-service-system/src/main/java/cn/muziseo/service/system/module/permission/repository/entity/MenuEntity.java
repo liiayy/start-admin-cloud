@@ -1,5 +1,6 @@
 package cn.muziseo.service.system.module.permission.repository.entity;
 
+import cn.muziseo.common.core.constant.DictConstants;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldDict;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldIgnore;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
@@ -92,7 +93,7 @@ public class MenuEntity extends BaseEntity {
      * 菜单状态（0正常 1停用）
      */
     @DataTracerFieldLabel("菜单状态")
-    @DataTracerFieldDict(dictType = "sys_status")
+    @DataTracerFieldDict(dictType = DictConstants.SYS_STATUS)
     private Integer status;
 
     /**

@@ -2,6 +2,9 @@ package cn.muziseo.service.system.module.organization.repository.entity;
 
 import cn.muziseo.common.db.annotation.DataColumn;
 import cn.muziseo.common.db.entity.BaseEntity;
+import cn.muziseo.common.core.constant.DictConstants;
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldDict;
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
@@ -36,31 +39,38 @@ public class PostEntity extends BaseEntity {
      * 所属部门ID
      */
     @DataColumn(DataColumn.DataType.DEPT)
+    @DataTracerFieldLabel("所属部门ID")
     private Long deptId;
 
     /**
      * 岗位编码
      */
+    @DataTracerFieldLabel("岗位编码")
     private String code;
 
     /**
      * 岗位名称
      */
+    @DataTracerFieldLabel("岗位名称")
     private String name;
 
     /**
      * 显示顺序
      */
+    @DataTracerFieldLabel("显示顺序")
     private Integer sort;
 
     /**
      * 状态（0正常 1停用）
      */
+    @DataTracerFieldLabel("状态")
+    @DataTracerFieldDict(dictType = DictConstants.SYS_STATUS)
     private Integer status;
 
     /**
      * 备注
      */
+    @DataTracerFieldLabel("备注")
     private String remark;
 
 }

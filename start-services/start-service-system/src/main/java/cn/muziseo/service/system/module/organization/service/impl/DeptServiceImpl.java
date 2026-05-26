@@ -1,6 +1,8 @@
 package cn.muziseo.service.system.module.organization.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.log.utils.DataTracerUtils;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.service.system.enums.DeptErrorCode;
 import cn.muziseo.service.system.module.organization.controller.request.DeptCreateRequest;
@@ -110,6 +112,7 @@ public class DeptServiceImpl implements DeptService {
             entity.setStatus(0);
         }
         deptManager.save(entity);
+        DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.DEPT);
         log.info("新增部门成功: id={}, name={}", entity.getId(), entity.getName());
     }
 
@@ -148,6 +151,8 @@ public class DeptServiceImpl implements DeptService {
         DeptEntity entity = deptConverter.toEntity(request);
         entity.setId(id);
         deptManager.updateById(entity);
+        DeptEntity updated = deptManager.getById(id);
+        DataTracerUtils.update(id, DataTracerTypeEnum.DEPT, dept, updated);
         log.info("更新部门成功: id={}", id);
     }
 
@@ -184,6 +189,7 @@ public class DeptServiceImpl implements DeptService {
         }
 
         deptManager.removeById(id);
+        DataTracerUtils.delete(id, DataTracerTypeEnum.DEPT);
         log.info("删除部门成功: id={}", id);
     }
 
@@ -204,6 +210,8 @@ public class DeptServiceImpl implements DeptService {
         entity.setId(id);
         entity.setStatus(status);
         deptManager.updateById(entity);
+        DeptEntity updated = deptManager.getById(id);
+        DataTracerUtils.update(id, DataTracerTypeEnum.DEPT, dept, updated);
         log.info("更新部门状态: id={}, status={}", id, status);
     }
 

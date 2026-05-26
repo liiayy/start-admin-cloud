@@ -1,6 +1,8 @@
 package cn.muziseo.service.system.module.notice.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.log.utils.DataTracerUtils;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.muziseo.common.db.page.PageResponse;
@@ -109,6 +111,7 @@ public class NoticeServiceImpl implements NoticeService {
             entity.setStatus(0); // 默认正常发布
         }
         noticeManager.save(entity);
+        DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.NOTICE);
         log.info("创建公告成功: id={}, title={}", entity.getId(), entity.getTitle());
     }
 
@@ -126,6 +129,8 @@ public class NoticeServiceImpl implements NoticeService {
         }
         NoticeEntity entity = noticeConverter.toEntity(request);
         noticeManager.updateById(entity);
+        NoticeEntity updated = noticeManager.getById(request.getId());
+        DataTracerUtils.update(request.getId(), DataTracerTypeEnum.NOTICE, existing, updated);
         log.info("更新公告成功: id={}", request.getId());
     }
 
@@ -138,6 +143,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteNotice(Long id) {
         noticeManager.removeById(id);
+        DataTracerUtils.delete(id, DataTracerTypeEnum.NOTICE);
         log.info("删除公告成功: id={}", id);
     }
 

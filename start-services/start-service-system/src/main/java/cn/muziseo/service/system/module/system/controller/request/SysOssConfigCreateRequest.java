@@ -8,7 +8,7 @@ import lombok.Data;
 /**
  * OSS 存储配置保存/修改 Request
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Data
 public class SysOssConfigCreateRequest {

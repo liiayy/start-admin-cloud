@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 /**
  * 演示产品视图对象
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Data
 @Schema(description = "演示数据视图对象")

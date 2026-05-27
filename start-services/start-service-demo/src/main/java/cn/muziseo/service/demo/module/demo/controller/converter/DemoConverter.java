@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 /**
  * 演示产品 MapStruct 转换器
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Mapper(componentModel = "spring")
 public interface DemoConverter {

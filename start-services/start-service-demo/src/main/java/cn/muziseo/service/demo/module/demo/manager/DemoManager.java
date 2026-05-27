@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 /**
  * 演示数据管理层 Manager
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Service
 public class DemoManager extends BaseServiceImpl<DemoMapper, DemoEntity> {

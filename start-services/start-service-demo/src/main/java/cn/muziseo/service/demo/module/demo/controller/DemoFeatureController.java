@@ -15,15 +15,18 @@ import cn.muziseo.service.demo.module.demo.controller.vo.DemoVO;
 import cn.muziseo.service.demo.module.demo.service.DemoService;
 import cn.muziseo.service.system.module.auth.api.UserApi;
 import cn.muziseo.service.system.module.auth.api.dto.UserRemoteDTO;
+import cn.muziseo.service.system.module.system.api.FileApi;
+import cn.muziseo.service.system.module.system.api.dto.FileRemoteDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 演示基座与高级特性 Controller
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Tag(name = "基座特性演示")
 @RestController
@@ -35,6 +38,9 @@ public class DemoFeatureController {
 
     @Resource
     private UserApi userApi;
+
+    @Resource
+    private FileApi fileApi;
 
     @Operation(summary = "测试接口幂等提交 (防重)")
     @PostMapping("/idempotent")
@@ -139,5 +145,39 @@ public class DemoFeatureController {
         // 演示三：通过在 DemoDictVO 的属性上使用 @Dict 注解实现自动拦截翻译。
         // （返回值是 ResponseDTO 且 VO 中含有 @Dict 标注的字段，DictTranslationAdvice 会在返回时拦截并自动填充翻译字段）
         return ResponseDTO.success(vo);
+    }
+
+    @Operation(summary = "测试文件上传 (带系统参数大小校验)")
+    @PostMapping(value = "/upload", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SaCheckPermission("demo:cache:query")
+    public ResponseDTO<java.util.Map<String, Object>> uploadTest(@RequestPart("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new BusinessException(DemoErrorCode.FILE_UPLOAD_ERROR, "请选择要上传的文件！");
+        }
+
+        // 获取系统参数限制的大小 (MB)
+        int maxMb = ConfigUtils.getInt(ConfigConstants.UPLOAD_MAX_SIZE_MB, 10);
+        long maxBytes = maxMb * 1024L * 1024L;
+
+        if (file.getSize() > maxBytes) {
+            throw new BusinessException(DemoErrorCode.FILE_UPLOAD_ERROR, 
+                    "上传失败：文件大小 (" + String.format("%.2f", file.getSize() / 1024.0 / 1024.0) + "MB) 超出系统最大限制 (" + maxMb + "MB)！");
+        }
+
+        // 调用 system 服务的 fileApi 远程上传文件
+        FileRemoteDTO remoteFile = fileApi.uploadFile(file);
+        if (remoteFile == null) {
+            throw new BusinessException(DemoErrorCode.FILE_UPLOAD_ERROR, "远程调用系统服务文件上传接口失败！");
+        }
+
+        // 返回文件元数据
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("fileName", remoteFile.getOriginalName());
+        result.put("fileSize", remoteFile.getFileSize());
+        result.put("fileSizeFriendly", String.format("%.2f KB", remoteFile.getFileSize() / 1024.0));
+        result.put("contentType", file.getContentType());
+        result.put("url", remoteFile.getUrl());
+
+        return ResponseDTO.success(result);
     }
 }

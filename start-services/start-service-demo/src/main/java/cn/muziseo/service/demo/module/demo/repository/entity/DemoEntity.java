@@ -9,7 +9,7 @@ import lombok.*;
 /**
  * 演示产品实体类
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Table("demo")
 @Data

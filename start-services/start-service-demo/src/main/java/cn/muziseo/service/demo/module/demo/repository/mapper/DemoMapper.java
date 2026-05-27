@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * 演示 Mapper 接口
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Mapper
 public interface DemoMapper extends BaseMapper<DemoEntity> {

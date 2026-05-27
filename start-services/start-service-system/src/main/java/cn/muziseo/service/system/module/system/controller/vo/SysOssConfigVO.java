@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * OSS 存储配置 VO
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Data
 @Builder

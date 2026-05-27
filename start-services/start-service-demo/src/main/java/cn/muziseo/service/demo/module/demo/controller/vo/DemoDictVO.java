@@ -8,7 +8,7 @@ import lombok.Data;
 /**
  * 演示字典与系统参数视图对象
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Data
 @Schema(description = "演示字典与系统参数视图对象")

@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 演示产品分页查询请求
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Data
 @Schema(description = "演示数据分页查询请求")

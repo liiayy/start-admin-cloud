@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * 演示产品新增/修改请求
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Data
 @Schema(description = "演示数据新增/修改请求")

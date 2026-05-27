@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 演示产品管理 Controller
  *
- * @author Antigravity
+ * @author 木子软件
  */
 @Tag(name = "产品演示管理")
 @RestController

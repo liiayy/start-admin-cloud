@@ -8,7 +8,7 @@ import cn.muziseo.service.demo.module.demo.controller.vo.DemoVO;
 /**
  * 演示产品 Service 接口
  *
- * @author Antigravity
+ * @author 木子软件
  */
 public interface DemoService {
 

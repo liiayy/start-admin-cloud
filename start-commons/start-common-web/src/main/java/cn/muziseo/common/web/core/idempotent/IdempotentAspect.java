@@ -4,7 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.muziseo.common.cache.utils.RedissonUtils;
 import cn.muziseo.common.core.annotation.Idempotent;
-import cn.muziseo.common.core.exception.ServiceException;
+import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.core.exception.errorCode.CommonErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -50,7 +50,7 @@ public class IdempotentAspect {
         boolean isLocked = lock.tryLock(0, idempotent.time(), idempotent.unit());
         if (!isLocked) {
             log.warn("[幂等校验] 触发重复请求拦截, key: {}", key);
-            throw new ServiceException(CommonErrorCode.OPERATION_TOO_FREQUENT, idempotent.message());
+            throw new BusinessException(CommonErrorCode.OPERATION_TOO_FREQUENT, idempotent.message());
         }
  
         try {

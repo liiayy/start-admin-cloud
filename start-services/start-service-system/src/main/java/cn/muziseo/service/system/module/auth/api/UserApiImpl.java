@@ -50,10 +50,10 @@ public class UserApiImpl implements UserApi {
 
     @Override
     public void updateNickname(Long id, String nickname) {
-        UserEntity user = userManager.getById(id);
-        if (user != null) {
-            user.setNickname(nickname);
-            userManager.updateById(user);
-        }
+        // 仅更新 nickname 单列，避免触发 Seata 对 post_ids 等复杂类型字段生成 undo log before/after image
+        userManager.updateChain()
+                .set(UserEntity::getNickname, nickname)
+                .eq(UserEntity::getId, id)
+                .update();
     }
 }

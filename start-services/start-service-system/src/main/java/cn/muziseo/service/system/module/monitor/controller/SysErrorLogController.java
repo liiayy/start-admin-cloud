@@ -3,10 +3,8 @@ package cn.muziseo.service.system.module.monitor.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.db.page.PageResponse;
-import cn.muziseo.common.core.event.ErrorLogEvent;
 import cn.muziseo.common.log.annotation.Log;
 import cn.muziseo.common.log.enums.BusinessType;
-import cn.muziseo.service.system.module.monitor.api.ErrorLogApi;
 import cn.muziseo.service.system.module.monitor.repository.entity.SysErrorLogEntity;
 import cn.muziseo.service.system.module.monitor.service.SysErrorLogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,14 +21,10 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RequestMapping("/admin/system/error-log")
 @RequiredArgsConstructor
-public class SysErrorLogController implements ErrorLogApi {
+public class SysErrorLogController {
 
     private final SysErrorLogService errorLogService;
 
-    @Override
-    public void saveErrorLog(ErrorLogEvent errorLog) {
-        errorLogService.saveErrorLog(errorLog);
-    }
 
     @Operation(summary = "分页查询错误日志")
     @GetMapping("/page")

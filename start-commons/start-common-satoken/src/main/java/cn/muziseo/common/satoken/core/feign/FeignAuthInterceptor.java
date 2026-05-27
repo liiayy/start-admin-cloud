@@ -37,10 +37,18 @@ public class FeignAuthInterceptor implements RequestInterceptor {
         }
 
         // 透传用户 ID（与网关 AuthFilter 保持一致）
-        Object loginId = StpUtil.getLoginIdDefaultNull();
-        if (loginId != null) {
-            template.header(HEADER_USER_ID, loginId.toString());
+        try {
+            if (StpUtil.isLogin()) {
+                Object loginId = StpUtil.getLoginIdDefaultNull();
+                if (loginId != null) {
+                    template.header(HEADER_USER_ID, loginId.toString());
+                }
+            }
+        } catch (Exception e) {
+            // 当在异步线程或非 HTTP 请求线程（如事件监听器、定时任务等）中调用 Feign 时，上下文未初始化，直接忽略
+            log.debug("Feign 透传用户认证上下文忽略 (非 HTTP 请求线程): {}", e.getMessage());
         }
+
  
         // 【新增】透传 TraceId，实现全链路追踪
         String traceId = MDC.get(TraceConstants.TRACE_ID);

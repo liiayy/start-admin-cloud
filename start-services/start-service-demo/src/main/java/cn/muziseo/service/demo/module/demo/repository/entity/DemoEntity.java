@@ -1,5 +1,6 @@
 package cn.muziseo.service.demo.module.demo.repository.entity;
 
+import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
 import cn.muziseo.common.db.entity.BaseEntity;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
@@ -28,6 +29,7 @@ public class DemoEntity extends BaseEntity {
     /**
      * 名称
      */
+    @DataTracerFieldLabel("产品名称")
     private String name;
 
 }

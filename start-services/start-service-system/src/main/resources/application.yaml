@@ -23,6 +23,10 @@ spring:
     multipart:
       max-file-size: 30MB
       max-request-size: 30MB
+seata:
+  client:
+    undo:
+      log-serialization: fastjson
 
 # ===================================================================
 # 业务定制配置

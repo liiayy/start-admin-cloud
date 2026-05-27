@@ -18,7 +18,8 @@ public enum DataTracerTypeEnum {
     DEPT(6, "部门管理"),
     POST(7, "岗位管理"),
     NOTICE(8, "公告管理"),
-    OSS_CONFIG(9, "存储配置");
+    OSS_CONFIG(9, "存储配置"),
+    DEMO(10, "开发演示");
 
     private final int value;
     private final String desc;

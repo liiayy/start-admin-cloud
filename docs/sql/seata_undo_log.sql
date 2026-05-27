@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS public.undo_log
     context       VARCHAR(128) NOT NULL,
     rollback_info BYTEA        NOT NULL,
     log_status    INT          NOT NULL,
-    log_created   TIMESTAMP(6) NOT NULL,
-    log_modified  TIMESTAMP(6) NOT NULL,
+    log_created   timestamp(0) NOT NULL,
+    log_modified  timestamp(0) NOT NULL,
     CONSTRAINT pk_undo_log PRIMARY KEY (id),
     CONSTRAINT ux_undo_log UNIQUE (xid, branch_id)
 );

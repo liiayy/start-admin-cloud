@@ -6,6 +6,11 @@ import cn.muziseo.common.core.domain.dto.ResponseDTO;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.websocket.utils.WebSocketUtils;
 import cn.muziseo.service.demo.enums.DemoErrorCode;
+import cn.muziseo.common.cache.config.ConfigUtils;
+import cn.muziseo.common.cache.dict.DictUtils;
+import cn.muziseo.common.core.constant.ConfigConstants;
+import cn.muziseo.common.core.constant.DictConstants;
+import cn.muziseo.service.demo.module.demo.controller.vo.DemoDictVO;
 import cn.muziseo.service.demo.module.demo.controller.vo.DemoVO;
 import cn.muziseo.service.demo.module.demo.service.DemoService;
 import cn.muziseo.service.system.module.auth.api.UserApi;
@@ -44,6 +49,15 @@ public class DemoFeatureController {
     @GetMapping("/exception")
     public ResponseDTO<Void> exceptionTest() {
         throw new BusinessException(DemoErrorCode.CUSTOM_DEMO_ERROR);
+    }
+
+    @Operation(summary = "测试系统制造的异常拦截 (自动记录日志)")
+    @GetMapping("/sys-exception")
+    public ResponseDTO<Void> sysExceptionTest() {
+        throw new cn.muziseo.common.core.exception.ServiceException(
+                cn.muziseo.common.core.exception.errorCode.SystemErrorCode.INTERNAL_ERROR,
+                "演示系统致命异常上报！"
+        );
     }
 
     @Operation(summary = "测试缓存获取 (Spring Cache)")
@@ -101,5 +115,29 @@ public class DemoFeatureController {
     public ResponseDTO<Void> pushToUser(@RequestParam Long userId, @RequestParam String title, @RequestParam String message) {
         WebSocketUtils.pushNotification(userId, title, message);
         return ResponseDTO.success();
+    }
+
+    @Operation(summary = "演示在demo服务中使用字典与系统参数")
+    @GetMapping("/dict-system-demo")
+    public ResponseDTO<DemoDictVO> dictSystemDemo(
+            @RequestParam(required = false, defaultValue = "1") Integer sex,
+            @RequestParam(required = false, defaultValue = "0") String status) {
+        DemoDictVO vo = new DemoDictVO();
+        vo.setSex(sex);
+        vo.setStatus(status);
+
+        // 演示一：通过 ConfigUtils 获取系统参数配置
+        boolean captchaEnabled = ConfigUtils.getBoolean(ConfigConstants.CAPTCHA_ENABLED, true);
+        String defaultPassword = ConfigUtils.getString(ConfigConstants.USER_DEFAULT_PASSWORD, "123456");
+        vo.setCaptchaEnabled(captchaEnabled);
+        vo.setDefaultPassword(defaultPassword);
+
+        // 演示二：手动使用 DictUtils 翻译字典
+        String manualLabel = DictUtils.getDictLabel(DictConstants.SYS_USER_SEX, sex);
+        vo.setManualSexLabel(manualLabel);
+
+        // 演示三：通过在 DemoDictVO 的属性上使用 @Dict 注解实现自动拦截翻译。
+        // （返回值是 ResponseDTO 且 VO 中含有 @Dict 标注的字段，DictTranslationAdvice 会在返回时拦截并自动填充翻译字段）
+        return ResponseDTO.success(vo);
     }
 }

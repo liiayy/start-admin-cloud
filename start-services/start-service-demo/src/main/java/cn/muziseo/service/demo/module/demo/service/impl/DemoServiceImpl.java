@@ -13,6 +13,8 @@ import cn.muziseo.service.demo.module.demo.repository.entity.DemoEntity;
 import cn.muziseo.service.demo.module.demo.service.DemoService;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
+import cn.muziseo.common.core.datatracer.DataTracerTypeEnum;
+import cn.muziseo.common.log.utils.DataTracerUtils;
 import cn.muziseo.service.system.module.auth.api.UserApi;
 import io.seata.spring.annotation.GlobalTransactional;
 import jakarta.annotation.Resource;
@@ -82,7 +84,10 @@ public class DemoServiceImpl implements DemoService {
         }
         DemoEntity entity = demoConverter.toEntity(request);
         demoManager.save(entity);
-    }
+        
+        // 记录数据新增变更记录
+        DataTracerUtils.insert(entity.getId(), DataTracerTypeEnum.DEMO);
+     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -94,8 +99,15 @@ public class DemoServiceImpl implements DemoService {
         if (demoManager.existsByName(request.getName(), id)) {
             throw new BusinessException(DemoErrorCode.DEMO_NAME_EXISTS);
         }
+        
+        // 备份旧实体，用于变更差异比对
+        DemoEntity oldEntity = cn.hutool.core.bean.BeanUtil.toBean(entity, DemoEntity.class);
+        
         entity.setName(request.getName());
         demoManager.updateById(entity);
+        
+        // 比对并记录数据更新变更记录
+        DataTracerUtils.update(id, DataTracerTypeEnum.DEMO, oldEntity, entity);
     }
 
     @Override
@@ -106,6 +118,9 @@ public class DemoServiceImpl implements DemoService {
             throw new BusinessException(DemoErrorCode.DEMO_NOT_EXISTS);
         }
         demoManager.removeById(id);
+        
+        // 记录数据删除变更记录
+        DataTracerUtils.delete(id, DataTracerTypeEnum.DEMO);
     }
 
     @Override

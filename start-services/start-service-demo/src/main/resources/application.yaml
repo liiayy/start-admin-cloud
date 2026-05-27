@@ -18,6 +18,16 @@ spring:
     virtual:
       enabled: true
 
+seata:
+  client:
+    undo:
+      log-serialization: fastjson
+start:
+  log:
+    remote:
+      enabled: true
+
+
 # ===================================================================
 # 接口文档配置
 # ===================================================================

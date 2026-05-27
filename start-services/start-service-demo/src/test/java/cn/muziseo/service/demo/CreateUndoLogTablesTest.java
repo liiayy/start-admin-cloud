@@ -16,8 +16,8 @@ public class CreateUndoLogTablesTest {
                 "    context       VARCHAR(128) NOT NULL,\n" +
                 "    rollback_info BYTEA        NOT NULL,\n" +
                 "    log_status    INT          NOT NULL,\n" +
-                "    log_created   TIMESTAMP(6) NOT NULL,\n" +
-                "    log_modified  TIMESTAMP(6) NOT NULL,\n" +
+                "    log_created   timestamp(0) NOT NULL,\n" +
+                "    log_modified  timestamp(0) NOT NULL,\n" +
                 "    CONSTRAINT pk_undo_log PRIMARY KEY (id),\n" +
                 "    CONSTRAINT ux_undo_log UNIQUE (xid, branch_id)\n" +
                 ");\n" +

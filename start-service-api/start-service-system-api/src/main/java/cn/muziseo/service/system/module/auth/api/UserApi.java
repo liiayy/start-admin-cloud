@@ -4,6 +4,7 @@ import cn.muziseo.service.system.constants.ApiConstants;
 import cn.muziseo.service.system.module.auth.api.dto.UserRemoteDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -44,4 +45,13 @@ public interface UserApi {
      */
     @GetMapping(PREFIX + "/get-by-username")
     UserRemoteDTO getUserByUsername(@RequestParam("username") String username);
+
+    /**
+     * 更新用户昵称
+     *
+     * @param id 用户ID
+     * @param nickname 昵称
+     */
+    @PostMapping(PREFIX + "/update-nickname")
+    void updateNickname(@RequestParam("id") Long id, @RequestParam("nickname") String nickname);
 }

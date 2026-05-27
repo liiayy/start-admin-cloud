@@ -47,4 +47,13 @@ public class UserApiImpl implements UserApi {
         UserEntity user = userManager.getByUsername(username);
         return user != null ? userConverter.toRemoteDTO(user) : null;
     }
+
+    @Override
+    public void updateNickname(Long id, String nickname) {
+        UserEntity user = userManager.getById(id);
+        if (user != null) {
+            user.setNickname(nickname);
+            userManager.updateById(user);
+        }
+    }
 }

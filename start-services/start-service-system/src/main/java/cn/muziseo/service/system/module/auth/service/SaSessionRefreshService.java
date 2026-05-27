@@ -109,8 +109,10 @@ public class SaSessionRefreshService {
         // 补存用户信息
         UserEntity user = userService.getUserById(userId);
         if (user != null) {
-            // 存入整个对象（供 system 服务内部使用）
-            session.set(SaSessionConstants.USER, user);
+            // 存入整个对象（转换成 Map 存入并排除敏感信息，避免跨服务反序列化时 ClassNotFound 异常）
+            java.util.Map<String, Object> userMap = cn.hutool.core.bean.BeanUtil.beanToMap(user, false, true);
+            userMap.remove("password");
+            session.set(SaSessionConstants.USER, userMap);
             // 存入纯文本用户名（供 common 模块跨服务使用）
             session.set(SaSessionConstants.USERNAME, user.getUsername());
         }

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.muziseo</groupId>
+        <artifactId>start-services</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>start-service-demo</artifactId>
+    <description>
+        demo 模块，用于演示系统提供的基座和基础能力。
+    </description>
+
+    <properties>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- Nacos Discovery -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- Nacos Config -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <!-- Commons modules -->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-env</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-db</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-cache</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-satoken</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-satoken-integration</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-websocket</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-log</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+
+        <!-- Feign Client and loadbalancer (if calling other services) -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
+        <!-- System Service RPC API -->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-service-system-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- Seata Distributed Transaction -->
+        <dependency>
+            <groupId>cn.muziseo</groupId>
+            <artifactId>start-common-seata</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

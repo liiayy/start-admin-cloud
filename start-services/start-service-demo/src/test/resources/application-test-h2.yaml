@@ -1,0 +1,46 @@
+spring:
+  # 禁用 Nacos 配置导入
+  config:
+    import: []
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+  # H2 内存数据库
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=FALSE
+    username: sa
+    password:
+    type: com.alibaba.druid.pool.DruidDataSource
+  # Redis（连接 Embedded Redis）
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 16379
+      password: 123456
+  # 允许缓存空值，防止缓存穿透
+  cache:
+    redis:
+      cache-null-values: true
+
+# MyBatis-Flex
+mybatis-flex:
+  mapper-locations: classpath*:mapper/**/*.xml
+  global-config:
+    key-config:
+      key-type: generator
+      value: snowFlakeId
+    logic-delete-column: deleted
+    normal-value-of-logic-delete: false
+    deleted-value-of-logic-delete: true
+
+# 禁用 Seata
+seata:
+  enabled: false
+
+# Sa-Token
+sa-token:
+  jwt-secret-key: test-secret-key-for-unit-testing-only

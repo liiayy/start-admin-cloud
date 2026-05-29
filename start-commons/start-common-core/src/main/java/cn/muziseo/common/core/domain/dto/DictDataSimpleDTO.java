@@ -22,6 +22,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class DictDataSimpleDTO implements Serializable {
 
+    /** 字典ID */
+    private Long id;
+
     /** 字典标签 */
     private String label;
 
@@ -30,6 +33,9 @@ public class DictDataSimpleDTO implements Serializable {
 
     /** 字典类型 */
     private String dictType;
+
+    /** 状态（0正常 1停用） */
+    private Integer status;
 
     /** 颜色类型（如 primary, success, danger, info, warning） */
     private String colorType;

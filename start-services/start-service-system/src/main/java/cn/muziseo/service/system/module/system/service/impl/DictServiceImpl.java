@@ -121,6 +121,7 @@ public class DictServiceImpl implements DictService {
 
         // 清除该字典类型的二级缓存
         DictCacheManager.evictCache(request.getDictType());
+        publishDictUpdate(request.getDictType());
         log.info("新增字典数据成功: id={}, type={}", entity.getId(), entity.getDictType());
     }
 
@@ -151,8 +152,10 @@ public class DictServiceImpl implements DictService {
 
         // 清除该字典类型的二级缓存（如果类型变了，两个都清）
         DictCacheManager.evictCache(existing.getDictType());
+        publishDictUpdate(existing.getDictType());
         if (!existing.getDictType().equals(request.getDictType())) {
             DictCacheManager.evictCache(request.getDictType());
+            publishDictUpdate(request.getDictType());
         }
         log.info("更新字典数据成功: id={}", id);
     }
@@ -178,6 +181,28 @@ public class DictServiceImpl implements DictService {
 
         // 清除该字典类型的二级缓存
         DictCacheManager.evictCache(existing.getDictType());
+        publishDictUpdate(existing.getDictType());
         log.info("删除字典数据成功: id={}", id);
+    }
+
+    /**
+     * 通过 WebSocket 广播字典变更通知给所有在线用户
+     */
+    private void publishDictUpdate(String dictType) {
+        try {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("type", "dict_update");
+            
+            java.util.Map<String, Object> data = new java.util.HashMap<>();
+            data.put("dictType", dictType);
+            map.put("data", data);
+            map.put("timestamp", System.currentTimeMillis());
+
+            String payload = cn.hutool.json.JSONUtil.toJsonStr(map);
+            cn.muziseo.common.websocket.utils.WebSocketUtils.publishAll(payload);
+            log.info("[WebSocket] 已广播字典[{}]变更消息", dictType);
+        } catch (Exception e) {
+            log.error("[WebSocket] 广播字典[{}]变更消息失败", dictType, e);
+        }
     }
 }

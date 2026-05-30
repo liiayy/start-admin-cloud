@@ -11,6 +11,7 @@ import cn.muziseo.service.demo.module.demo.controller.request.DemoPageRequest;
 import cn.muziseo.service.demo.module.demo.controller.vo.DemoVO;
 import cn.muziseo.service.demo.module.demo.manager.DemoManager;
 import cn.muziseo.service.demo.module.demo.repository.entity.DemoEntity;
+import cn.muziseo.service.demo.constant.DemoLockConstants;
 import cn.muziseo.service.system.module.auth.api.UserApi;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -310,7 +311,7 @@ class DemoServiceImplTest {
         void executeWithLock_success_returnsSuccessMessage() throws InterruptedException {
             // Given
             RLock mockLock = mock(RLock.class);
-            when(redissonClient.getLock("demo:lock:resource_key")).thenReturn(mockLock);
+            when(redissonClient.getLock(DemoLockConstants.DEMO_LOCK_PREFIX + "resource_key")).thenReturn(mockLock);
             when(mockLock.tryLock(0, 5, TimeUnit.SECONDS)).thenReturn(true);
             when(mockLock.isHeldByCurrentThread()).thenReturn(true);
 
@@ -330,7 +331,7 @@ class DemoServiceImplTest {
         void executeWithLock_failedToAcquire_throwsBusinessException() throws InterruptedException {
             // Given
             RLock mockLock = mock(RLock.class);
-            when(redissonClient.getLock("demo:lock:resource_key")).thenReturn(mockLock);
+            when(redissonClient.getLock(DemoLockConstants.DEMO_LOCK_PREFIX + "resource_key")).thenReturn(mockLock);
             when(mockLock.tryLock(0, 5, TimeUnit.SECONDS)).thenReturn(false);
 
             // When & Then

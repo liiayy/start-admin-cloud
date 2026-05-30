@@ -6,6 +6,7 @@ import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldIgnore;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
 import cn.muziseo.common.db.entity.BaseEntity;
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
 
@@ -29,7 +30,7 @@ public class DictEntity extends BaseEntity {
     /**
      * 字典ID
      */
-    @Id
+    @Id(keyType = KeyType.Generator, value = "snowFlakeId")
     private Long id;
 
     /**

@@ -6,6 +6,7 @@ import cn.muziseo.common.core.constant.DictConstants;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldDict;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
 
@@ -32,7 +33,7 @@ public class PostEntity extends BaseEntity {
     /**
      * 岗位ID
      */
-    @Id
+    @Id(keyType = KeyType.Generator, value = "snowFlakeId")
     private Long id;
 
     /**

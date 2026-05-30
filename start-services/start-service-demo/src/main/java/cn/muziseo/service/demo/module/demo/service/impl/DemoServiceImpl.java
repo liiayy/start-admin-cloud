@@ -1,6 +1,7 @@
 package cn.muziseo.service.demo.module.demo.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.muziseo.service.demo.constant.DemoLockConstants;
 import cn.muziseo.common.core.exception.BusinessException;
 import cn.muziseo.common.db.page.PageResponse;
 import cn.muziseo.service.demo.enums.DemoErrorCode;
@@ -138,7 +139,7 @@ public class DemoServiceImpl implements DemoService {
 
     @Override
     public String executeWithLock(String lockKey) {
-        String key = "demo:lock:" + lockKey;
+        String key = DemoLockConstants.DEMO_LOCK_PREFIX + lockKey;
         RLock lock = redissonClient.getLock(key);
         try {
             // 尝试获取锁，等待0秒，锁定5秒

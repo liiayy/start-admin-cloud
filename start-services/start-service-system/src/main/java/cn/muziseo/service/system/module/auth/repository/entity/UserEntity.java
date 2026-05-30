@@ -9,6 +9,7 @@ import cn.muziseo.common.db.entity.BaseEntity;
 import cn.muziseo.common.db.handler.BigIntArrayTypeHandler;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
 
@@ -38,7 +39,7 @@ public class UserEntity extends BaseEntity {
     /**
      * 用户ID
      */
-    @Id
+    @Id(keyType = KeyType.Generator, value = "snowFlakeId")
     @DataColumn(DataColumn.DataType.USER)
     private Long id;
 

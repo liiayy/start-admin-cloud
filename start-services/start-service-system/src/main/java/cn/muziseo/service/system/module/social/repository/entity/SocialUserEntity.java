@@ -2,6 +2,7 @@ package cn.muziseo.service.system.module.social.repository.entity;
 
 import cn.muziseo.common.db.entity.BaseEntity;
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
 
@@ -24,7 +25,7 @@ public class SocialUserEntity extends BaseEntity {
     /**
      * 主键
      */
-    @Id
+    @Id(keyType = KeyType.Generator, value = "snowFlakeId")
     private Long id;
 
     /**

@@ -3,6 +3,7 @@ package cn.muziseo.service.system.module.permission.repository.entity;
 import cn.muziseo.common.db.entity.BaseEntity;
 import cn.muziseo.common.core.constant.DictConstants;
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
@@ -31,7 +32,7 @@ public class RoleEntity extends BaseEntity {
     /**
      * 角色ID
      */
-    @Id
+    @Id(keyType = KeyType.Generator, value = "snowFlakeId")
     private Long id;
 
     /**

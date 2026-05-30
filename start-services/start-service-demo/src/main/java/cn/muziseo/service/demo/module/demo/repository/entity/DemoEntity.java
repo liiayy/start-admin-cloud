@@ -3,6 +3,7 @@ package cn.muziseo.service.demo.module.demo.repository.entity;
 import cn.muziseo.common.core.datatracer.annotation.DataTracerFieldLabel;
 import cn.muziseo.common.db.entity.BaseEntity;
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
 
@@ -18,12 +19,13 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("all")
 public class DemoEntity extends BaseEntity {
 
     /**
      * ID 主键
      */
-    @Id
+    @Id(keyType = KeyType.Generator, value = "snowFlakeId")
     private Long id;
 
     /**
